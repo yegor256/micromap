@@ -48,6 +48,15 @@ impl<K, V> Pair<K, V> {
 use anyhow::Result;
 
 #[test]
-fn boom() -> Result<()> {
+fn makes_absent_and_checks() -> Result<()> {
+    let p: Pair<u8, u8> = Pair::Absent;
+    assert!(!p.is_some());
+    Ok(())
+}
+
+#[test]
+fn makes_present_and_checks() -> Result<()> {
+    let p = Pair::Present((1, 2));
+    assert!(p.is_some());
     Ok(())
 }
