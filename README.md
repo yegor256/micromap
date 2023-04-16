@@ -13,6 +13,10 @@ for very small maps. It is also faster than
 performance. When the map is larger than 50, it is better to use standard 
 [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html).
 
+**WELCOME**: 
+Not all functions that a user expects to have in a map are implemented. 
+I will appreciate if you contribute by implementing these missing functions.
+
 Here is how you use it:
 
 ```rust
@@ -27,7 +31,9 @@ Pay attention, here the map is created with an extra generic argument `10`. This
 the total size of the map, which is allocated on stack when `::new()` is called. 
 Unlike `HashMap`, the `Map` doesn't use heap at all.
 
-Read [the documentation](https://docs.rs/micromap/latest/micromap/).
+Read [the API documentation](https://docs.rs/micromap/latest/micromap/). Important to notice
+that signatures of some functions are different from `HashMap`, for example `remove()` and
+`insert()` expect arguments to be passes by-value instead of by-reference.
 
 ## How to Contribute
 
