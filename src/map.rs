@@ -285,6 +285,41 @@ fn insert_and_gets_mut() -> Result<()> {
     Ok(())
 }
 
+#[test]
+fn checks_key() -> Result<()> {
+    let mut m: Map<&str, i32, 10> = Map::new();
+    m.insert("one", 42);
+    assert!(m.contains_key("one"));
+    assert!(!m.contains_key("another"));
+    Ok(())
+}
+
+#[test]
+fn gets_missing_key() -> Result<()> {
+    let mut m: Map<&str, i32, 10> = Map::new();
+    m.insert("one", 42);
+    assert!(m.get("two").is_none());
+    Ok(())
+}
+
+#[test]
+fn mut_gets_missing_key() -> Result<()> {
+    let mut m: Map<&str, i32, 10> = Map::new();
+    m.insert("one", 42);
+    assert!(m.get_mut("two").is_none());
+    Ok(())
+}
+
+#[test]
+fn removes_simple_pair() -> Result<()> {
+    let mut m: Map<&str, i32, 10> = Map::new();
+    m.insert("one", 42);
+    m.remove("one");
+    m.remove("another");
+    assert!(m.get("one").is_none());
+    Ok(())
+}
+
 #[cfg(test)]
 #[derive(Clone)]
 struct Foo {
