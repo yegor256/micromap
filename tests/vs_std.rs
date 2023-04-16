@@ -56,7 +56,7 @@ pub fn with_micromap(total: usize) -> i64 {
 
 #[test]
 pub fn main() {
-    let total = 100000;
+    let total = 1000000;
     let start1 = Instant::now();
     let s1 = with_std(total);
     let e1 = start1.elapsed();

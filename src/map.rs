@@ -56,7 +56,7 @@ impl<'a, K: Clone, V: Clone, const N: usize> Iterator for IntoIter<'a, K, V, N> 
     }
 }
 
-impl<'a, K: Copy + PartialEq, V: Clone, const N: usize> IntoIterator for &'a Map<K, V, N> {
+impl<'a, K: Copy + PartialEq, V: Clone + Copy, const N: usize> IntoIterator for &'a Map<K, V, N> {
     type Item = (K, V);
     type IntoIter = IntoIter<'a, K, V, N>;
 
@@ -69,19 +69,19 @@ impl<'a, K: Copy + PartialEq, V: Clone, const N: usize> IntoIterator for &'a Map
     }
 }
 
-impl<K: Copy + PartialEq, V: Clone, const N: usize> Default for Map<K, V, N> {
+impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Default for Map<K, V, N> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<K: Copy + PartialEq, V: Clone, const N: usize> Map<K, V, N> {
+impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
     /// Make it.
     #[inline]
     #[must_use]
     pub fn new() -> Self {
         Self {
-            pairs: [(); N].map(|_| Pair::<K, V>::default()),
+            pairs: [Pair::<K, V>::default(); N],
         }
     }
 
@@ -321,22 +321,22 @@ fn removes_simple_pair() -> Result<()> {
 }
 
 #[cfg(test)]
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 struct Foo {
-    v: Vec<u32>,
+    v: [u32; 3],
 }
 
 #[test]
 fn insert_struct() -> Result<()> {
     let mut m: Map<u8, Foo, 8> = Map::new();
-    let foo = Foo { v: vec![1, 2, 100] };
+    let foo = Foo { v: [1, 2, 100] };
     m.insert(1, foo);
     assert_eq!(100, m.into_iter().next().unwrap().1.v[2]);
     Ok(())
 }
 
 #[cfg(test)]
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 struct Composite {
     r: Map<u8, u8, 1>,
 }
@@ -350,7 +350,7 @@ fn insert_composite() -> Result<()> {
     Ok(())
 }
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 struct Bar {}
 
 #[test]
