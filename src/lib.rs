@@ -39,26 +39,33 @@ mod serialization;
 mod pair;
 mod map;
 
-/// Item in the Map.
+/// A pair in the Map.
 #[derive(Clone)]
 enum Pair<K, V> {
     Present((K, V)),
     Absent,
 }
 
-/// Memory structure for edges.
+/// A faster alternative of `HashMap`.
+///
+/// It is faster because it doesn't use a hash function at all. It simply keeps
+/// all pairs in an array and when it's necessary to find a value, it goes through
+/// all pairs comparing the needle with each one available. Also it is faster
+/// because it doesn't use heap. When a `Map` is created it allocated the necessary
+/// space on stack. That's why the maximum size of the map must be provided in
+/// compile time.
 #[derive(Clone)]
 pub struct Map<K: Copy + PartialEq, V: Clone, const N: usize> {
     pairs: [Pair<K, V>; N],
 }
 
-/// Iterator over Map.
+/// Iterator over the `Map`.
 pub struct MapIter<'a, K, V, const N: usize> {
     pos: usize,
     pairs: &'a [Pair<K, V>; N],
 }
 
-/// Iterator over Map.
+/// Into-iterator over the `Map`.
 pub struct MapIntoIter<'a, K, V, const N: usize> {
     pos: usize,
     pairs: &'a [Pair<K, V>; N],

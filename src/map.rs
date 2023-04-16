@@ -77,6 +77,7 @@ impl<K: Copy + PartialEq, V: Clone, const N: usize> Default for Map<K, V, N> {
 
 impl<K: Copy + PartialEq, V: Clone, const N: usize> Map<K, V, N> {
     /// Make it.
+    #[inline]
     #[must_use]
     pub fn new() -> Self {
         Self {
@@ -164,7 +165,7 @@ impl<K: Copy + PartialEq, V: Clone, const N: usize> Map<K, V, N> {
                 return;
             }
         }
-        panic!("Out of space!")
+        panic!("There are only {N} pairs available in the map and all of them are already occupied")
     }
 
     /// Get a reference to a single value.
