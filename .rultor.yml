@@ -1,0 +1,24 @@
+docker:
+  image: yegor256/rultor-image:1.18.0
+assets:
+  credentials: yegor256/objectionary-secrets#crates-credentials
+install: |
+  pdd --file=/dev/null
+merge:
+  script: |
+    cargo --color=never test -vv
+    cargo --color=never fmt --check
+    cargo doc --no-deps
+    cargo clippy
+release:
+  script: |-
+    [[ "${tag}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || exit -1
+    sed -i -e "s/^version = \"0.0.0\"/version = \"${tag}\"/" Cargo.toml
+    sed -i -e "s/0.0.0/${tag}/" src/lib.rs
+    cargo --color=never test -vv -- --nocapture
+    cargo --color=never test --features sober -vv -- --nocapture
+    cargo --color=never fmt --check
+    cargo --color=never clippy -- --no-deps
+    git commit -am "${tag}"
+    mkdir -p ~/.cargo && cp ../credentials ~/.cargo
+    cargo --color=never publish

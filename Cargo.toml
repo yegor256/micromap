@@ -1,0 +1,21 @@
+[package]
+name = "micromap"
+version = "0.0.0"
+edition = "2021"
+repository = "https://github.com/objectionary/micromap"
+description = "A faster alternative to HashMap for super small maps"
+readme = "README.md"
+license-file = "LICENSE.txt"
+homepage = "https://github.com/objectionary/micromap"
+keywords = ["memory"]
+categories = ["data-structures", "memory-management"]
+
+[dependencies]
+anyhow = "1.0.70"
+serde = { version = "1.0.159", features = ["derive"] }
+
+[dev-dependencies]
+bincode = "1.3.3"
+simple_logger = "4.1.0"
+log = "0.4.17"
+ctor = "0.2.0"
