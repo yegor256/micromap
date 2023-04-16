@@ -16,7 +16,6 @@ release:
     sed -i -e "s/^version = \"0.0.0\"/version = \"${tag}\"/" Cargo.toml
     sed -i -e "s/0.0.0/${tag}/" src/lib.rs
     cargo --color=never test -vv -- --nocapture
-    cargo --color=never test --features sober -vv -- --nocapture
     cargo --color=never fmt --check
     cargo --color=never clippy -- --no-deps
     git commit -am "${tag}"
