@@ -7,7 +7,9 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/objectionary/micromap/blob/master/LICENSE.txt)
 [![docs.rs](https://img.shields.io/docsrs/micromap)](https://docs.rs/micromap/latest/micromap/)
 
-A faster alternative to Rust `HashMap`, for very small maps.
+At least **5x faster** alternative of `HashMap`, for very small maps.
+
+Here is how you use it:
 
 ```rust
 use micromap::Map;
