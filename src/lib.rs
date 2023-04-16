@@ -35,9 +35,9 @@
 #![allow(clippy::multiple_inherent_impl)]
 #![allow(clippy::multiple_crate_versions)]
 
-mod serialization;
-mod pair;
 mod map;
+mod pair;
+mod serialization;
 
 /// A pair in the Map.
 #[derive(Clone)]

@@ -19,7 +19,7 @@
 // SOFTWARE.
 
 use crate::Pair::{Absent, Present};
-use crate::{Map, MapIntoIter, Pair, MapIter};
+use crate::{Map, MapIntoIter, MapIter, Pair};
 
 impl<'a, K: Clone, V: Clone, const N: usize> Iterator for MapIter<'a, K, V, N> {
     type Item = (&'a K, &'a V);
@@ -151,7 +151,7 @@ impl<K: Copy + PartialEq, V: Clone, const N: usize> Map<K, V, N> {
         }
     }
 
-    /// Insert a single pair into it.
+    /// Insert a single pair into the map.
     ///
     /// # Panics
     ///

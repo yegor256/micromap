@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use crate::{Map};
+use crate::Map;
 use serde::de::{MapAccess, Visitor};
 use serde::ser::SerializeMap;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
@@ -89,4 +89,3 @@ fn serialize_and_deserialize() -> Result<()> {
     assert_eq!(42, after.into_iter().next().unwrap().1);
     Ok(())
 }
-

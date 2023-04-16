@@ -18,8 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+use crate::Pair;
 use crate::Pair::{Absent, Present};
-use crate::{Pair};
 
 impl<K, V> Default for Pair<K, V> {
     fn default() -> Self {
@@ -57,4 +57,3 @@ use anyhow::Result;
 fn boom() -> Result<()> {
     Ok(())
 }
-
