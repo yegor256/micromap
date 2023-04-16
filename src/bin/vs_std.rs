@@ -18,11 +18,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-/// Run this script like this:
-///
-/// ```text
-/// $ cargo build --release && ./target/release/vs_std
-/// ```
+// Run this script like this:
+//
+// ```text
+// $ cargo build --release && ./target/release/vs_std
+// ```
+
 use std::collections::HashMap;
 use std::time::Instant;
 
