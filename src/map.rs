@@ -19,9 +19,9 @@
 // SOFTWARE.
 
 use crate::Pair::{Absent, Present};
-use crate::{Map, MapIntoIter, MapIter, Pair};
+use crate::{IntoIter, Iter, Map, Pair};
 
-impl<'a, K: Clone, V: Clone, const N: usize> Iterator for MapIter<'a, K, V, N> {
+impl<'a, K: Clone, V: Clone, const N: usize> Iterator for Iter<'a, K, V, N> {
     type Item = (&'a K, &'a V);
 
     #[inline]
@@ -38,7 +38,7 @@ impl<'a, K: Clone, V: Clone, const N: usize> Iterator for MapIter<'a, K, V, N> {
     }
 }
 
-impl<'a, K: Clone, V: Clone, const N: usize> Iterator for MapIntoIter<'a, K, V, N> {
+impl<'a, K: Clone, V: Clone, const N: usize> Iterator for IntoIter<'a, K, V, N> {
     type Item = (K, V);
 
     #[inline]
@@ -58,11 +58,11 @@ impl<'a, K: Clone, V: Clone, const N: usize> Iterator for MapIntoIter<'a, K, V, 
 
 impl<'a, K: Copy + PartialEq, V: Clone, const N: usize> IntoIterator for &'a Map<K, V, N> {
     type Item = (K, V);
-    type IntoIter = MapIntoIter<'a, K, V, N>;
+    type IntoIter = IntoIter<'a, K, V, N>;
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter {
-        MapIntoIter {
+        IntoIter {
             pos: 0,
             pairs: &self.pairs,
         }
@@ -88,8 +88,8 @@ impl<K: Copy + PartialEq, V: Clone, const N: usize> Map<K, V, N> {
     /// Make an iterator over all pairs.
     #[inline]
     #[must_use]
-    pub const fn iter(&self) -> MapIter<K, V, N> {
-        MapIter {
+    pub const fn iter(&self) -> Iter<K, V, N> {
+        Iter {
             pos: 0,
             pairs: &self.pairs,
         }
@@ -98,8 +98,8 @@ impl<K: Copy + PartialEq, V: Clone, const N: usize> Map<K, V, N> {
     /// Make an iterator over all pairs.
     #[inline]
     #[must_use]
-    pub const fn into_iter(&self) -> MapIntoIter<K, V, N> {
-        MapIntoIter {
+    pub const fn into_iter(&self) -> IntoIter<K, V, N> {
+        IntoIter {
             pos: 0,
             pairs: &self.pairs,
         }
