@@ -7,7 +7,9 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/objectionary/micromap/blob/master/LICENSE.txt)
 [![docs.rs](https://img.shields.io/docsrs/micromap)](https://docs.rs/micromap/latest/micromap/)
 
-At least **5x faster** alternative of `HashMap`, for very small maps.
+At least **5x faster** alternative of `HashMap`, for very small maps. It is also faster than
+[FxHashMap](https://github.com/rust-lang/rustc-hash),
+[ArrayMap](https://github.com/robjtede/tinymap).
 
 Here is how you use it:
 
