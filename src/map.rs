@@ -125,7 +125,7 @@ impl<K: Copy + PartialEq, V: Clone, const N: usize> Map<K, V, N> {
         busy
     }
 
-    /// Contains this key?
+    /// Does the map contain this key?
     #[inline]
     pub fn contains_key(&self, k: K) -> bool {
         for i in 0..N {
@@ -155,7 +155,7 @@ impl<K: Copy + PartialEq, V: Clone, const N: usize> Map<K, V, N> {
     ///
     /// # Panics
     ///
-    /// It may panic if you attempt to insert too many pairs.
+    /// It may panic if there are too many pairs in the map already.
     #[inline]
     pub fn insert(&mut self, k: K, v: V) {
         self.remove(k);

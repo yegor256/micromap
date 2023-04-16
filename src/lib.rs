@@ -40,9 +40,10 @@ mod pair;
 mod serialization;
 
 /// A pair in the Map.
-#[derive(Clone)]
+#[derive(Clone, Default)]
 enum Pair<K, V> {
     Present((K, V)),
+    #[default]
     Absent,
 }
 

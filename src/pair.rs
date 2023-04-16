@@ -21,12 +21,6 @@
 use crate::Pair;
 use crate::Pair::{Absent, Present};
 
-impl<K, V> Default for Pair<K, V> {
-    fn default() -> Self {
-        Absent
-    }
-}
-
 impl<K, V> Pair<K, V> {
     pub(crate) const fn is_some(&self) -> bool {
         match self {
