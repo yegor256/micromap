@@ -32,10 +32,12 @@ pub fn with_std(total: usize) -> i64 {
     let mut sum = 0;
     for _ in 0..total {
         let mut m = HashMap::with_capacity(CAPACITY);
-        for i in 0..CAPACITY - 1 {
+        m.insert(0, 42);
+        for i in 1..CAPACITY - 1 {
             m.insert(i, i as i64);
+            m.remove(&i);
         }
-        sum += m.into_iter().find(|(_k, v)| *v == 1).unwrap().1
+        sum += m.into_iter().find(|(_k, v)| *v == 42).unwrap().1
     }
     std::hint::black_box(sum)
 }
@@ -44,10 +46,12 @@ pub fn with_micromap(total: usize) -> i64 {
     let mut sum = 0;
     for _ in 0..total {
         let mut m: micromap::Map<usize, i64, CAPACITY> = micromap::Map::new();
-        for i in 0..CAPACITY - 1 {
+        m.insert(0, 42);
+        for i in 1..CAPACITY - 1 {
             m.insert(i, i as i64);
+            m.remove(i);
         }
-        sum += m.into_iter().find(|(_k, v)| *v == 1).unwrap().1
+        sum += m.into_iter().find(|(_k, v)| *v == 42).unwrap().1
     }
     std::hint::black_box(sum)
 }
