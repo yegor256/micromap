@@ -6,9 +6,12 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/yegor256/micromap/blob/master/LICENSE.txt)
 [![docs.rs](https://img.shields.io/docsrs/micromap)](https://docs.rs/micromap/latest/micromap/)
 
-At least **5x faster** alternative of `HashMap`, for very small maps. It is also faster than
+At least **5x faster** alternative of [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html), 
+for very small maps. It is also faster than
 [FxHashMap](https://github.com/rust-lang/rustc-hash),
-[ArrayMap](https://github.com/robjtede/tinymap).
+[ArrayMap](https://github.com/robjtede/tinymap). The smaller the map, the higher the
+performance. When the map is larger than 50, it is better to use standard 
+[`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html).
 
 Here is how you use it:
 
@@ -19,6 +22,10 @@ m.insert(1, "foo");
 m.insert(2, "bar");
 assert_eq!(2, m.len());
 ```
+
+Pay attention, here the map is created with an extra generic argument `10`. This is 
+the total size of the map, which is allocated on stack when `::new()` is called. 
+Unlike `HashMap`, the `Map` doesn't use heap at all.
 
 Read [the documentation](https://docs.rs/micromap/latest/micromap/).
 
