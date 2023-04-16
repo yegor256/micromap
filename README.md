@@ -10,8 +10,8 @@
 A faster alternative to Rust `HashMap`, for very small maps.
 
 ```rust
-use micromap::MicroMap;
-let mut m : MicroMap<u64, &str, 10> = MicroMap::new();
+use micromap::Map;
+let mut m : Map<u64, &str, 10> = Map::new();
 m.insert(1, "foo");
 m.insert(2, "bar");
 assert_eq!(2, m.len());
