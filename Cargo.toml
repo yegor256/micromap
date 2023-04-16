@@ -2,11 +2,11 @@
 name = "micromap"
 version = "0.0.0"
 edition = "2021"
-repository = "https://github.com/objectionary/micromap"
+repository = "https://github.com/yegor256/micromap"
 description = "A faster alternative to HashMap for super small maps"
 readme = "README.md"
 license-file = "LICENSE.txt"
-homepage = "https://github.com/objectionary/micromap"
+homepage = "https://github.com/yegor256/micromap"
 keywords = ["memory"]
 categories = ["data-structures", "memory-management"]
 

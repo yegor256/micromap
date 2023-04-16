@@ -1,7 +1,7 @@
 docker:
   image: yegor256/rultor-image:1.18.0
 assets:
-  credentials: yegor256/objectionary-secrets#crates-credentials
+  credentials: yegor256/yegor256-secrets#crates-credentials
 install: |
   pdd --file=/dev/null
 merge:
