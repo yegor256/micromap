@@ -18,11 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// Run this script like this:
-//
-// ```text
-// $ cargo build --release && ./target/release/vs_std
-// ```
+// In order to run this single test:
+// $ cargo test --test vs_std -- --nocapture
 
 use std::collections::HashMap;
 use std::time::Instant;
@@ -57,8 +54,9 @@ pub fn with_micromap(total: usize) -> i64 {
     std::hint::black_box(sum)
 }
 
-fn main() {
-    let total = 4000000;
+#[test]
+pub fn main() {
+    let total = 100000;
     let start1 = Instant::now();
     let s1 = with_std(total);
     let e1 = start1.elapsed();
