@@ -20,6 +20,7 @@
 
 use crate::Pair::{Absent, Present};
 use crate::{IntoIter, Iter, Map, Pair};
+use std::mem::MaybeUninit;
 
 impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Default for Map<K, V, N> {
     fn default() -> Self {
@@ -34,7 +35,7 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
     pub fn new() -> Self {
         Self {
             next: 0,
-            pairs: [Pair::<K, V>::default(); N],
+            pairs: unsafe { *MaybeUninit::<[Pair<K, V>; N]>::uninit().as_mut_ptr() },
         }
     }
 
