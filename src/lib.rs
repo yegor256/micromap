@@ -42,7 +42,7 @@ mod pair;
 mod serialization;
 
 /// A pair in the Map.
-#[derive(Clone, Default, Copy)]
+#[derive(Clone, Default, Copy, Eq, PartialEq)]
 enum Pair<K, V> {
     Present((K, V)),
     #[default]
@@ -57,7 +57,7 @@ enum Pair<K, V> {
 /// because it doesn't use heap. When a `Map` is being created, it allocates the necessary
 /// space on stack. That's why the maximum size of the map must be provided in
 /// compile time.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Eq, PartialEq)]
 pub struct Map<K: Copy + PartialEq, V: Clone + Copy, const N: usize> {
     next: usize,
     pairs: [Pair<K, V>; N],

@@ -24,7 +24,7 @@ Here is how you use it:
 
 ```rust
 use micromap::Map;
-let mut m : Map<u64, &str, 10> = Map::new();
+let mut m : Map<u64, &str, 10> = Map::new(); // allocation on stack
 m.insert(1, "foo");
 m.insert(2, "bar");
 assert_eq!(2, m.len());
