@@ -11,7 +11,8 @@ for very small maps. It is also faster than
 [FxHashMap](https://github.com/rust-lang/rustc-hash),
 [ArrayMap](https://github.com/robjtede/tinymap). The smaller the map, the higher the
 performance. When the map is larger than 50, it is better to use standard 
-[`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html).
+[`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html), since
+the performance of `micromap::Map` _may_ start to degrade.
 
 The only important restriction is that both key and value must implement the `Copy` trait.
 
