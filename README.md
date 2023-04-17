@@ -8,7 +8,8 @@
 
 At least **5x faster** alternative of [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html), 
 for very small maps. It is also faster than
-[FxHashMap](https://github.com/rust-lang/rustc-hash) 
+[FxHashMap](https://github.com/rust-lang/rustc-hash),
+[Hashbrown](https://github.com/rust-lang/hashbrown),
 and
 [ArrayMap](https://github.com/robjtede/tinymap). 
 The smaller the map, the higher the
