@@ -198,6 +198,8 @@ impl<K: Copy + PartialEq, V: Copy + PartialEq, const N: usize> PartialEq for Map
     }
 }
 
+impl<K: Copy + Eq, V: Copy + Eq, const N: usize> Eq for Map<K, V, N> {}
+
 #[cfg(test)]
 use anyhow::Result;
 
