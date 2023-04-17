@@ -21,61 +21,6 @@
 use crate::Pair::{Absent, Present};
 use crate::{IntoIter, Iter, Map, Pair};
 
-impl<'a, K: Clone, V: Clone, const N: usize> Iterator for Iter<'a, K, V, N> {
-    type Item = (&'a K, &'a V);
-
-    #[inline]
-    #[must_use]
-    fn next(&mut self) -> Option<Self::Item> {
-        while self.pos < N {
-            if self.next <= self.pos {
-                break;
-            }
-            if let Present(p) = &self.pairs[self.pos] {
-                self.pos += 1;
-                return Some((&p.0, &p.1));
-            }
-            self.pos += 1;
-        }
-        None
-    }
-}
-
-impl<'a, K: Clone, V: Clone, const N: usize> Iterator for IntoIter<'a, K, V, N> {
-    type Item = (K, V);
-
-    #[inline]
-    #[must_use]
-    fn next(&mut self) -> Option<Self::Item> {
-        while self.pos < N {
-            if self.next <= self.pos {
-                break;
-            }
-            if self.pairs[self.pos].is_some() {
-                let pair = self.pairs[self.pos].clone().unwrap();
-                self.pos += 1;
-                return Some(pair);
-            }
-            self.pos += 1;
-        }
-        None
-    }
-}
-
-impl<'a, K: Copy + PartialEq, V: Clone + Copy, const N: usize> IntoIterator for &'a Map<K, V, N> {
-    type Item = (K, V);
-    type IntoIter = IntoIter<'a, K, V, N>;
-
-    #[inline]
-    fn into_iter(self) -> Self::IntoIter {
-        IntoIter {
-            next: self.next,
-            pos: 0,
-            pairs: &self.pairs,
-        }
-    }
-}
-
 impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Default for Map<K, V, N> {
     fn default() -> Self {
         Self::new()
@@ -256,49 +201,6 @@ fn insert_and_check_length() -> Result<()> {
 fn empty_length() -> Result<()> {
     let m: Map<u32, u32, 10> = Map::new();
     assert_eq!(0, m.len());
-    Ok(())
-}
-
-#[test]
-fn empty_iterator() -> Result<()> {
-    let m: Map<u32, u32, 4> = Map::new();
-    assert!(m.into_iter().next().is_none());
-    Ok(())
-}
-
-#[test]
-fn insert_and_jump_over_next() -> Result<()> {
-    let mut m: Map<&str, i32, 10> = Map::new();
-    m.insert("foo", 42);
-    let mut iter = m.into_iter();
-    assert_eq!(42, iter.next().unwrap().1);
-    assert!(iter.next().is_none());
-    Ok(())
-}
-
-#[test]
-fn insert_and_iterate() -> Result<()> {
-    let mut m: Map<&str, i32, 10> = Map::new();
-    m.insert("one", 42);
-    m.insert("two", 16);
-    let mut sum = 0;
-    for (_k, v) in m.iter() {
-        sum += v;
-    }
-    assert_eq!(58, sum);
-    Ok(())
-}
-
-#[test]
-fn insert_and_into_iterate() -> Result<()> {
-    let mut m: Map<&str, i32, 10> = Map::new();
-    m.insert("one", 42);
-    m.insert("two", 16);
-    let mut sum = 0;
-    for (_k, v) in m.into_iter() {
-        sum += v;
-    }
-    assert_eq!(58, sum);
     Ok(())
 }
 
