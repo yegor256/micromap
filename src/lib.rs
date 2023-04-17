@@ -35,6 +35,7 @@
 #![allow(clippy::multiple_inherent_impl)]
 #![allow(clippy::multiple_crate_versions)]
 
+mod debug;
 mod iterators;
 mod map;
 mod pair;
