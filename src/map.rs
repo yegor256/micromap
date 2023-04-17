@@ -105,13 +105,13 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
 
     /// Remove by key.
     #[inline]
-    pub fn remove(&mut self, k: K) {
+    pub fn remove(&mut self, k: &K) {
         for i in 0..N {
             if self.next <= i {
                 break;
             }
             if let Present((bk, _bv)) = &self.pairs[i] {
-                if *bk == k {
+                if bk == k {
                     self.pairs[i] = Absent;
                     break;
                 }
@@ -126,7 +126,7 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
     /// It may panic if there are too many pairs in the map already.
     #[inline]
     pub fn insert(&mut self, k: K, v: V) {
-        self.remove(k);
+        self.remove(&k);
         for i in 0..N {
             if self.next <= i {
                 break;
@@ -253,8 +253,8 @@ fn mut_gets_missing_key() -> Result<()> {
 fn removes_simple_pair() -> Result<()> {
     let mut m: Map<&str, i32, 10> = Map::new();
     m.insert("one", 42);
-    m.remove("one");
-    m.remove("another");
+    m.remove(&"one");
+    m.remove(&"another");
     assert!(m.get("one").is_none());
     Ok(())
 }

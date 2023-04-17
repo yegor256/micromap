@@ -33,9 +33,9 @@ Pay attention, here the map is created with an extra generic argument `10`. This
 the total size of the map, which is allocated on stack when `::new()` is called. 
 Unlike `HashMap`, the `Map` doesn't use heap at all.
 
-Read [the API documentation](https://docs.rs/micromap/latest/micromap/). Important to notice
-that signatures of some functions are different from `HashMap`, for example `remove()` and
-`insert()` expect arguments to be passes by-value instead of by-reference.
+Read [the API documentation](https://docs.rs/micromap/latest/micromap/). The struct
+[`micromap::Map`](https://docs.rs/micromap/latest/micromap/struct.Map.html) is designed as closely similar to 
+[`std::collections::HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html) as possible.
 
 ## How to Contribute
 
