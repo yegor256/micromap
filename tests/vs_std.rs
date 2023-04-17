@@ -33,6 +33,7 @@ pub fn with_std(total: usize) -> i64 {
         m.insert(0, 42);
         for i in 1..CAPACITY - 1 {
             m.insert(i, i as i64);
+            m.get(&i);
             m.remove(&i);
         }
         sum += m.into_iter().find(|(_k, v)| *v == 42).unwrap().1
@@ -47,6 +48,7 @@ pub fn with_micromap(total: usize) -> i64 {
         m.insert(0, 42);
         for i in 1..CAPACITY - 1 {
             m.insert(i, i as i64);
+            m.get(&i);
             m.remove(&i);
         }
         sum += m.into_iter().find(|(_k, v)| *v == 42).unwrap().1

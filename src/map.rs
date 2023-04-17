@@ -147,13 +147,13 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
     /// Get a reference to a single value.
     #[inline]
     #[must_use]
-    pub fn get(&self, k: K) -> Option<&V> {
+    pub fn get(&self, k: &K) -> Option<&V> {
         for i in 0..N {
             if self.next <= i {
                 break;
             }
             if let Present(p) = &self.pairs[i] {
-                if p.0 == k {
+                if p.0 == *k {
                     return Some(&p.1);
                 }
             }
@@ -168,13 +168,13 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
     /// If can't turn it into a mutable state.
     #[inline]
     #[must_use]
-    pub fn get_mut(&mut self, k: K) -> Option<&mut V> {
+    pub fn get_mut(&mut self, k: &K) -> Option<&mut V> {
         for i in 0..N {
             if self.next <= i {
                 break;
             }
             if let Present(p) = &mut self.pairs[i] {
-                if p.0 == k {
+                if p.0 == *k {
                     return Some(&mut self.pairs[i].as_mut().unwrap().1);
                 }
             }
@@ -210,7 +210,7 @@ fn insert_and_gets() -> Result<()> {
     let mut m: Map<&str, i32, 10> = Map::new();
     m.insert("one", 42);
     m.insert("two", 16);
-    assert_eq!(16, *m.get("two").unwrap());
+    assert_eq!(16, *m.get(&"two").unwrap());
     Ok(())
 }
 
@@ -218,9 +218,9 @@ fn insert_and_gets() -> Result<()> {
 fn insert_and_gets_mut() -> Result<()> {
     let mut m: Map<i32, [i32; 3], 10> = Map::new();
     m.insert(42, [1, 2, 3]);
-    let a = m.get_mut(42).unwrap();
+    let a = m.get_mut(&42).unwrap();
     a[0] = 500;
-    assert_eq!(500, m.get(42).unwrap()[0]);
+    assert_eq!(500, m.get(&42).unwrap()[0]);
     Ok(())
 }
 
@@ -237,7 +237,7 @@ fn checks_key() -> Result<()> {
 fn gets_missing_key() -> Result<()> {
     let mut m: Map<&str, i32, 10> = Map::new();
     m.insert("one", 42);
-    assert!(m.get("two").is_none());
+    assert!(m.get(&"two").is_none());
     Ok(())
 }
 
@@ -245,7 +245,7 @@ fn gets_missing_key() -> Result<()> {
 fn mut_gets_missing_key() -> Result<()> {
     let mut m: Map<&str, i32, 10> = Map::new();
     m.insert("one", 42);
-    assert!(m.get_mut("two").is_none());
+    assert!(m.get_mut(&"two").is_none());
     Ok(())
 }
 
@@ -255,7 +255,7 @@ fn removes_simple_pair() -> Result<()> {
     m.insert("one", 42);
     m.remove(&"one");
     m.remove(&"another");
-    assert!(m.get("one").is_none());
+    assert!(m.get(&"one").is_none());
     Ok(())
 }
 
