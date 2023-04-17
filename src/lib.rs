@@ -57,17 +57,20 @@ enum Pair<K, V> {
 /// compile time.
 #[derive(Clone, Copy)]
 pub struct Map<K: Copy + PartialEq, V: Clone + Copy, const N: usize> {
+    next: usize,
     pairs: [Pair<K, V>; N],
 }
 
 /// Iterator over the `Map`.
 pub struct Iter<'a, K, V, const N: usize> {
+    next: usize,
     pos: usize,
     pairs: &'a [Pair<K, V>; N],
 }
 
 /// Into-iterator over the `Map`.
 pub struct IntoIter<'a, K, V, const N: usize> {
+    next: usize,
     pos: usize,
     pairs: &'a [Pair<K, V>; N],
 }

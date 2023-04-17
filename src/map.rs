@@ -28,6 +28,9 @@ impl<'a, K: Clone, V: Clone, const N: usize> Iterator for Iter<'a, K, V, N> {
     #[must_use]
     fn next(&mut self) -> Option<Self::Item> {
         while self.pos < N {
+            if self.next <= self.pos {
+                break;
+            }
             if let Present(p) = &self.pairs[self.pos] {
                 self.pos += 1;
                 return Some((&p.0, &p.1));
@@ -45,6 +48,9 @@ impl<'a, K: Clone, V: Clone, const N: usize> Iterator for IntoIter<'a, K, V, N> 
     #[must_use]
     fn next(&mut self) -> Option<Self::Item> {
         while self.pos < N {
+            if self.next <= self.pos {
+                break;
+            }
             if self.pairs[self.pos].is_some() {
                 let pair = self.pairs[self.pos].clone().unwrap();
                 self.pos += 1;
@@ -63,6 +69,7 @@ impl<'a, K: Copy + PartialEq, V: Clone + Copy, const N: usize> IntoIterator for 
     #[inline]
     fn into_iter(self) -> Self::IntoIter {
         IntoIter {
+            next: self.next,
             pos: 0,
             pairs: &self.pairs,
         }
@@ -81,6 +88,7 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
     #[must_use]
     pub fn new() -> Self {
         Self {
+            next: 0,
             pairs: [Pair::<K, V>::default(); N],
         }
     }
@@ -90,6 +98,7 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
     #[must_use]
     pub const fn iter(&self) -> Iter<K, V, N> {
         Iter {
+            next: self.next,
             pos: 0,
             pairs: &self.pairs,
         }
@@ -100,6 +109,7 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
     #[must_use]
     pub const fn into_iter(&self) -> IntoIter<K, V, N> {
         IntoIter {
+            next: self.next,
             pos: 0,
             pairs: &self.pairs,
         }
@@ -116,8 +126,14 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
     #[inline]
     #[must_use]
     pub fn len(&self) -> usize {
+        if self.next == 0 {
+            return 0;
+        }
         let mut busy = 0;
         for i in 0..N {
+            if self.next <= i {
+                break;
+            }
             if self.pairs[i].is_some() {
                 busy += 1;
             }
@@ -129,6 +145,9 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
     #[inline]
     pub fn contains_key(&self, k: K) -> bool {
         for i in 0..N {
+            if self.next <= i {
+                break;
+            }
             if let Present((bk, _bv)) = &self.pairs[i] {
                 if *bk == k {
                     return true;
@@ -142,6 +161,9 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
     #[inline]
     pub fn remove(&mut self, k: K) {
         for i in 0..N {
+            if self.next <= i {
+                break;
+            }
             if let Present((bk, _bv)) = &self.pairs[i] {
                 if *bk == k {
                     self.pairs[i] = Absent;
@@ -160,10 +182,18 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
     pub fn insert(&mut self, k: K, v: V) {
         self.remove(k);
         for i in 0..N {
+            if self.next <= i {
+                break;
+            }
             if !self.pairs[i].is_some() {
                 self.pairs[i] = Present((k, v));
                 return;
             }
+        }
+        if self.next < N {
+            self.pairs[self.next] = Present((k, v));
+            self.next += 1;
+            return;
         }
         panic!("There are only {N} pairs available in the map and all of them are already occupied")
     }
@@ -173,6 +203,9 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
     #[must_use]
     pub fn get(&self, k: K) -> Option<&V> {
         for i in 0..N {
+            if self.next <= i {
+                break;
+            }
             if let Present(p) = &self.pairs[i] {
                 if p.0 == k {
                     return Some(&p.1);
@@ -191,6 +224,9 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
     #[must_use]
     pub fn get_mut(&mut self, k: K) -> Option<&mut V> {
         for i in 0..N {
+            if self.next <= i {
+                break;
+            }
             if let Present(p) = &mut self.pairs[i] {
                 if p.0 == k {
                     return Some(&mut self.pairs[i].as_mut().unwrap().1);
