@@ -89,13 +89,13 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
 
     /// Does the map contain this key?
     #[inline]
-    pub fn contains_key(&self, k: K) -> bool {
+    pub fn contains_key(&self, k: &K) -> bool {
         for i in 0..N {
             if self.next <= i {
                 break;
             }
             if let Present((bk, _bv)) = &self.pairs[i] {
-                if *bk == k {
+                if bk == k {
                     return true;
                 }
             }
@@ -234,8 +234,8 @@ fn insert_and_gets_mut() -> Result<()> {
 fn checks_key() -> Result<()> {
     let mut m: Map<&str, i32, 10> = Map::new();
     m.insert("one", 42);
-    assert!(m.contains_key("one"));
-    assert!(!m.contains_key("another"));
+    assert!(m.contains_key(&"one"));
+    assert!(!m.contains_key(&"another"));
     Ok(())
 }
 
