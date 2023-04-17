@@ -58,7 +58,7 @@ enum Pair<K, V> {
 /// because it doesn't use heap. When a `Map` is being created, it allocates the necessary
 /// space on stack. That's why the maximum size of the map must be provided in
 /// compile time.
-#[derive(Clone, Copy, Eq, PartialEq)]
+#[derive(Clone, Copy, Eq)]
 pub struct Map<K: Copy + PartialEq, V: Clone + Copy, const N: usize> {
     next: usize,
     pairs: [Pair<K, V>; N],
