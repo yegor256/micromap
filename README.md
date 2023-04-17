@@ -9,9 +9,10 @@
 At least **5x faster** alternative of [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html), 
 for very small maps. It is also faster than
 [FxHashMap](https://github.com/rust-lang/rustc-hash),
-[Hashbrown](https://github.com/rust-lang/hashbrown),
-and
-[ArrayMap](https://github.com/robjtede/tinymap). 
+[hashbrown](https://github.com/rust-lang/hashbrown),
+[ArrayMap](https://github.com/robjtede/tinymap),
+and 
+[nohash-hasher](https://github.com/paritytech/nohash-hasher). 
 The smaller the map, the higher the
 performance. When the map contains more than 50 keys, it is better to use the standard 
 [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html), since
