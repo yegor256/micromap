@@ -181,6 +181,12 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
         }
         None
     }
+
+    /// Remove all pairs from it, but keep the space intact for future use.
+    #[inline]
+    pub fn clear(&mut self) {
+        self.next = 0;
+    }
 }
 
 #[cfg(test)]
@@ -295,6 +301,15 @@ struct Bar {}
 #[test]
 fn large_map_in_heap() -> Result<()> {
     let m: Box<Map<u64, [u64; 10], 10>> = Box::new(Map::new());
+    assert_eq!(0, m.len());
+    Ok(())
+}
+
+#[test]
+fn clears_it_up() -> Result<()> {
+    let mut m: Map<&str, i32, 10> = Map::new();
+    m.insert("one", 42);
+    m.clear();
     assert_eq!(0, m.len());
     Ok(())
 }
