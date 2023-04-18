@@ -37,6 +37,7 @@
 
 mod ctors;
 mod debug;
+mod index;
 mod iterators;
 mod map;
 mod pair;

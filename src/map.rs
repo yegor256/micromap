@@ -20,6 +20,7 @@
 
 use crate::Pair::{Absent, Present};
 use crate::{IntoIter, Iter, Map};
+use std::borrow::Borrow;
 
 impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Default for Map<K, V, N> {
     fn default() -> Self {
@@ -136,13 +137,13 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
     /// Get a reference to a single value.
     #[inline]
     #[must_use]
-    pub fn get(&self, k: &K) -> Option<&V> {
-        for i in 0..N {
-            if self.next <= i {
-                break;
-            }
+    pub fn get<Q: PartialEq + ?Sized>(&self, k: &Q) -> Option<&V>
+    where
+        K: Borrow<Q>,
+    {
+        for i in 0..self.next {
             if let Present(p) = &self.pairs[i] {
-                if p.0 == *k {
+                if p.0.borrow() == k {
                     return Some(&p.1);
                 }
             }
@@ -157,13 +158,13 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
     /// If can't turn it into a mutable state.
     #[inline]
     #[must_use]
-    pub fn get_mut(&mut self, k: &K) -> Option<&mut V> {
-        for i in 0..N {
-            if self.next <= i {
-                break;
-            }
+    pub fn get_mut<Q: PartialEq + ?Sized>(&mut self, k: &Q) -> Option<&mut V>
+    where
+        K: Borrow<Q>,
+    {
+        for i in 0..self.next {
             if let Present(p) = &mut self.pairs[i] {
-                if p.0 == *k {
+                if p.0.borrow() == k {
                     return Some(&mut self.pairs[i].as_mut().unwrap().1);
                 }
             }
