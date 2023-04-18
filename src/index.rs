@@ -25,12 +25,6 @@ use std::ops::{Index, IndexMut};
 impl<K: Copy + Eq + Borrow<Q>, Q: Eq + ?Sized, V: Copy, const N: usize> Index<&Q> for Map<K, V, N> {
     type Output = V;
 
-    ///```
-    /// use micromap::Map;
-    /// let mut m: Map<&str, i32, 10> = Map::new();
-    /// m.insert("first", 42);
-    /// assert_eq!(m["first"], 42);
-    ///```
     fn index(&self, key: &Q) -> &V {
         self.get(key).expect("no entry found for key")
     }
@@ -39,14 +33,56 @@ impl<K: Copy + Eq + Borrow<Q>, Q: Eq + ?Sized, V: Copy, const N: usize> Index<&Q
 impl<K: Copy + Eq + Borrow<Q>, Q: Eq + ?Sized, V: Copy, const N: usize> IndexMut<&Q>
     for Map<K, V, N>
 {
-    ///```
-    /// use micromap::Map;
-    /// let mut m: Map<&str, i32, 10> = Map::new();
-    /// m.insert("first", 42);
-    /// m["first"] += 10;
-    /// assert_eq!(m["first"], 52);
-    ///```
     fn index_mut(&mut self, key: &Q) -> &mut V {
         self.get_mut(key).expect("no entry found for key")
     }
+}
+
+#[cfg(test)]
+use anyhow::Result;
+
+#[test]
+fn index() -> Result<()> {
+    let mut m: Map<&str, i32, 10> = Map::new();
+    m.insert("first", 42);
+    assert_eq!(m["first"], 42);
+    Ok(())
+}
+
+#[test]
+fn index_mut() -> Result<()> {
+    let mut m: Map<&str, i32, 10> = Map::new();
+    m.insert("first", 42);
+    m["first"] += 10;
+    assert_eq!(m["first"], 52);
+    Ok(())
+}
+
+#[test]
+#[should_panic]
+fn wrong_index() -> () {
+    let mut m: Map<&str, i32, 10> = Map::new();
+    m.insert("first", 42);
+    assert_eq!(m["second"], 42);
+}
+
+#[cfg(test)]
+#[derive(Clone, Copy, PartialEq, Eq)]
+struct Container {
+    pub t: i32,
+}
+
+#[cfg(test)]
+impl Borrow<i32> for Container {
+    fn borrow(&self) -> &i32 {
+        &self.t
+    }
+}
+
+#[test]
+fn index_by_borrow() -> Result<()> {
+    let mut m: Map<Container, i32, 10> = Map::new();
+    m.insert(Container { t: 10 }, 42);
+    assert_eq!(m[&10], 42);
+    Ok(())
 }
