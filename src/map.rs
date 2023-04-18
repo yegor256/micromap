@@ -66,10 +66,7 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
             return 0;
         }
         let mut busy = 0;
-        for i in 0..N {
-            if self.next <= i {
-                break;
-            }
+        for i in 0..self.next {
             if self.pairs[i].is_some() {
                 busy += 1;
             }
@@ -80,10 +77,7 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
     /// Does the map contain this key?
     #[inline]
     pub fn contains_key(&self, k: &K) -> bool {
-        for i in 0..N {
-            if self.next <= i {
-                break;
-            }
+        for i in 0..self.next {
             if let Present((bk, _bv)) = &self.pairs[i] {
                 if bk == k {
                     return true;
@@ -96,10 +90,7 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
     /// Remove by key.
     #[inline]
     pub fn remove(&mut self, k: &K) {
-        for i in 0..N {
-            if self.next <= i {
-                break;
-            }
+        for i in 0..self.next {
             if let Present((bk, _bv)) = &self.pairs[i] {
                 if bk == k {
                     self.pairs[i] = Absent;
@@ -117,10 +108,7 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
     #[inline]
     pub fn insert(&mut self, k: K, v: V) {
         self.remove(&k);
-        for i in 0..N {
-            if self.next <= i {
-                break;
-            }
+        for i in 0..self.next {
             if !self.pairs[i].is_some() {
                 self.pairs[i] = Present((k, v));
                 return;
