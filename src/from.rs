@@ -23,11 +23,11 @@ use crate::Map;
 impl<K: Copy + PartialEq, V: Copy, const N: usize> FromIterator<(K, V)> for Map<K, V, N> {
     #[inline]
     fn from_iter<T: IntoIterator<Item = (K, V)>>(iter: T) -> Self {
-        let mut m: Map<K, V, N> = Map::new();
+        let mut m: Self = Self::new();
         for (k, v) in iter {
             m.insert(k, v);
         }
-        return m;
+        m
     }
 }
 
