@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-//! This is a simpler and faster alternative implementation of a standard `HashMap`.
+//! This is a simpler and faster alternative implementation of the standard `HashMap`.
 //! It doesn't use heap and doesn't use hashing at all. It simply keeps all key-value
 //! pairs in an array and when it's necessary to retrieve by key, it scrolls through
 //! the entire array. This implementation works much faster for small maps of
