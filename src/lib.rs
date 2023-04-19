@@ -24,7 +24,7 @@
 //! the entire array. This implementation works much faster for small maps of
 //! less than 50 keys, but definitely is not suitable for larger maps.
 //!
-//! For example, here is how you create a map and insert a few keys into it:
+//! For example, here is a map with a few keys can be created:
 //!
 //! ```
 //! use micromap::Map;
