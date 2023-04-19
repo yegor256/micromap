@@ -18,15 +18,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-//! This is a fast implmenetation of a map.
+//! This is a simpler and faster alternative implementation of a standard `HashMap`.
+//! It doesn't use heap and doesn't use hashing at all. It simply keeps all key-value
+//! pairs in an array and when it's necessary to retrieve by key, it scrolls through
+//! the entire array. This implementation works much faster for small maps of
+//! less than 50 keys, but definitely is not suitable for larger maps.
 //!
-//! For example, here is how you create a map and insert a few pairs into it:
+//! For example, here is how you create a map and insert a few keys into it:
 //!
 //! ```
 //! use micromap::Map;
 //! let mut m : Map<u64, &str, 10> = Map::new();
 //! m.insert(1, "Hello, world!");
-//! assert_eq!(1, m.len());
+//! m.insert(2, "Good bye!");
+//! assert_eq!(2, m.len());
 //! ```
 
 #![doc(html_root_url = "https://docs.rs/micromap/0.0.0")]
