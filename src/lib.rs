@@ -62,7 +62,7 @@ enum Pair<K, V> {
     Absent,
 }
 
-/// A faster alternative of `HashMap`.
+/// A faster alternative of [`std::collections::HashMap`].
 ///
 /// It is faster because it doesn't use a hash function at all. It simply keeps
 /// all pairs in an array and when it's necessary to find a value, it goes through
