@@ -15,7 +15,7 @@ jobs:
       - uses: actions-rs/tarpaulin@v0.1
         with:
           version: '0.15.0'
-          args: '-- --test-threads 1'
+          args: '-- --test-threads 1 --exclude-files lib.rs'
       - uses: codecov/codecov-action@v3
         with:
           fail_ci_if_error: true
