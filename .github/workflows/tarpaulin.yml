@@ -14,7 +14,7 @@ jobs:
           override: true
       - uses: actions-rs/tarpaulin@v0.1
         with:
-          version: '0.15.0'
+          version: '0.25.2'
           args: '-- --test-threads 1 --exclude-files src/lib.rs'
       - uses: codecov/codecov-action@v3
         with:
