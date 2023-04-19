@@ -48,6 +48,7 @@
 mod ctors;
 mod debug;
 mod eq;
+mod from;
 mod index;
 mod iterators;
 mod map;
