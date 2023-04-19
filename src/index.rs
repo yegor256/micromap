@@ -25,6 +25,7 @@ use std::ops::{Index, IndexMut};
 impl<K: Copy + Eq + Borrow<Q>, Q: Eq + ?Sized, V: Copy, const N: usize> Index<&Q> for Map<K, V, N> {
     type Output = V;
 
+    #[inline]
     fn index(&self, key: &Q) -> &V {
         self.get(key).expect("no entry found for key")
     }
@@ -33,6 +34,7 @@ impl<K: Copy + Eq + Borrow<Q>, Q: Eq + ?Sized, V: Copy, const N: usize> Index<&Q
 impl<K: Copy + Eq + Borrow<Q>, Q: Eq + ?Sized, V: Copy, const N: usize> IndexMut<&Q>
     for Map<K, V, N>
 {
+    #[inline]
     fn index_mut(&mut self, key: &Q) -> &mut V {
         self.get_mut(key).expect("no entry found for key")
     }
