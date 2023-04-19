@@ -119,7 +119,7 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
             self.next += 1;
             return;
         }
-        panic!("There are only {N} pairs available in the map and all of them are already occupied")
+        panic!("There are only {N} keys available in the map and all of them are already occupied")
     }
 
     /// Get a reference to a single value.
