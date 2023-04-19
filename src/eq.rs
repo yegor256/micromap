@@ -21,13 +21,16 @@
 use crate::Map;
 
 impl<K: Copy + PartialEq, V: Copy + PartialEq, const N: usize> PartialEq for Map<K, V, N> {
+    /// Two maps can be compared.
+    ///
+    /// For example:
+    ///
     /// ```
     /// let mut m1: micromap::Map<u8, i32, 10> = micromap::Map::new();
     /// let mut m2: micromap::Map<u8, i32, 10> = micromap::Map::new();
     /// m1.insert(1, 42);
     /// m2.insert(1, 42);
     /// assert_eq!(m1, m2);
-    ///
     /// // two maps with different order of key-value pairs are still equal:
     /// m1.insert(2, 1);
     /// m1.insert(3, 16);
