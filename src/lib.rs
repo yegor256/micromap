@@ -33,6 +33,11 @@
 //! m.insert(2, "Good bye!");
 //! assert_eq!(2, m.len());
 //! ```
+//!
+//! Creating a [`Map`] requires knowing the maximum size of it upfront. This is
+//! what the third type argument `10` is for, in the example above. The array
+//! will have exactly ten elements. An attempt to add an 11th element will lead
+//! to a panic.
 
 #![doc(html_root_url = "https://docs.rs/micromap/0.0.0")]
 #![deny(warnings)]
