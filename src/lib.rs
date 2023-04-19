@@ -76,14 +76,14 @@ pub struct Map<K: Copy + PartialEq, V: Clone + Copy, const N: usize> {
     pairs: [Pair<K, V>; N],
 }
 
-/// Iterator over the `Map`.
+/// Iterator over the [`Map`].
 pub struct Iter<'a, K, V, const N: usize> {
     next: usize,
     pos: usize,
     pairs: &'a [Pair<K, V>; N],
 }
 
-/// Into-iterator over the `Map`.
+/// Into-iterator over the [`Map`].
 pub struct IntoIter<'a, K, V, const N: usize> {
     next: usize,
     pos: usize,
