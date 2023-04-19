@@ -67,7 +67,7 @@ enum Pair<K, V> {
 /// It is faster because it doesn't use a hash function at all. It simply keeps
 /// all pairs in an array and when it's necessary to find a value, it goes through
 /// all pairs comparing the needle with each pair available. Also it is faster
-/// because it doesn't use heap. When a `Map` is being created, it allocates the necessary
+/// because it doesn't use heap. When a [`Map`] is being created, it allocates the necessary
 /// space on stack. That's why the maximum size of the map must be provided in
 /// compile time.
 #[derive(Clone, Copy)]
