@@ -36,7 +36,8 @@ assert_eq!(2, m.len());
 
 Pay attention, here the map is created with an extra generic argument `10`. This is 
 the total size of the map, which is allocated on stack when `::new()` is called. 
-Unlike `HashMap`, the `Map` doesn't use heap at all.
+Unlike `HashMap`, the `Map` doesn't use heap at all. If more than ten keys will be
+added to the map, it will panic.
 
 Read [the API documentation](https://docs.rs/micromap/latest/micromap/). The struct
 [`micromap::Map`](https://docs.rs/micromap/latest/micromap/struct.Map.html) is designed as closely similar to 
