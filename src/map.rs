@@ -165,6 +165,18 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
     pub fn clear(&mut self) {
         self.next = 0;
     }
+
+    /// Retains only the elements specified by the predicate.
+    #[inline]
+    pub fn retain<F: Fn(&K, &V) -> bool>(&mut self, f: F) {
+        for i in 0..self.next {
+            if let Present((k, v)) = &self.pairs[i] {
+                if !f(k, v) {
+                    self.pairs[i] = Absent;
+                }
+            }
+        }
+    }
 }
 
 #[cfg(test)]
@@ -289,5 +301,17 @@ fn clears_it_up() -> Result<()> {
     m.insert("one", 42);
     m.clear();
     assert_eq!(0, m.len());
+    Ok(())
+}
+
+#[test]
+fn retain_test() -> Result<()> {
+    let vec: Vec<(i32, i32)> = (0..8).map(|x| (x, x * 10)).collect();
+    let mut m: Map<i32, i32, 10> = Map::from_iter(vec);
+    assert_eq!(m.len(), 8);
+    m.retain(|&k, _| k < 6);
+    assert_eq!(m.len(), 6);
+    m.retain(|_, &v| v > 30);
+    assert_eq!(m.len(), 2);
     Ok(())
 }
