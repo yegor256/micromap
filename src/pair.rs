@@ -49,7 +49,7 @@ use anyhow::Result;
 
 #[test]
 fn makes_absent_and_checks() -> Result<()> {
-    let p: Pair<u8, u8> = Pair::Absent;
+    let p: Pair<u8, u8> = Absent;
     assert!(!p.is_some());
     Ok(())
 }
@@ -63,7 +63,7 @@ fn makes_present_and_checks() -> Result<()> {
 
 #[test]
 fn absent_is_mut() -> Result<()> {
-    let mut p: Pair<u8, u8> = Pair::Absent;
+    let mut p: Pair<u8, u8> = Absent;
     assert!(!p.as_mut().is_some());
     Ok(())
 }
