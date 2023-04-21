@@ -202,6 +202,15 @@ fn empty_length() -> Result<()> {
 }
 
 #[test]
+fn is_empty_check() -> Result<()> {
+    let mut m: Map<u32, u32, 10> = Map::new();
+    assert!(m.is_empty());
+    m.insert(42, 42);
+    assert!(!m.is_empty());
+    Ok(())
+}
+
+#[test]
 fn insert_and_gets() -> Result<()> {
     let mut m: Map<&str, i32, 10> = Map::new();
     m.insert("one", 42);
