@@ -49,10 +49,19 @@ use crate::Pair::Present;
 use anyhow::Result;
 
 #[test]
-fn displays_map() -> Result<()> {
+fn debugs_map() -> Result<()> {
     let mut m: Map<&str, i32, 10> = Map::new();
     m.insert("one", 42);
     m.insert("two", 16);
     assert_eq!("{one: 42, two: 16}", format!("{:?}", m));
+    Ok(())
+}
+
+#[test]
+fn displays_map() -> Result<()> {
+    let mut m: Map<&str, i32, 10> = Map::new();
+    m.insert("one", 42);
+    m.insert("two", 16);
+    assert_eq!("{one: 42, two: 16}", format!("{}", m));
     Ok(())
 }
