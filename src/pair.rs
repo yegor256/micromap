@@ -60,3 +60,10 @@ fn makes_present_and_checks() -> Result<()> {
     assert!(p.is_some());
     Ok(())
 }
+
+#[test]
+fn absent_is_mut() -> Result<()> {
+    let mut p: Pair<u8, u8> = Pair::Absent;
+    assert!(!p.as_mut().is_some());
+    Ok(())
+}
