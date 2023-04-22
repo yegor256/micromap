@@ -40,6 +40,9 @@ macro_rules! eval {
             for i in 1..$capacity - 1 {
                 $map.remove(&(i as u32));
             }
+            if $map.iter().find(|(_k, v)| **v == 0).is_some() {
+                $map.clear();
+            }
             sum += $map.iter().find(|(_k, v)| **v == 42).unwrap().1
         }
         std::hint::black_box(sum)
@@ -119,7 +122,7 @@ pub fn benchmark_and_print() {
 
 pub fn main() {
     let args: Vec<String> = env::args().collect();
-    let times = benchmark(args.get(0).unwrap().parse::<usize>().unwrap());
+    let times = benchmark(args.get(1).unwrap().parse::<usize>().unwrap());
     for (m, d) in &times {
         println!("{m}\t{}", d.as_nanos());
     }
