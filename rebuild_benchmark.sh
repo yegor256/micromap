@@ -15,7 +15,7 @@ mkdir -p target/benchmark
 for capacity in ${capacities}; do
   sed -E -i "s/CAPACITY: usize = [0-9]+/CAPACITY: usize = ${capacity}/g" src/bin/benchmark.rs
   cargo build --release
-  ./target/release/benchmark 100000 > target/benchmark/${capacity}.out
+  ./target/release/benchmark 1000000 > target/benchmark/${capacity}.out
 done
 
 {
@@ -67,7 +67,7 @@ perl -e '
   open(my $t, "<", $table);
   { local $/; $table = <$t>; }
   close($t);
-  $p[1] = "\n\n" . $table . "\n\n";
+  $p[1] = "\n" . $table . "\n";
   my $new = join($sep, @p);
   open(my $w, ">", $file);
   print $w join($sep, @p);
