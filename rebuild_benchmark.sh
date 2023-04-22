@@ -65,3 +65,5 @@ perl -e '
   print $w join($sep, @p);
   close($w);
 '
+
+git restore Cargo.toml
