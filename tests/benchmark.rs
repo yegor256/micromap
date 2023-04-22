@@ -69,6 +69,12 @@ fn benchmark(total: usize) -> HashMap<&'static str, Duration> {
         total
     );
     insert!(
+        "rustc_hash::FxHashMap",
+        ret,
+        rustc_hash::FxHashMap::<u32, i64>::default(),
+        total
+    );
+    insert!(
         "micromap::Map",
         ret,
         micromap::Map::<u32, i64, CAPACITY>::new(),
