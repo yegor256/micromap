@@ -26,45 +26,34 @@ use std::time::Instant;
 
 const CAPACITY: usize = 10;
 
-pub fn with_std(total: usize) -> i64 {
-    let mut sum = 0;
-    for _ in 0..total {
-        let mut m = HashMap::with_capacity(CAPACITY);
-        m.insert(0, 42);
-        for i in 1..CAPACITY - 1 {
-            m.insert(i, i as i64);
-            assert_eq!(i as i64, *m.get(&i).unwrap());
-            m.remove(&i);
+macro_rules! eval {
+    ($map:expr, $total:expr, $capacity:expr) => {{
+        let mut sum = 0;
+        for _ in 0..$total {
+            $map.clear();
+            $map.insert(0, 42);
+            for i in 1..$capacity - 1 {
+                $map.insert(i as u32, i as i64);
+                assert_eq!(i as i64, *$map.get(&(i as u32)).unwrap());
+                $map.remove(&(i as u32));
+            }
+            sum += $map.iter().find(|(_k, v)| **v == 42).unwrap().1
         }
-        sum += m.into_iter().find(|(_k, v)| *v == 42).unwrap().1
-    }
-    std::hint::black_box(sum)
-}
-
-pub fn with_micromap(total: usize) -> i64 {
-    let mut sum = 0;
-    for _ in 0..total {
-        let mut m: micromap::Map<usize, i64, CAPACITY> = micromap::Map::new();
-        m.insert(0, 42);
-        for i in 1..CAPACITY - 1 {
-            m.insert(i, i as i64);
-            assert_eq!(i as i64, *m.get(&i).unwrap());
-            m.remove(&i);
-        }
-        sum += m.into_iter().find(|(_k, v)| *v == 42).unwrap().1
-    }
-    std::hint::black_box(sum)
+        std::hint::black_box(sum)
+    }};
 }
 
 #[test]
 pub fn main() {
     let total = 100000;
     let start1 = Instant::now();
-    let s1 = with_std(total);
+    let mut m1 = HashMap::<u32, i64>::with_capacity(CAPACITY);
+    let s1 = eval!(m1, total, CAPACITY);
     let e1 = start1.elapsed();
     println!("hashmap: {:?}", e1);
     let start2 = Instant::now();
-    let s2 = with_micromap(total);
+    let mut m2 = micromap::Map::<u32, i64, CAPACITY>::new();
+    let s2 = eval!(m2, total, CAPACITY);
     let e2 = start2.elapsed();
     println!("micromap: {:?}", e2);
     println!("gain: {:.2}x", e1.as_nanos() as f64 / e2.as_nanos() as f64);
