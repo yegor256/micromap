@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-    paths-ignore: [ 'README.md' ]
+    paths-ignore: [ 'README.md', '.github' ]
 jobs:
   pr:
     runs-on: ubuntu-20.04

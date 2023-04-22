@@ -1,0 +1,20 @@
+---
+name: up
+on:
+  push:
+    tags:
+jobs:
+  up:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          git pull --tags
+          latest=$(git tag | tail -1)
+          sed -E -i 's/micromap = "[^"]+"/micromap = "${latest}"/g' README.md
+      - uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: 'new version in README'
+          delete-branch: true
+          title: 'New version in README'
+          assignees: yegor256
