@@ -55,12 +55,13 @@ Read [the API documentation](https://docs.rs/micromap/latest/micromap/). The str
 
 ## Benchmark
 
-There is a summary of a simple benchmark, where we compare `micromap::Map` with
+There is a summary of a simple benchmark, where we compared `micromap::Map` with
 a few other Rust maps, changing the total capacity of the map (horizontal axis).
-We apply the same interactions 
+We applied the same interactions 
 ([`benchmark.rs`](https://github.com/yegor256/micromap/blob/master/tests/benchmark.rs)) 
-to them and measure how fast they perform. The numbers above 1.0 indicate performance
-gain, while numbers below 1.0 demonstrate performance loss.
+to them and measured how fast they performed. In the following table, 
+the numbers over 1.0 indicate performance gain, 
+while the numbers below 1.0 demonstrate performance loss.
 
 <!-- benchmark -->
 | | 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
