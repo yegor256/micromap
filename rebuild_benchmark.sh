@@ -13,11 +13,13 @@ cycles=1000000
 
 rm -rf target/benchmark
 mkdir -p target/benchmark
+SECONDS=0
 for capacity in ${capacities}; do
   sed -E -i "s/CAPACITY: usize = [0-9]+/CAPACITY: usize = ${capacity}/g" src/bin/benchmark.rs
   cargo build --release
   ./target/release/benchmark ${cycles} > target/benchmark/${capacity}.out
 done
+lapsed=$SECONDS
 
 {
   echo -n '| |'
@@ -55,7 +57,7 @@ done
     echo ''
   done
   echo ''
-  echo "There were ${cycles} repetition cycles."
+  echo "There were ${cycles} repetition cycles. The entire benchmark tool ${SECONDS}s."
 } > target/benchmark/table.md
 
 perl -e '
