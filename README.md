@@ -18,7 +18,8 @@ performance. When the map contains more than 50 keys, it is better to use the st
 [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html), since
 the performance of `micromap::Map` _may_ start to degrade.
 
-The only important restriction is that both key and value must implement the `Copy` trait.
+The only important restriction is that both key and value must implement 
+the [`Copy`](https://doc.rust-lang.org/std/marker/trait.Copy.html) trait.
 
 **WELCOME**: 
 Not all functions that you might expect to have in a map are implemented. 
