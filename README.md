@@ -22,6 +22,16 @@ The only important restriction is that both key and value must implement
 the [`Copy`](https://doc.rust-lang.org/std/marker/trait.Copy.html) trait.
 
 <!-- benchmark -->
+
+| | 2 | 4 | 8 | 16 | 32 | 64 |
+| --- | --- | --- | --- | --- | --- | --- |
+| `tinymap::array_map::ArrayMap` | 205402.00 | 2.22 | 2.23 | 2.38 | 2.60 | 2.37 |
+| `std::collections::HashMap` | 3253835.00 | 6.26 | 4.33 | 2.44 | 1.32 | 0.64 |
+| `hashbrown::HashMap` | 3256235.00 | 3.85 | 2.45 | 1.51 | 0.62 | 0.28 |
+| `rustc_hash::FxHashMap` | 2225924.00 | 3.62 | 2.50 | 1.64 | 0.64 | 0.28 |
+| `nohash_hasher::BuildNoHashHasher` | 2437327.00 | 3.92 | 2.94 | 1.22 | 0.65 | 0.27 |
+
+
 <!-- benchmark -->
 
 **WELCOME**: 
