@@ -29,7 +29,7 @@ lapsed=$SECONDS
   echo ''
   echo -n '| --- |'
   for capacity in ${capacities}; do
-    echo -n " --- |"
+    echo -n " --: |"
   done
   echo ''
   maps=$(cut -f 1 target/benchmark/2.out)
