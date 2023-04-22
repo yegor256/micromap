@@ -66,11 +66,11 @@ gain, while numbers below 1.0 demonstrate performance loss.
 
 | | 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `hashbrown::HashMap` | 34K | 33K | 5.49 | 2.75 | 1.53 | 0.63 | 0.32 | 0.15 |
-| `nohash_hasher::BuildNoHashHasher` | 20K | 21K | 5.30 | 3.35 | 1.33 | 0.60 | 0.32 | 0.15 |
-| `rustc_hash::FxHashMap` | 20K | 20K | 5.02 | 2.73 | 1.71 | 0.55 | 0.30 | 0.15 |
-| `std::collections::HashMap` | 34K | 34K | 8.36 | 4.29 | 2.69 | 1.31 | 0.69 | 0.33 |
-| `tinymap::array_map::ArrayMap` | 1K | 1K | 2.40 | 2.12 | 2.26 | 2.35 | 2.84 | 2.77 |
+| `hashbrown::HashMap` | 2M | 26K | 3.78 | 2.33 | 1.16 | 0.48 | 0.22 | 0.12 |
+| `nohash_hasher::BuildNoHashHasher` | 1M | 20K | 3.91 | 2.85 | 0.95 | 0.44 | 0.21 | 0.12 |
+| `rustc_hash::FxHashMap` | 1M | 19K | 3.65 | 2.29 | 1.26 | 0.45 | 0.22 | 0.12 |
+| `std::collections::HashMap` | 3M | 30K | 6.23 | 4.04 | 2.12 | 1.04 | 0.48 | 0.26 |
+| `tinymap::array_map::ArrayMap` | 167K | 1K | 2.32 | 2.22 | 2.12 | 2.26 | 1.98 | 2.04 |
 
 
 <!-- benchmark -->
