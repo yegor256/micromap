@@ -2,3 +2,4 @@
 target/
 *.relf
 *.svg
+bin/

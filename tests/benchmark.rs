@@ -22,7 +22,8 @@
 // $ cargo test --test vs_std -- --nocapture
 
 use std::collections::HashMap;
-use std::time::Instant;
+use std::env;
+use std::time::{Duration, Instant};
 
 const CAPACITY: usize = 10;
 
@@ -43,19 +44,42 @@ macro_rules! eval {
     }};
 }
 
-#[test]
-pub fn main() {
-    let total = 100000;
+fn benchmark(total: usize) -> HashMap<&'static str, Duration> {
+    let mut ret = HashMap::new();
     let start1 = Instant::now();
     let mut m1 = HashMap::<u32, i64>::with_capacity(CAPACITY);
-    let s1 = eval!(m1, total, CAPACITY);
+    eval!(m1, total, CAPACITY);
     let e1 = start1.elapsed();
-    println!("hashmap: {:?}", e1);
+    ret.insert("std::collections::HashMap", e1);
     let start2 = Instant::now();
     let mut m2 = micromap::Map::<u32, i64, CAPACITY>::new();
-    let s2 = eval!(m2, total, CAPACITY);
+    eval!(m2, total, CAPACITY);
     let e2 = start2.elapsed();
-    println!("micromap: {:?}", e2);
-    println!("gain: {:.2}x", e1.as_nanos() as f64 / e2.as_nanos() as f64);
-    assert_eq!(s1, s2);
+    ret.insert("micromap::Map", e2);
+    ret
+}
+
+#[test]
+pub fn benchmark_and_print() {
+    let times = benchmark(100000);
+    let ours = times.get("micromap::Map").unwrap();
+    for (m, d) in &times {
+        println!(
+            "{m} -> {:?} ({:.2}x)",
+            d,
+            d.as_nanos() as f64 / ours.as_nanos() as f64
+        );
+        if d == ours {
+            continue;
+        }
+        assert!(d.cmp(ours).is_gt());
+    }
+}
+
+pub fn main() {
+    let args: Vec<String> = env::args().collect();
+    let times = benchmark(args.get(0).unwrap().parse::<usize>().unwrap());
+    for (m, d) in &times {
+        println!("{m}\t{}", d.as_nanos());
+    }
 }
