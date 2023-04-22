@@ -63,6 +63,12 @@ fn benchmark(total: usize) -> HashMap<&'static str, Duration> {
         total
     );
     insert!(
+        "hashbrown::HashMap",
+        ret,
+        hashbrown::HashMap::<u32, i64>::new(),
+        total
+    );
+    insert!(
         "micromap::Map",
         ret,
         micromap::Map::<u32, i64, CAPACITY>::new(),
