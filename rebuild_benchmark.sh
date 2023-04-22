@@ -57,7 +57,7 @@ lapsed=$SECONDS
     echo ''
   done
   echo ''
-  echo "There were ${cycles} repetition cycles. The entire benchmark tool ${SECONDS}s."
+  echo "There were ${cycles} repetition cycles. The entire benchmark took ${SECONDS}s."
 } > target/benchmark/table.md
 
 perl -e '

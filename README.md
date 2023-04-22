@@ -74,7 +74,7 @@ gain, while numbers below 1.0 demonstrate performance loss.
 <!-- benchmark -->
 
 As you see, the highest performance gain is achieved for maps that are smaller than ten keys.
-For a maps of just a few keys, the gain is enormous (most probably due to compiler optimizations).
+For a map of just a few keys, the gain is enormous (most probably due to compiler optimizations).
 
 ## How to Contribute
 
