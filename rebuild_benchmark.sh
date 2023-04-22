@@ -42,7 +42,9 @@ done
       fi
       their=$(grep "${map}" "tmp/${capacity}.out" | cut -f 2)
       echo -n ' '
-      if [ "$(expr $their / $our / 1000)" -gt 0 ]; then
+      if [ "$(expr $their / $our / 1000 / 1000)" -gt 0 ]; then
+        perl -e "printf(\"%dM\", ${their} / ${our} / 1000 / 1000);"
+      elif [ "$(expr $their / $our / 1000)" -gt 0 ]; then
         perl -e "printf(\"%dK\", ${their} / ${our} / 1000);"
       else
         perl -e "printf(\"%.02f\", ${their} / ${our});"

@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/yegor256/micromap/blob/master/LICENSE.txt)
 [![docs.rs](https://img.shields.io/docsrs/micromap)](https://docs.rs/micromap/latest/micromap/)
 
-At least **5x faster** alternative of [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html), 
+A much faster alternative of [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html), 
 for very small maps. It is also faster than
 [FxHashMap](https://github.com/rust-lang/rustc-hash),
 [hashbrown](https://github.com/rust-lang/hashbrown),
@@ -14,9 +14,10 @@ for very small maps. It is also faster than
 and 
 [nohash-hasher](https://github.com/paritytech/nohash-hasher). 
 The smaller the map, the higher the
-performance. When the map contains more than 50 keys, it is better to use the standard 
+performance. When the map contains more than 20 keys, it may be better to use the standard 
 [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html), since
-the performance of `micromap::Map` _may_ start to degrade.
+the performance of `micromap::Map` _may_ start to degrade. See the 
+[benchmarking results](#benchmark) below.
 
 The only important restriction is that both key and value must implement 
 the [`Copy`](https://doc.rust-lang.org/std/marker/trait.Copy.html) trait.
