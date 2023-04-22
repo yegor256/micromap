@@ -8,7 +8,7 @@ cp tests/benchmark.rs src/bin/benchmark.rs
 
 sed -E -i 's/\[dev-dependencies\]//g' Cargo.toml
 
-capacities="1 2 4 8 16 32 64"
+capacities="1 2 4 8 16 32 64 128"
 
 rm -rf tmp
 mkdir tmp
@@ -42,8 +42,8 @@ done
       fi
       their=$(grep "${map}" "tmp/${capacity}.out" | cut -f 2)
       echo -n ' '
-      if [ "$(expr $their / $our / 100)" -gt 0 ]; then
-        echo -n '>100'
+      if [ "$(expr $their / $our / 1000)" -gt 0 ]; then
+        perl -e "printf(\"%dK\", ${their} / ${our} / 1000);"
       else
         perl -e "printf(\"%.02f\", ${their} / ${our});"
       fi
