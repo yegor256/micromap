@@ -78,7 +78,7 @@ There were 1000000 repetition cycles. The entire benchmark took 259s.
 <!-- benchmark -->
 
 As you see, the highest performance gain was achieved for the maps that were smaller than ten keys.
-For the maps of just a few keys, the gain was enormous (most probably due to compiler optimizations).
+For the maps of just a few keys, the gain was enormous.
 
 ## How to Contribute
 
