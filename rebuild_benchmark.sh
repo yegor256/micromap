@@ -34,9 +34,9 @@ lapsed=$SECONDS
   echo ''
   maps=$(cut -f 1 target/benchmark/2.out)
   for map in ${maps}; do
-    if [ "${map}" == "micromap::Map" ]; then
-      continue;
-    fi
+#    if [ "${map}" == "micromap::Map" ]; then
+#      continue;
+#    fi
     echo -n "| \`${map}\` |"
     for capacity in ${capacities}; do
       our=$(grep "micromap::Map" "target/benchmark/${capacity}.out" | cut -f 2)
