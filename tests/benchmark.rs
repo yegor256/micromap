@@ -89,6 +89,12 @@ fn benchmark(total: usize) -> HashMap<&'static str, Duration> {
         total
     );
     insert!(
+        "std::collections::BTreeMap",
+        ret,
+        std::collections::BTreeMap::<u32, i64>::new(),
+        total
+    );
+    insert!(
         "tinymap::array_map::ArrayMap",
         ret,
         tinymap::array_map::ArrayMap::<u32, i64, CAPACITY>::new(),
@@ -105,7 +111,7 @@ fn benchmark(total: usize) -> HashMap<&'static str, Duration> {
 
 #[test]
 pub fn benchmark_and_print() {
-    let times = benchmark(100000);
+    let times = benchmark(10000);
     let ours = times.get("micromap::Map").unwrap();
     for (m, d) in &times {
         println!(
