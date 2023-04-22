@@ -63,15 +63,15 @@ to them and measure how fast they perform. The numbers above 1.0 indicate perfor
 gain, while numbers below 1.0 demonstrate performance loss.
 
 <!-- benchmark -->
-
 | | 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `hashbrown::HashMap` | 34K | 33K | 5.49 | 2.75 | 1.53 | 0.63 | 0.32 | 0.15 |
-| `nohash_hasher::BuildNoHashHasher` | 20K | 21K | 5.30 | 3.35 | 1.33 | 0.60 | 0.32 | 0.15 |
-| `rustc_hash::FxHashMap` | 20K | 20K | 5.02 | 2.73 | 1.71 | 0.55 | 0.30 | 0.15 |
-| `std::collections::HashMap` | 34K | 34K | 8.36 | 4.29 | 2.69 | 1.31 | 0.69 | 0.33 |
-| `tinymap::array_map::ArrayMap` | 1K | 1K | 2.40 | 2.12 | 2.26 | 2.35 | 2.84 | 2.77 |
+| `hashbrown::HashMap` | 26M | 26M | 3.78 | 2.34 | 1.17 | 0.48 | 0.22 | 0.12 |
+| `nohash_hasher::BuildNoHashHasher` | 19M | 19M | 3.96 | 2.84 | 0.96 | 0.44 | 0.21 | 0.11 |
+| `rustc_hash::FxHashMap` | 19M | 20M | 3.68 | 2.30 | 1.27 | 0.45 | 0.22 | 0.12 |
+| `std::collections::HashMap` | 30M | 30M | 6.27 | 4.04 | 2.18 | 1.14 | 0.48 | 0.25 |
+| `tinymap::array_map::ArrayMap` | 1M | 1M | 2.44 | 2.22 | 2.13 | 2.25 | 1.97 | 2.04 |
 
+There were 1000000 repetition cycles.
 
 <!-- benchmark -->
 
