@@ -25,7 +25,7 @@ use std::collections::HashMap;
 use std::env;
 use std::time::{Duration, Instant};
 
-const CAPACITY: usize = 10;
+const CAPACITY: usize = 2;
 
 macro_rules! eval {
     ($map:expr, $total:expr, $capacity:expr) => {{
@@ -35,9 +35,8 @@ macro_rules! eval {
             $map.insert(0, 42);
             for i in 1..$capacity - 1 {
                 $map.insert(i as u32, i as i64);
-                if *$map.get(&(i as u32)).unwrap() != i as i64 {
-                    panic!("Why?");
-                }
+                let v = std::hint::black_box(*$map.get(&(i as u32)).unwrap());
+                assert_eq!(v, i as i64);
             }
             for i in 1..$capacity - 1 {
                 $map.remove(&(i as u32));
@@ -45,7 +44,8 @@ macro_rules! eval {
             if $map.iter().find(|(_k, v)| **v == 0).is_some() {
                 $map.clear();
             }
-            sum += $map.iter().find(|(_k, v)| **v == 42).unwrap().1
+            let p = std::hint::black_box($map.iter().find(|(_k, v)| **v == 42).unwrap().1);
+            sum += p
         }
         std::hint::black_box(sum)
     }};
