@@ -10,22 +10,20 @@ A much faster alternative of [`HashMap`](https://doc.rust-lang.org/std/collectio
 for very small maps. It is also faster than
 [FxHashMap](https://github.com/rust-lang/rustc-hash),
 [hashbrown](https://github.com/rust-lang/hashbrown),
-[ArrayMap](https://github.com/robjtede/tinymap),
-and 
-[nohash-hasher](https://github.com/paritytech/nohash-hasher). 
-The smaller the map, the higher the
-performance. When the map contains more than 20 keys, it may be better to use the standard 
+[ArrayMap](https://github.com/robjtede/tinymap), and _all_ others.
+The smaller the map, the higher the performance. 
+When the map contains more than 20 keys, it may be better to use the standard 
 [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html), since
-the performance of `micromap::Map` _may_ start to degrade. See the 
-[benchmarking results](#benchmark) below.
+the performance of `micromap::Map` _may_ start to degrade. 
+See the [benchmarking results](#benchmark) below.
 
 The only important restriction is that both key and value must implement 
 the [`Copy`](https://doc.rust-lang.org/std/marker/trait.Copy.html) trait.
 
 **WELCOME**: 
 Not all functions that you might expect to have in a map are implemented. 
-I will appreciate if you contribute by implementing these missing functions.
-Here is [a full list](https://github.com/yegor256/micromap/issues) of missed features.
+I will appreciate if you contribute by implementing these 
+[missing functions](https://github.com/yegor256/micromap/issues).
 
 First, add this to `Cargo.toml`:
 
