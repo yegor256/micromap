@@ -44,4 +44,5 @@ done
   done
 } > tmp/table.md
 
+perl -e
 
