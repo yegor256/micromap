@@ -3,19 +3,19 @@ set -x
 set -e
 
 rm -rf src/bin
-mkdir src/bin
+mkdir -p src/bin
 cp tests/benchmark.rs src/bin/benchmark.rs
 
 sed -E -i 's/\[dev-dependencies\]//g' Cargo.toml
 
 capacities="1 2 4 8 16 32 64 128"
 
-rm -rf tmp
-mkdir tmp
+rm -rf target/benchmark
+mkdir -p target/benchmark
 for capacity in ${capacities}; do
   sed -E -i "s/CAPACITY: usize = [0-9]+/CAPACITY: usize = ${capacity}/g" src/bin/benchmark.rs
   cargo build --release
-  ./target/release/benchmark 100000 > tmp/${capacity}.out
+  ./target/release/benchmark 100000 > target/benchmark/${capacity}.out
 done
 
 {
@@ -29,18 +29,18 @@ done
     echo -n " --- |"
   done
   echo ''
-  maps=$(cut -f 1 tmp/2.out)
+  maps=$(cut -f 1 target/benchmark/2.out)
   for map in ${maps}; do
     if [ "${map}" == "micromap::Map" ]; then
       continue;
     fi
     echo -n "| \`${map}\` |"
     for capacity in ${capacities}; do
-      our=$(grep "micromap::Map" "tmp/${capacity}.out" | cut -f 2)
+      our=$(grep "micromap::Map" "target/benchmark/${capacity}.out" | cut -f 2)
       if [ "${our}" -eq "0" ]; then
         our=1
       fi
-      their=$(grep "${map}" "tmp/${capacity}.out" | cut -f 2)
+      their=$(grep "${map}" "target/benchmark/${capacity}.out" | cut -f 2)
       echo -n ' '
       if [ "$(expr $their / $our / 1000 / 1000)" -gt 0 ]; then
         perl -e "printf(\"%dM\", ${their} / ${our} / 1000 / 1000);"
@@ -53,7 +53,7 @@ done
     done
     echo ''
   done
-} > tmp/table.md
+} > target/benchmark/table.md
 
 perl -e '
   my $readme;
@@ -63,7 +63,7 @@ perl -e '
   close($r);
   my $sep = "<!-- benchmark -->";
   my @p = split(/\Q$sep\E/, $readme);
-  my $table = "tmp/table.md";
+  my $table = "target/benchmark/table.md";
   open(my $t, "<", $table);
   { local $/; $table = <$t>; }
   close($t);

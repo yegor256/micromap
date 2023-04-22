@@ -123,7 +123,12 @@ pub fn benchmark_and_print() {
 pub fn main() {
     let args: Vec<String> = env::args().collect();
     let times = benchmark(args.get(1).unwrap().parse::<usize>().unwrap());
+    let mut lines = vec![];
     for (m, d) in &times {
-        println!("{m}\t{}", d.as_nanos());
+        lines.push(format!("{m}\t{}", d.as_nanos()));
+    }
+    lines.sort();
+    for t in lines {
+        println!("{t}");
     }
 }
