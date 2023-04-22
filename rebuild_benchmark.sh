@@ -6,14 +6,14 @@ rm -rf src/bin
 mkdir src/bin
 cp tests/benchmark.rs src/bin/benchmark.rs
 
-gsed -E -i 's/\[dev-dependencies\]//g' Cargo.toml
+sed -E -i 's/\[dev-dependencies\]//g' Cargo.toml
 
 capacities="2 4"
 
 rm -rf tmp
 mkdir tmp
 for capacity in ${capacities}; do
-  gsed -E -i "s/CAPACITY: usize = [0-9]+/CAPACITY: usize = ${capacity}/g" src/bin/benchmark.rs
+  sed -E -i "s/CAPACITY: usize = [0-9]+/CAPACITY: usize = ${capacity}/g" src/bin/benchmark.rs
   cargo build --release
   ./target/release/benchmark 100000 > tmp/${capacity}.out
 done
