@@ -66,15 +66,16 @@ while the numbers below 1.0 demonstrate performance loss.
 <!-- benchmark -->
 | | 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `hashbrown::HashMap` | 25M | 255K | 3.52 | 2.28 | 1.25 | 0.47 | 0.22 | 0.12 |
-| `linked_hash_map::LinkedHashMap` | 44M | 442K | 8.02 | 5.10 | 3.08 | 1.36 | 0.64 | 0.37 |
-| `nohash_hasher::BuildNoHashHasher` | 19M | 197K | 3.67 | 2.74 | 1.02 | 0.43 | 0.21 | 0.11 |
-| `rustc_hash::FxHashMap` | 19M | 198K | 3.41 | 2.21 | 1.37 | 0.44 | 0.21 | 0.12 |
-| `std::collections::BTreeMap` | 35M | 358K | 5.00 | 3.36 | 2.53 | 1.25 | 0.55 | 0.34 |
-| `std::collections::HashMap` | 29M | 301K | 5.87 | 3.87 | 2.31 | 1.02 | 0.51 | 0.26 |
-| `tinymap::array_map::ArrayMap` | 1M | 13K | 2.12 | 2.36 | 2.33 | 2.17 | 2.00 | 2.04 |
+| `hashbrown::HashMap` | 30M | 306K | 3.48 | 2.28 | 1.25 | 0.47 | 0.22 | 0.12 |
+| `linked_hash_map::LinkedHashMap` | 52M | 529K | 8.26 | 5.18 | 3.09 | 1.38 | 0.64 | 0.37 |
+| `micromap::Map` | 0.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
+| `nohash_hasher::BuildNoHashHasher` | 23M | 236K | 3.62 | 2.74 | 1.02 | 0.44 | 0.20 | 0.11 |
+| `rustc_hash::FxHashMap` | 23M | 236K | 3.37 | 2.21 | 1.37 | 0.44 | 0.21 | 0.12 |
+| `std::collections::BTreeMap` | 44M | 430K | 5.32 | 3.40 | 2.53 | 1.19 | 0.55 | 0.34 |
+| `std::collections::HashMap` | 36M | 361K | 5.81 | 3.85 | 2.28 | 1.04 | 0.51 | 0.26 |
+| `tinymap::array_map::ArrayMap` | 1M | 16K | 2.09 | 2.36 | 2.28 | 2.18 | 2.00 | 2.05 |
 
-There were 1000000 repetition cycles. The entire benchmark took 250s.
+There were 1000000 repetition cycles. The entire benchmark took 307s.
 
 <!-- benchmark -->
 
