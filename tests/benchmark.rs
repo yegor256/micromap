@@ -75,6 +75,15 @@ fn benchmark(total: usize) -> HashMap<&'static str, Duration> {
         total
     );
     insert!(
+        "nohash_hasher::BuildNoHashHasher",
+        ret,
+        HashMap::<u32, i64, nohash_hasher::BuildNoHashHasher<u32>>::with_capacity_and_hasher(
+            2,
+            nohash_hasher::BuildNoHashHasher::default()
+        ),
+        total
+    );
+    insert!(
         "micromap::Map",
         ret,
         micromap::Map::<u32, i64, CAPACITY>::new(),
