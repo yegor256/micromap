@@ -36,6 +36,8 @@ macro_rules! eval {
             for i in 1..$capacity - 1 {
                 $map.insert(i as u32, i as i64);
                 assert_eq!(i as i64, *$map.get(&(i as u32)).unwrap());
+            }
+            for i in 1..$capacity - 1 {
                 $map.remove(&(i as u32));
             }
             sum += $map.iter().find(|(_k, v)| **v == 42).unwrap().1

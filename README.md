@@ -21,10 +21,18 @@ the performance of `micromap::Map` _may_ start to degrade.
 The only important restriction is that both key and value must implement the `Copy` trait.
 
 **WELCOME**: 
-Not all functions that a user expects to have in a map are implemented. 
+Not all functions that you might expect to have in a map are implemented. 
 I will appreciate if you contribute by implementing these missing functions.
+Here is [a full list](https://github.com/yegor256/micromap/issues) of missed features.
 
-Here is how you use it:
+First, add this to `Cargo.toml`:
+
+```toml
+[dependencies]
+micromap = "0.0.5"
+```
+
+Then, use it like a standard hash map... well, almost:
 
 ```rust
 use micromap::Map;
