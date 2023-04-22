@@ -3,4 +3,5 @@ target/
 *.relf
 *.svg
 bin/
-Cargo.toml-E
+*.bak
+tmp/
