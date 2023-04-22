@@ -44,18 +44,30 @@ macro_rules! eval {
     }};
 }
 
+macro_rules! insert {
+    ($name:expr, $ret:expr, $map:expr, $total:expr) => {{
+        let start = Instant::now();
+        let mut m = $map;
+        eval!(m, $total, CAPACITY);
+        let e = start.elapsed();
+        $ret.insert($name, e);
+    }};
+}
+
 fn benchmark(total: usize) -> HashMap<&'static str, Duration> {
     let mut ret = HashMap::new();
-    let start1 = Instant::now();
-    let mut m1 = HashMap::<u32, i64>::with_capacity(CAPACITY);
-    eval!(m1, total, CAPACITY);
-    let e1 = start1.elapsed();
-    ret.insert("std::collections::HashMap", e1);
-    let start2 = Instant::now();
-    let mut m2 = micromap::Map::<u32, i64, CAPACITY>::new();
-    eval!(m2, total, CAPACITY);
-    let e2 = start2.elapsed();
-    ret.insert("micromap::Map", e2);
+    insert!(
+        "std::collections::HashMap",
+        ret,
+        HashMap::<u32, i64>::with_capacity(CAPACITY),
+        total
+    );
+    insert!(
+        "micromap::Map",
+        ret,
+        micromap::Map::<u32, i64, CAPACITY>::new(),
+        total
+    );
     ret
 }
 
