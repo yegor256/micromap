@@ -21,8 +21,8 @@ the performance of `micromap::Map` _may_ start to degrade.
 The only important restriction is that both key and value must implement 
 the [`Copy`](https://doc.rust-lang.org/std/marker/trait.Copy.html) trait.
 
-<!-- benchmark-begin -->
-<!-- benchmark-end -->
+<!-- benchmark -->
+<!-- benchmark -->
 
 **WELCOME**: 
 Not all functions that you might expect to have in a map are implemented. 
