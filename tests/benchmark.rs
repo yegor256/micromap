@@ -84,6 +84,12 @@ fn benchmark(total: usize) -> HashMap<&'static str, Duration> {
         total
     );
     insert!(
+        "tinymap::array_map::ArrayMap",
+        ret,
+        tinymap::array_map::ArrayMap::<u32, i64, CAPACITY>::new(),
+        total
+    );
+    insert!(
         "micromap::Map",
         ret,
         micromap::Map::<u32, i64, CAPACITY>::new(),
