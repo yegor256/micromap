@@ -8,7 +8,7 @@ cp tests/benchmark.rs src/bin/benchmark.rs
 
 sed -E -i 's/\[dev-dependencies\]//g' Cargo.toml
 
-capacities="2 4 8 16 32"
+capacities="2 4 8 16 32 64"
 
 rm -rf tmp
 mkdir tmp
