@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v3
       - run: git pull --tags
       - run: latest=$(git tag | tail -1)
-      - run: sed -E -i 's/micromap = "[^"]+"/micromap = "${latest}"/g' README.md
+      - run: sed -E -i "s/micromap = \"[^\"]+\"/micromap = \"${latest}\"/g" README.md
       - uses: peter-evans/create-pull-request@v5
         with:
           commit-message: 'new version in README'
