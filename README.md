@@ -21,19 +21,6 @@ the performance of `micromap::Map` _may_ start to degrade.
 The only important restriction is that both key and value must implement 
 the [`Copy`](https://doc.rust-lang.org/std/marker/trait.Copy.html) trait.
 
-<!-- benchmark -->
-
-| | 2 | 4 | 8 | 16 | 32 | 64 |
-| --- | --- | --- | --- | --- | --- | --- |
-| `rustc_hash::FxHashMap` | 2113875.00 | 4.84 | 3.03 | 1.82 | 0.59 | 0.29 |
-| `tinymap::array_map::ArrayMap` | 160598.00 | 2.28 | 2.39 | 2.41 | 2.51 | 2.76 |
-| `std::collections::HashMap` | 3250962.00 | 7.97 | 4.78 | 2.85 | 1.34 | 0.68 |
-| `hashbrown::HashMap` | 3351360.00 | 5.28 | 3.06 | 1.61 | 0.67 | 0.31 |
-| `nohash_hasher::BuildNoHashHasher` | 2060176.00 | 5.13 | 3.73 | 1.39 | 0.63 | 0.31 |
-
-
-<!-- benchmark -->
-
 **WELCOME**: 
 Not all functions that you might expect to have in a map are implemented. 
 I will appreciate if you contribute by implementing these missing functions.
@@ -64,6 +51,27 @@ added to the map, it will panic.
 Read [the API documentation](https://docs.rs/micromap/latest/micromap/). The struct
 [`micromap::Map`](https://docs.rs/micromap/latest/micromap/struct.Map.html) is designed as closely similar to 
 [`std::collections::HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html) as possible.
+
+## Benchmark
+
+There is a summary of a simple benchmark, where we compare `micromap::Map` with
+a few other Rust maps, changing the total capacity of the map (horizontal axis).
+We apply the same interactions 
+([`benchmark.rs`](https://github.com/yegor256/micromap/blob/master/tests/benchmark.rs)) 
+to them and measure how fast they perform. The numbers above 1.0 indicate performance
+gain, while numbers below 1.0 demonstrate performance loss.
+
+<!-- benchmark -->
+
+| | 2 | 4 | 8 | 16 | 32 | 64 |
+| --- | --- | --- | --- | --- | --- | --- |
+| `rustc_hash::FxHashMap` | 2113875.00 | 4.84 | 3.03 | 1.82 | 0.59 | 0.29 |
+| `tinymap::array_map::ArrayMap` | 160598.00 | 2.28 | 2.39 | 2.41 | 2.51 | 2.76 |
+| `std::collections::HashMap` | 3250962.00 | 7.97 | 4.78 | 2.85 | 1.34 | 0.68 |
+| `hashbrown::HashMap` | 3351360.00 | 5.28 | 3.06 | 1.61 | 0.67 | 0.31 |
+| `nohash_hasher::BuildNoHashHasher` | 2060176.00 | 5.13 | 3.73 | 1.39 | 0.63 | 0.31 |
+
+<!-- benchmark -->
 
 ## How to Contribute
 
