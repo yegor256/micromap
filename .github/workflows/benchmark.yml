@@ -1,15 +1,13 @@
 ---
-name: pdd
+name: benchmark
 on:
   push:
     branches:
       - master
-  pull_request:
-    branches:
-      - master
 jobs:
-  pdd:
+  pr:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - uses: g4s8/pdd-action@master
+      - run: ./rebuild_benchmark.sh
+      - uses: peter-evans/create-pull-request@v5
