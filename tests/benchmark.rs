@@ -35,7 +35,9 @@ macro_rules! eval {
             $map.insert(0, 42);
             for i in 1..$capacity - 1 {
                 $map.insert(i as u32, i as i64);
-                assert_eq!(i as i64, *$map.get(&(i as u32)).unwrap());
+                if *$map.get(&(i as u32)).unwrap() != i as i64 {
+                    panic!("Why?");
+                }
             }
             for i in 1..$capacity - 1 {
                 $map.remove(&(i as u32));
