@@ -1,6 +1,6 @@
 [package]
 name = "micromap"
-version = "0.0.0"
+version = "0.0.7"
 edition = "2021"
 repository = "https://github.com/yegor256/micromap"
 description = "The fastest alternative to HashMap, for maps smaller than 20 keys"

@@ -39,7 +39,7 @@
 //! will have exactly ten elements. An attempt to add an 11th element will lead
 //! to a panic.
 
-#![doc(html_root_url = "https://docs.rs/micromap/0.0.0")]
+#![doc(html_root_url = "https://docs.rs/micromap/0.0.7")]
 #![deny(warnings)]
 #![warn(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
 #![allow(clippy::multiple_inherent_impl)]
