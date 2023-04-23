@@ -67,21 +67,21 @@ while the numbers below 1.0 demonstrate performance loss.
 <!-- benchmark -->
 | | 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
 | --- | --: | --: | --: | --: | --: | --: | --: | --: |
-| `hashbrown::HashMap` | 28.22 | 28.33 | 5.43 | 2.87 | 1.72 | 0.68 | 0.34 | 0.16 |
-| `indexmap::IndexMap` | 18.28 | 18.39 | 7.41 | 4.45 | 2.70 | 1.29 | 0.67 | 0.33 |
-| `linear_map::LinearMap` | 2.84 | 2.76 | 0.81 | 0.67 | 0.66 | 0.56 | 0.57 | 0.66 |
-| `linked_hash_map::LinkedHashMap` | 31.85 | 31.78 | 10.26 | 5.54 | 3.53 | 1.69 | 0.90 | 0.44 |
-| `litemap::LiteMap` | 5.59 | 6.49 | 1.52 | 1.02 | 0.84 | 0.51 | 0.34 | 0.22 |
+| `hashbrown::HashMap` | 28.20 | 21.80 | 5.31 | 2.81 | 1.69 | 0.68 | 0.34 | 0.16 |
+| `indexmap::IndexMap` | 19.41 | 15.21 | 7.26 | 4.40 | 2.65 | 1.32 | 0.66 | 0.33 |
+| `linear_map::LinearMap` | 2.94 | 2.26 | 0.75 | 0.69 | 0.66 | 0.56 | 0.55 | 0.66 |
+| `linked_hash_map::LinkedHashMap` | 31.84 | 24.51 | 9.37 | 5.33 | 4.18 | 1.69 | 0.87 | 0.43 |
+| `litemap::LiteMap` | 5.52 | 5.01 | 1.51 | 1.00 | 0.82 | 0.51 | 0.33 | 0.22 |
 | `micromap::Map` 👍 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
-| `nohash_hasher::BuildNoHashHasher` | 17.23 | 17.79 | 5.14 | 3.31 | 1.44 | 0.65 | 0.34 | 0.16 |
-| `rustc_hash::FxHashMap` | 18.05 | 18.37 | 4.88 | 2.78 | 1.85 | 0.59 | 0.31 | 0.15 |
-| `std::collections::BTreeMap` | 26.96 | 27.00 | 6.05 | 3.79 | 3.03 | 1.54 | 0.70 | 0.39 |
-| `std::collections::HashMap` | 28.57 | 26.51 | 7.70 | 4.28 | 2.78 | 1.31 | 0.68 | 0.34 |
-| `tinymap::array_map::ArrayMap` | 1.62 | 1.62 | 2.24 | 2.15 | 2.42 | 2.45 | 2.86 | 2.82 |
+| `nohash_hasher::BuildNoHashHasher` | 17.13 | 13.63 | 5.03 | 3.25 | 1.43 | 0.66 | 0.33 | 0.16 |
+| `rustc_hash::FxHashMap` | 18.13 | 14.17 | 4.79 | 2.72 | 1.82 | 0.59 | 0.31 | 0.15 |
+| `std::collections::BTreeMap` | 26.72 | 20.97 | 5.91 | 3.45 | 2.92 | 1.54 | 0.69 | 0.38 |
+| `std::collections::HashMap` | 26.39 | 20.60 | 7.39 | 4.24 | 2.75 | 1.34 | 0.67 | 0.34 |
+| `tinymap::array_map::ArrayMap` | 1.45 | 1.24 | 2.19 | 2.10 | 2.38 | 2.46 | 2.79 | 2.80 |
 
 The experiment was performed on 23-04-2023.
  There were 1000000 repetition cycles.
- The entire benchmark took 309s.
+ The entire benchmark took 305s.
 
 <!-- benchmark -->
 
