@@ -109,6 +109,12 @@ fn benchmark(total: usize) -> HashMap<&'static str, Duration> {
         total
     );
     insert!(
+        "linear_map::LinearMap",
+        ret,
+        linear_map::LinearMap::<u32, i64>::new(),
+        total
+    );
+    insert!(
         "micromap::Map",
         ret,
         micromap::Map::<u32, i64, CAPACITY>::new(),
