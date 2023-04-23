@@ -18,8 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// In order to run this single test:
-// $ cargo test --test vs_std -- --nocapture
+// In order to run this single test from the command line:
+// $ cargo test --test benchmark -- --nocapture
 
 use std::collections::HashMap;
 use std::env;
