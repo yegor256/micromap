@@ -62,9 +62,6 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
     #[inline]
     #[must_use]
     pub fn len(&self) -> usize {
-        if self.next == 0 {
-            return 0;
-        }
         let mut busy = 0;
         for i in 0..self.next {
             if self.pairs[i].is_some() {
