@@ -25,7 +25,7 @@ use std::collections::HashMap;
 use std::env;
 use std::time::{Duration, Instant};
 
-const CAPACITY: usize = 10;
+const CAPACITY: usize = 1;
 
 macro_rules! eval {
     ($map:expr, $total:expr, $capacity:expr) => {{
@@ -131,7 +131,7 @@ fn benchmark(total: usize) -> HashMap<&'static str, Duration> {
 
 #[test]
 pub fn benchmark_and_print() {
-    let times = benchmark(10000);
+    let times = benchmark(100000);
     let ours = times.get("micromap::Map").unwrap();
     for (m, d) in &times {
         println!(
