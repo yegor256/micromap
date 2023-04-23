@@ -67,20 +67,20 @@ while the numbers below 1.0 demonstrate performance loss.
 <!-- benchmark -->
 | | 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
 | --- | --: | --: | --: | --: | --: | --: | --: | --: |
-| `hashbrown::HashMap` | 16.14 | 16.14 | 3.50 | 2.38 | 1.24 | 0.53 | 0.25 | 0.12 |
-| `indexmap::IndexMap` | 13.88 | 14.00 | 6.05 | 4.32 | 2.24 | 1.18 | 0.55 | 0.28 |
-| `linear_map::LinearMap` | 2.28 | 2.21 | 0.67 | 0.62 | 0.56 | 0.73 | 0.61 | 0.63 |
-| `linked_hash_map::LinkedHashMap` | 26.08 | 26.36 | 8.07 | 5.26 | 2.99 | 1.50 | 0.72 | 0.36 |
+| `hashbrown::HashMap` | 29.04 | 29.05 | 5.51 | 3.04 | 1.73 | 0.67 | 0.34 | 0.17 |
+| `indexmap::IndexMap` | 20.02 | 20.27 | 7.76 | 4.78 | 2.82 | 1.31 | 0.65 | 0.35 |
+| `linear_map::LinearMap` | 3.35 | 3.37 | 0.78 | 0.73 | 0.68 | 0.71 | 0.62 | 0.69 |
+| `linked_hash_map::LinkedHashMap` | 33.23 | 33.53 | 9.78 | 5.80 | 3.61 | 1.70 | 0.85 | 0.46 |
 | `micromap::Map` 👍 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
-| `nohash_hasher::BuildNoHashHasher` | 12.08 | 12.07 | 3.69 | 2.76 | 1.02 | 0.49 | 0.24 | 0.12 |
-| `rustc_hash::FxHashMap` | 12.08 | 12.11 | 3.53 | 2.29 | 1.36 | 0.50 | 0.26 | 0.12 |
-| `std::collections::BTreeMap` | 22.40 | 22.24 | 5.04 | 3.41 | 2.56 | 1.28 | 0.59 | 0.35 |
-| `std::collections::HashMap` | 18.35 | 18.24 | 5.66 | 4.02 | 2.21 | 1.12 | 0.55 | 0.27 |
-| `tinymap::array_map::ArrayMap` | 1.20 | 1.40 | 2.12 | 2.40 | 2.26 | 2.33 | 2.21 | 2.04 |
+| `nohash_hasher::BuildNoHashHasher` | 18.73 | 18.94 | 5.23 | 3.51 | 1.45 | 0.64 | 0.32 | 0.17 |
+| `rustc_hash::FxHashMap` | 17.72 | 17.62 | 4.96 | 2.94 | 1.85 | 0.59 | 0.31 | 0.16 |
+| `std::collections::BTreeMap` | 26.93 | 27.94 | 6.00 | 3.81 | 3.00 | 1.59 | 0.68 | 0.40 |
+| `std::collections::HashMap` | 29.23 | 29.21 | 7.84 | 4.62 | 2.91 | 1.39 | 0.66 | 0.35 |
+| `tinymap::array_map::ArrayMap` | 1.54 | 1.88 | 2.34 | 2.23 | 2.47 | 2.43 | 2.74 | 2.93 |
 
 The experiment was performed on 23-04-2023.
  There were 1000000 repetition cycles.
- The entire benchmark took 307s.
+ The entire benchmark took 300s.
 
 <!-- benchmark -->
 
