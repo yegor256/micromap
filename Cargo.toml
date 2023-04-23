@@ -11,7 +11,7 @@ keywords = ["memory", "map"]
 categories = ["data-structures", "memory-management"]
 
 [dependencies]
-serde = { version = "1.0.160", features = ["derive"] }
+serde = { version = "1.0.160", optional = true, default-features = false }
 
 [dev-dependencies]
 anyhow = "1.0.70"

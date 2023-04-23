@@ -53,6 +53,7 @@ mod index;
 mod iterators;
 mod map;
 mod pair;
+#[cfg(feature = "serde")]
 mod serialization;
 
 /// A pair in the Map.
