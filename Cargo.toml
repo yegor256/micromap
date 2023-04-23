@@ -7,7 +7,7 @@ description = "A faster alternative to HashMap for super small maps"
 readme = "README.md"
 license = "MIT"
 homepage = "https://github.com/yegor256/micromap"
-keywords = ["memory"]
+keywords = ["memory", "map"]
 categories = ["data-structures", "memory-management"]
 
 [dependencies]
