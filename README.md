@@ -67,20 +67,21 @@ while the numbers below 1.0 demonstrate performance loss.
 <!-- benchmark -->
 | | 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
 | --- | --: | --: | --: | --: | --: | --: | --: | --: |
-| `hashbrown::HashMap` | 16.14 | 16.14 | 3.50 | 2.38 | 1.24 | 0.53 | 0.25 | 0.12 |
-| `indexmap::IndexMap` | 13.88 | 14.00 | 6.05 | 4.32 | 2.24 | 1.18 | 0.55 | 0.28 |
-| `linear_map::LinearMap` | 2.28 | 2.21 | 0.67 | 0.62 | 0.56 | 0.73 | 0.61 | 0.63 |
-| `linked_hash_map::LinkedHashMap` | 26.08 | 26.36 | 8.07 | 5.26 | 2.99 | 1.50 | 0.72 | 0.36 |
+| `hashbrown::HashMap` | 28.22 | 28.33 | 5.43 | 2.87 | 1.72 | 0.68 | 0.34 | 0.16 |
+| `indexmap::IndexMap` | 18.28 | 18.39 | 7.41 | 4.45 | 2.70 | 1.29 | 0.67 | 0.33 |
+| `linear_map::LinearMap` | 2.84 | 2.76 | 0.81 | 0.67 | 0.66 | 0.56 | 0.57 | 0.66 |
+| `linked_hash_map::LinkedHashMap` | 31.85 | 31.78 | 10.26 | 5.54 | 3.53 | 1.69 | 0.90 | 0.44 |
+| `litemap::LiteMap` | 5.59 | 6.49 | 1.52 | 1.02 | 0.84 | 0.51 | 0.34 | 0.22 |
 | `micromap::Map` 👍 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
-| `nohash_hasher::BuildNoHashHasher` | 12.08 | 12.07 | 3.69 | 2.76 | 1.02 | 0.49 | 0.24 | 0.12 |
-| `rustc_hash::FxHashMap` | 12.08 | 12.11 | 3.53 | 2.29 | 1.36 | 0.50 | 0.26 | 0.12 |
-| `std::collections::BTreeMap` | 22.40 | 22.24 | 5.04 | 3.41 | 2.56 | 1.28 | 0.59 | 0.35 |
-| `std::collections::HashMap` | 18.35 | 18.24 | 5.66 | 4.02 | 2.21 | 1.12 | 0.55 | 0.27 |
-| `tinymap::array_map::ArrayMap` | 1.20 | 1.40 | 2.12 | 2.40 | 2.26 | 2.33 | 2.21 | 2.04 |
+| `nohash_hasher::BuildNoHashHasher` | 17.23 | 17.79 | 5.14 | 3.31 | 1.44 | 0.65 | 0.34 | 0.16 |
+| `rustc_hash::FxHashMap` | 18.05 | 18.37 | 4.88 | 2.78 | 1.85 | 0.59 | 0.31 | 0.15 |
+| `std::collections::BTreeMap` | 26.96 | 27.00 | 6.05 | 3.79 | 3.03 | 1.54 | 0.70 | 0.39 |
+| `std::collections::HashMap` | 28.57 | 26.51 | 7.70 | 4.28 | 2.78 | 1.31 | 0.68 | 0.34 |
+| `tinymap::array_map::ArrayMap` | 1.62 | 1.62 | 2.24 | 2.15 | 2.42 | 2.45 | 2.86 | 2.82 |
 
 The experiment was performed on 23-04-2023.
  There were 1000000 repetition cycles.
- The entire benchmark took 307s.
+ The entire benchmark took 309s.
 
 <!-- benchmark -->
 
