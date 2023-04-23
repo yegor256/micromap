@@ -7,12 +7,15 @@
 [![docs.rs](https://img.shields.io/docsrs/micromap)](https://docs.rs/micromap/latest/micromap/)
 
 A much faster alternative of [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html), 
-for very small maps. It is also faster than
+for very small maps. 
+It is also faster than
 [FxHashMap](https://github.com/rust-lang/rustc-hash),
 [hashbrown](https://github.com/rust-lang/hashbrown),
-[ArrayMap](https://github.com/robjtede/tinymap), and _all_ others.
+[ArrayMap](https://github.com/robjtede/tinymap),
+[IndexMap](https://crates.io/crates/indexmap),
+and _all_ others.
 The smaller the map, the higher the performance. 
-When the map contains more than 20 keys, it may be better to use the standard 
+It was observed that when a map contains more than 20 keys, it may be better to use the standard 
 [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html), since
 the performance of `micromap::Map` _may_ start to degrade. 
 See the [benchmarking results](#benchmark) below.
