@@ -8,6 +8,7 @@ cp tests/benchmark.rs src/bin/benchmark.rs
 
 sed -E -i 's/\[dev-dependencies\]//g' Cargo.toml
 
+micromap="micromap::Map"
 capacities="1 2 4 8 16 32 64 128"
 cycles=1000000
 
@@ -34,9 +35,13 @@ lapsed=$SECONDS
   echo ''
   maps=$(cut -f 1 target/benchmark/2.out)
   for map in ${maps}; do
-    echo -n "| \`${map}\` |"
+    echo -n "| \`${map}\`"
+      if [ "${map}" == "${micromap}" ]; then
+        echo -n ' 👍'
+      fi
+    echo -n ' |'
     for capacity in ${capacities}; do
-      our=$(grep "micromap::Map" "target/benchmark/${capacity}.out" | cut -f 2)
+      our=$(grep "${micromap}" "target/benchmark/${capacity}.out" | cut -f 2)
       if [ "${our}" -eq "0" ]; then
         our=1
       fi
