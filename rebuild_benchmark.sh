@@ -62,7 +62,9 @@ lapsed=$SECONDS
     echo ''
   done
   echo ''
-  echo "There were ${cycles} repetition cycles. The entire benchmark took ${SECONDS}s."
+  echo "The experiment was performed on $(date +%d-%m-%Y)."
+  echo " There were ${cycles} repetition cycles."
+  echo " The entire benchmark took ${SECONDS}s."
 } > target/benchmark/table.md
 
 perl -e '
