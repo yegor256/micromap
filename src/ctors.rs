@@ -25,10 +25,13 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
     /// Make it.
     #[inline]
     #[must_use]
-    pub fn new() -> Self {
-        Self {
-            next: 0,
-            pairs: unsafe { *MaybeUninit::<[Pair<K, V>; N]>::uninit().as_mut_ptr() },
+    #[allow(clippy::uninit_assumed_init)]
+    pub const fn new() -> Self {
+        unsafe {
+            Self {
+                next: 0,
+                pairs: MaybeUninit::<[Pair<K, V>; N]>::uninit().assume_init(),
+            }
         }
     }
 }
