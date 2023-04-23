@@ -107,3 +107,14 @@ fn init() {
         .init()
         .unwrap();
 }
+
+#[cfg(test)]
+use anyhow::Result;
+
+#[test]
+fn map_can_be_cloned() -> Result<()> {
+    let mut m: Map<u8, u8, 8> = Map::new();
+    m.insert(0, 42);
+    assert_eq!(42, *m.clone().get(&0).unwrap());
+    Ok(())
+}
