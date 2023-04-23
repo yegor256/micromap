@@ -25,7 +25,7 @@ use std::collections::HashMap;
 use std::env;
 use std::time::{Duration, Instant};
 
-const CAPACITY: usize = 2;
+const CAPACITY: usize = 10;
 
 macro_rules! eval {
     ($map:expr, $total:expr, $capacity:expr) => {{
