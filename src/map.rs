@@ -28,7 +28,7 @@ impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Default for Map<K, V,
     }
 }
 
-impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
+impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     /// Make an iterator over all pairs.
     #[inline]
     #[must_use]

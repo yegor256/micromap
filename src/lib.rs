@@ -73,7 +73,7 @@ enum Pair<K, V> {
 /// space on stack. That's why the maximum size of the map must be provided in
 /// compile time.
 #[derive(Clone, Copy)]
-pub struct Map<K: Copy + PartialEq, V: Clone + Copy, const N: usize> {
+pub struct Map<K: PartialEq, V: Clone, const N: usize> {
     next: usize,
     pairs: [Pair<K, V>; N],
 }

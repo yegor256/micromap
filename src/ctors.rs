@@ -21,7 +21,7 @@
 use crate::{Map, Pair};
 use std::mem::MaybeUninit;
 
-impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Map<K, V, N> {
+impl<K: PartialEq, V: Clone, const N: usize> Map<K, V, N> {
     /// Make it.
     #[inline]
     #[must_use]
