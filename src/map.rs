@@ -262,7 +262,7 @@ fn removes_simple_pair() -> Result<()> {
 }
 
 #[cfg(test)]
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 struct Foo {
     v: [u32; 3],
 }
@@ -277,7 +277,7 @@ fn insert_struct() -> Result<()> {
 }
 
 #[cfg(test)]
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 struct Composite {
     r: Map<u8, u8, 1>,
 }
