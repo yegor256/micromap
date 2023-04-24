@@ -20,7 +20,7 @@
 
 use crate::Map;
 
-impl<K: Copy + PartialEq, V: Copy, const N: usize> FromIterator<(K, V)> for Map<K, V, N> {
+impl<K: Clone + PartialEq, V: Clone, const N: usize> FromIterator<(K, V)> for Map<K, V, N> {
     #[inline]
     fn from_iter<T: IntoIterator<Item = (K, V)>>(iter: T) -> Self {
         let mut m: Self = Self::new();
@@ -31,7 +31,7 @@ impl<K: Copy + PartialEq, V: Copy, const N: usize> FromIterator<(K, V)> for Map<
     }
 }
 
-impl<K: Copy + PartialEq, V: Copy, const N: usize> From<[(K, V); N]> for Map<K, V, N> {
+impl<K: Clone + PartialEq, V: Clone, const N: usize> From<[(K, V); N]> for Map<K, V, N> {
     #[inline]
     fn from(arr: [(K, V); N]) -> Self {
         Self::from_iter(arr)
