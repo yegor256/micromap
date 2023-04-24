@@ -87,3 +87,4 @@ perl -e '
 '
 
 git restore Cargo.toml
+rm -rf src/bin
