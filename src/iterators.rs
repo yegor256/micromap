@@ -55,7 +55,7 @@ impl<'a, K: Clone, V: Clone, const N: usize> Iterator for IntoIter<'a, K, V, N> 
     }
 }
 
-impl<'a, K: Copy + PartialEq, V: Copy, const N: usize> IntoIterator for &'a Map<K, V, N> {
+impl<'a, K: Clone + PartialEq, V: Clone, const N: usize> IntoIterator for &'a Map<K, V, N> {
     type Item = (K, V);
     type IntoIter = IntoIter<'a, K, V, N>;
 
