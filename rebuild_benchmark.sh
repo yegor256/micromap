@@ -9,7 +9,7 @@ cp tests/benchmark.rs src/bin/benchmark.rs
 sed -E -i 's/\[dev-dependencies\]//g' Cargo.toml
 
 micromap="micromap::Map"
-capacities="1 2 4 8 16 32 64 128"
+capacities="2 4 8 16 32 64 128"
 cycles=1000000
 
 rm -rf target/benchmark
