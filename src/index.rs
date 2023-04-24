@@ -29,7 +29,7 @@ impl<K: Clone + Eq + Borrow<Q>, Q: Eq + ?Sized, V: Clone, const N: usize> Index<
 
     #[inline]
     fn index(&self, key: &Q) -> &V {
-        self.get(key).expect("no entry found for key")
+        self.get(key).expect("No entry found for the key")
     }
 }
 
@@ -38,7 +38,7 @@ impl<K: Clone + Eq + Borrow<Q>, Q: Eq + ?Sized, V: Clone, const N: usize> IndexM
 {
     #[inline]
     fn index_mut(&mut self, key: &Q) -> &mut V {
-        self.get_mut(key).expect("no entry found for key")
+        self.get_mut(key).expect("No entry found for the key")
     }
 }
 
