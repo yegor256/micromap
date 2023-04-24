@@ -65,23 +65,23 @@ the numbers over 1.0 indicate performance gain,
 while the numbers below 1.0 demonstrate performance loss.
 
 <!-- benchmark -->
-| | 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
-| --- | --: | --: | --: | --: | --: | --: | --: | --: |
-| `hashbrown::HashMap` | 15.63 | 18.71 | 4.04 | 2.35 | 1.50 | 0.69 | 0.30 | 0.17 |
-| `indexmap::IndexMap` | 11.86 | 15.45 | 6.80 | 4.37 | 2.67 | 1.45 | 0.63 | 0.39 |
-| `linear_map::LinearMap` | 1.74 | 2.71 | 0.79 | 0.66 | 0.66 | 0.62 | 0.66 | 0.65 |
-| `linked_hash_map::LinkedHashMap` | 25.20 | 27.32 | 9.56 | 5.34 | 3.96 | 1.83 | 0.85 | 0.47 |
-| `litemap::LiteMap` | 4.03 | 5.27 | 1.38 | 1.03 | 0.85 | 0.56 | 0.30 | 0.23 |
-| `micromap::Map` 👍 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
-| `nohash_hasher::BuildNoHashHasher` | 11.29 | 13.47 | 4.39 | 2.79 | 1.21 | 0.62 | 0.29 | 0.16 |
-| `rustc_hash::FxHashMap` | 9.88 | 13.33 | 3.87 | 2.32 | 1.64 | 0.67 | 0.29 | 0.17 |
-| `std::collections::BTreeMap` | 19.09 | 22.74 | 5.56 | 3.57 | 2.90 | 1.54 | 0.66 | 0.43 |
-| `std::collections::HashMap` | 33.61 | 22.10 | 6.96 | 4.23 | 3.13 | 1.45 | 0.63 | 0.36 |
-| `tinymap::array_map::ArrayMap` | 1.26 | 1.24 | 2.28 | 2.22 | 2.54 | 2.77 | 2.43 | 2.50 |
+| | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
+| --- | --: | --: | --: | --: | --: | --: | --: |
+| `hashbrown::HashMap` | 16.18 | 3.42 | 2.33 | 1.24 | 0.51 | 0.26 | 0.12 |
+| `indexmap::IndexMap` | 14.07 | 5.88 | 4.20 | 2.27 | 1.14 | 0.57 | 0.28 |
+| `linear_map::LinearMap` | 2.37 | 0.67 | 0.60 | 0.56 | 0.48 | 0.60 | 0.49 |
+| `linked_hash_map::LinkedHashMap` | 26.45 | 7.58 | 5.15 | 3.19 | 1.45 | 0.74 | 0.35 |
+| `litemap::LiteMap` | 4.93 | 1.45 | 1.18 | 0.86 | 0.46 | 0.29 | 0.18 |
+| `micromap::Map` 👍 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
+| `nohash_hasher::BuildNoHashHasher` | 12.14 | 3.54 | 2.79 | 1.01 | 0.48 | 0.26 | 0.11 |
+| `rustc_hash::FxHashMap` | 12.11 | 3.30 | 2.24 | 1.36 | 0.48 | 0.26 | 0.12 |
+| `std::collections::BTreeMap` | 22.28 | 4.75 | 3.35 | 2.48 | 1.22 | 0.62 | 0.35 |
+| `std::collections::HashMap` | 18.44 | 5.58 | 3.90 | 2.21 | 1.13 | 0.57 | 0.26 |
+| `tinymap::array_map::ArrayMap` | 2.00 | 2.30 | 2.14 | 2.30 | 2.27 | 2.31 | 2.01 |
 
-The experiment was performed on 23-04-2023.
+The experiment was performed on 24-04-2023.
  There were 1000000 repetition cycles.
- The entire benchmark took 310s.
+ The entire benchmark took 295s.
 
 <!-- benchmark -->
 
