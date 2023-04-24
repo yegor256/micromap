@@ -20,7 +20,7 @@
 
 use crate::Map;
 
-impl<K: Copy + PartialEq, V: Copy + PartialEq, const N: usize> PartialEq for Map<K, V, N> {
+impl<K: Clone + PartialEq, V: Clone + PartialEq, const N: usize> PartialEq for Map<K, V, N> {
     /// Two maps can be compared.
     ///
     /// For example:
@@ -43,7 +43,7 @@ impl<K: Copy + PartialEq, V: Copy + PartialEq, const N: usize> PartialEq for Map
     }
 }
 
-impl<K: Copy + Eq, V: Copy + Eq, const N: usize> Eq for Map<K, V, N> {}
+impl<K: Clone + Eq, V: Clone + Eq, const N: usize> Eq for Map<K, V, N> {}
 
 #[cfg(test)]
 use anyhow::Result;
