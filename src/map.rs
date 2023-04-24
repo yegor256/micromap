@@ -22,7 +22,7 @@ use crate::Pair::{Absent, Present};
 use crate::{IntoIter, Iter, Map};
 use std::borrow::Borrow;
 
-impl<K: Copy + PartialEq, V: Clone + Copy, const N: usize> Default for Map<K, V, N> {
+impl<K: PartialEq, V: Clone, const N: usize> Default for Map<K, V, N> {
     fn default() -> Self {
         Self::new()
     }
