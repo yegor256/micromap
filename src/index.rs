@@ -22,7 +22,7 @@ use crate::Map;
 use std::borrow::Borrow;
 use std::ops::{Index, IndexMut};
 
-impl<K: Copy + Eq + Borrow<Q>, Q: Eq + ?Sized, V: Clone, const N: usize> Index<&Q>
+impl<K: Clone + Eq + Borrow<Q>, Q: Eq + ?Sized, V: Clone, const N: usize> Index<&Q>
     for Map<K, V, N>
 {
     type Output = V;
@@ -33,7 +33,7 @@ impl<K: Copy + Eq + Borrow<Q>, Q: Eq + ?Sized, V: Clone, const N: usize> Index<&
     }
 }
 
-impl<K: Copy + Eq + Borrow<Q>, Q: Eq + ?Sized, V: Clone, const N: usize> IndexMut<&Q>
+impl<K: Clone + Eq + Borrow<Q>, Q: Eq + ?Sized, V: Clone, const N: usize> IndexMut<&Q>
     for Map<K, V, N>
 {
     #[inline]
