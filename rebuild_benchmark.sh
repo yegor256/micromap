@@ -11,6 +11,7 @@ sed -E -i 's/\[dev-dependencies\]//g' Cargo.toml
 micromap="micromap::Map"
 capacities="2 4 8 16 32 64 128"
 cycles=1000000
+first=$(echo ${capacities} | cut -f1 -d' ')
 
 rm -rf target/benchmark
 mkdir -p target/benchmark
@@ -33,7 +34,7 @@ lapsed=$SECONDS
     echo -n " --: |"
   done
   echo ''
-  maps=$(cut -f 1 target/benchmark/2.out)
+  maps=$(cut -f 1 target/benchmark/${first}.out)
   for map in ${maps}; do
     echo -n "| \`${map}\`"
       if [ "${map}" == "${micromap}" ]; then
