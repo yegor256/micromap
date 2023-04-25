@@ -67,21 +67,21 @@ while the numbers below 1.0 demonstrate performance loss.
 <!-- benchmark -->
 | | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
 | --- | --: | --: | --: | --: | --: | --: | --: |
-| `hashbrown::HashMap` | 29.12 | 5.41 | 2.80 | 1.71 | 0.68 | 0.32 | 0.16 |
-| `indexmap::IndexMap` | 20.29 | 7.49 | 4.36 | 2.72 | 1.33 | 0.63 | 0.34 |
-| `linear_map::LinearMap` | 3.03 | 0.76 | 0.63 | 0.66 | 0.56 | 0.52 | 0.66 |
-| `linked_hash_map::LinkedHashMap` | 32.52 | 9.56 | 5.30 | 4.09 | 1.73 | 0.83 | 0.44 |
-| `litemap::LiteMap` | 6.69 | 1.51 | 0.99 | 0.82 | 0.51 | 0.31 | 0.22 |
+| `hashbrown::HashMap` | 16.03 | 3.35 | 2.35 | 1.16 | 0.49 | 0.26 | 0.13 |
+| `indexmap::IndexMap` | 14.75 | 6.03 | 4.16 | 2.20 | 1.14 | 0.58 | 0.27 |
+| `linear_map::LinearMap` | 2.15 | 0.70 | 0.60 | 0.55 | 0.46 | 0.59 | 0.48 |
+| `linked_hash_map::LinkedHashMap` | 26.87 | 7.52 | 5.16 | 3.20 | 1.44 | 0.73 | 0.33 |
+| `litemap::LiteMap` | 5.00 | 1.43 | 1.18 | 0.84 | 0.46 | 0.29 | 0.18 |
 | `micromap::Map` 👍 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
-| `nohash_hasher::BuildNoHashHasher` | 17.86 | 5.12 | 3.23 | 1.44 | 0.66 | 0.32 | 0.17 |
-| `rustc_hash::FxHashMap` | 18.86 | 4.89 | 2.71 | 1.83 | 0.59 | 0.29 | 0.16 |
-| `std::collections::BTreeMap` | 27.76 | 6.26 | 3.45 | 2.94 | 1.56 | 0.65 | 0.41 |
-| `std::collections::HashMap` | 29.35 | 7.56 | 4.19 | 2.83 | 1.35 | 0.64 | 0.34 |
-| `tinymap::array_map::ArrayMap` | 1.55 | 2.25 | 2.09 | 2.42 | 2.46 | 2.67 | 2.78 |
+| `nohash_hasher::BuildNoHashHasher` | 11.90 | 3.60 | 2.72 | 0.94 | 0.46 | 0.25 | 0.12 |
+| `rustc_hash::FxHashMap` | 12.01 | 3.30 | 2.29 | 1.31 | 0.48 | 0.26 | 0.12 |
+| `std::collections::BTreeMap` | 22.11 | 4.78 | 3.40 | 2.40 | 1.24 | 0.60 | 0.36 |
+| `std::collections::HashMap` | 18.11 | 5.53 | 4.17 | 2.10 | 1.09 | 0.56 | 0.27 |
+| `tinymap::array_map::ArrayMap` | 2.07 | 2.27 | 2.12 | 2.24 | 2.30 | 2.28 | 2.07 |
 
 The experiment was performed on 25-04-2023.
  There were 1000000 repetition cycles.
- The entire benchmark took 328s.
+ The entire benchmark took 345s.
 
 <!-- benchmark -->
 
