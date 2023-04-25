@@ -20,9 +20,6 @@ It was observed that when a map contains more than 20 keys, it may be better to 
 the performance of `micromap::Map` _may_ start to degrade. 
 See the [benchmarking results](#benchmark) below.
 
-The only important restriction is that both key and value must implement 
-the [`Copy`](https://doc.rust-lang.org/std/marker/trait.Copy.html) trait.
-
 **WELCOME**: 
 Not all functions that you might expect to have in a map are implemented. 
 I will appreciate if you contribute by implementing these 
