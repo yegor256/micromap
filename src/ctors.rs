@@ -21,6 +21,12 @@
 use crate::{Map, Pair};
 use std::mem::MaybeUninit;
 
+impl<K: Clone + PartialEq, V: Clone, const N: usize> Default for Map<K, V, N> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<K: Clone + PartialEq, V: Clone, const N: usize> Map<K, V, N> {
     /// Make it.
     #[inline]
@@ -38,6 +44,13 @@ impl<K: Clone + PartialEq, V: Clone, const N: usize> Map<K, V, N> {
 
 #[cfg(test)]
 use anyhow::Result;
+
+#[test]
+fn makes_default_map() -> Result<()> {
+    let m: Map<u8, u8, 8> = Map::default();
+    assert_eq!(0, m.len());
+    Ok(())
+}
 
 #[test]
 fn makes_new_map() -> Result<()> {

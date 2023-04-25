@@ -23,12 +23,6 @@ use crate::{IntoIter, Iter, Map};
 use std::borrow::Borrow;
 use std::mem::MaybeUninit;
 
-impl<K: Clone + PartialEq, V: Clone, const N: usize> Default for Map<K, V, N> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     /// Make an iterator over all pairs.
     #[inline]
