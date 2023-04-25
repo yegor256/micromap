@@ -67,21 +67,22 @@ while the numbers below 1.0 demonstrate performance loss.
 <!-- benchmark -->
 | | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
 | --- | --: | --: | --: | --: | --: | --: | --: |
-| `hashbrown::HashMap` | 16.11 | 3.49 | 2.34 | 1.24 | 0.51 | 0.26 | 0.12 |
-| `indexmap::IndexMap` | 14.03 | 5.82 | 4.52 | 2.26 | 1.16 | 0.57 | 0.29 |
-| `linear_map::LinearMap` | 2.24 | 0.68 | 0.60 | 0.56 | 0.48 | 0.60 | 0.49 |
-| `linked_hash_map::LinkedHashMap` | 26.37 | 7.57 | 5.17 | 3.21 | 1.45 | 0.75 | 0.36 |
-| `litemap::LiteMap` | 4.93 | 1.48 | 1.18 | 0.85 | 0.46 | 0.29 | 0.18 |
+| `hashbrown::HashMap` | 16.12 | 3.47 | 2.34 | 1.24 | 0.51 | 0.26 | 0.12 |
+| `indexmap::IndexMap` | 13.98 | 6.07 | 4.28 | 2.26 | 1.15 | 0.57 | 0.27 |
+| `linear_map::LinearMap` | 2.22 | 0.68 | 0.61 | 0.56 | 0.48 | 0.60 | 0.49 |
+| `linked_hash_map::LinkedHashMap` | 26.38 | 7.67 | 5.18 | 3.24 | 1.46 | 0.77 | 0.35 |
+| `litemap::LiteMap` | 4.97 | 1.48 | 1.19 | 0.86 | 0.46 | 0.29 | 0.18 |
 | `micromap::Map` 👍 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
-| `nohash_hasher::BuildNoHashHasher` | 12.12 | 3.58 | 2.71 | 1.02 | 0.48 | 0.24 | 0.11 |
-| `rustc_hash::FxHashMap` | 12.07 | 3.35 | 2.25 | 1.36 | 0.48 | 0.25 | 0.12 |
-| `std::collections::BTreeMap` | 22.35 | 4.85 | 3.33 | 2.55 | 1.22 | 0.60 | 0.34 |
-| `std::collections::HashMap` | 18.46 | 5.61 | 3.91 | 2.25 | 1.10 | 0.56 | 0.26 |
-| `tinymap::array_map::ArrayMap` | 2.00 | 2.32 | 2.14 | 2.30 | 2.30 | 2.29 | 2.01 |
+| `nohash_hasher::BuildNoHashHasher` | 12.07 | 3.58 | 2.72 | 1.01 | 0.48 | 0.25 | 0.11 |
+| `rustc_hash::FxHashMap` | 12.06 | 3.34 | 2.25 | 1.36 | 0.48 | 0.25 | 0.12 |
+| `std::collections::BTreeMap` | 22.61 | 4.80 | 3.38 | 2.49 | 1.22 | 0.60 | 0.35 |
+| `std::collections::HashMap` | 18.61 | 5.67 | 4.02 | 2.24 | 1.13 | 0.56 | 0.26 |
+| `tinymap::array_map::ArrayMap` | 2.00 | 2.32 | 2.15 | 2.26 | 2.28 | 2.30 | 2.01 |
 
 The experiment [was performed](https://github.com/yegor256/micromap/actions/workflows/benchmark.yml) on 25-04-2023.
 There were 1000000 repetition cycles.
-The entire benchmark took 295s.
+The entire benchmark took 352s.
+
 <!-- benchmark -->
 
 As you see, the highest performance gain was achieved for the maps that were smaller than ten keys.
