@@ -2,7 +2,10 @@
 name: up
 on:
   push:
+    branches:
+      - master
     tags:
+      - '*'
 jobs:
   up:
     runs-on: ubuntu-20.04
