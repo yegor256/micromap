@@ -82,7 +82,6 @@ while the numbers below 1.0 demonstrate performance loss.
 The experiment [was performed](https://github.com/yegor256/micromap/actions/workflows/benchmark.yml) on 25-04-2023.
 There were 1000000 repetition cycles.
 The entire benchmark took 295s.
-
 <!-- benchmark -->
 
 As you see, the highest performance gain was achieved for the maps that were smaller than ten keys.
