@@ -67,22 +67,21 @@ while the numbers below 1.0 demonstrate performance loss.
 <!-- benchmark -->
 | | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
 | --- | --: | --: | --: | --: | --: | --: | --: |
-| `hashbrown::HashMap` | 16.03 | 3.35 | 2.35 | 1.16 | 0.49 | 0.26 | 0.13 |
-| `indexmap::IndexMap` | 14.75 | 6.03 | 4.16 | 2.20 | 1.14 | 0.58 | 0.27 |
-| `linear_map::LinearMap` | 2.15 | 0.70 | 0.60 | 0.55 | 0.46 | 0.59 | 0.48 |
-| `linked_hash_map::LinkedHashMap` | 26.87 | 7.52 | 5.16 | 3.20 | 1.44 | 0.73 | 0.33 |
-| `litemap::LiteMap` | 5.00 | 1.43 | 1.18 | 0.84 | 0.46 | 0.29 | 0.18 |
+| `hashbrown::HashMap` | 16.11 | 3.49 | 2.34 | 1.24 | 0.51 | 0.26 | 0.12 |
+| `indexmap::IndexMap` | 14.03 | 5.82 | 4.52 | 2.26 | 1.16 | 0.57 | 0.29 |
+| `linear_map::LinearMap` | 2.24 | 0.68 | 0.60 | 0.56 | 0.48 | 0.60 | 0.49 |
+| `linked_hash_map::LinkedHashMap` | 26.37 | 7.57 | 5.17 | 3.21 | 1.45 | 0.75 | 0.36 |
+| `litemap::LiteMap` | 4.93 | 1.48 | 1.18 | 0.85 | 0.46 | 0.29 | 0.18 |
 | `micromap::Map` 👍 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
-| `nohash_hasher::BuildNoHashHasher` | 11.90 | 3.60 | 2.72 | 0.94 | 0.46 | 0.25 | 0.12 |
-| `rustc_hash::FxHashMap` | 12.01 | 3.30 | 2.29 | 1.31 | 0.48 | 0.26 | 0.12 |
-| `std::collections::BTreeMap` | 22.11 | 4.78 | 3.40 | 2.40 | 1.24 | 0.60 | 0.36 |
-| `std::collections::HashMap` | 18.11 | 5.53 | 4.17 | 2.10 | 1.09 | 0.56 | 0.27 |
-| `tinymap::array_map::ArrayMap` | 2.07 | 2.27 | 2.12 | 2.24 | 2.30 | 2.28 | 2.07 |
+| `nohash_hasher::BuildNoHashHasher` | 12.12 | 3.58 | 2.71 | 1.02 | 0.48 | 0.24 | 0.11 |
+| `rustc_hash::FxHashMap` | 12.07 | 3.35 | 2.25 | 1.36 | 0.48 | 0.25 | 0.12 |
+| `std::collections::BTreeMap` | 22.35 | 4.85 | 3.33 | 2.55 | 1.22 | 0.60 | 0.34 |
+| `std::collections::HashMap` | 18.46 | 5.61 | 3.91 | 2.25 | 1.10 | 0.56 | 0.26 |
+| `tinymap::array_map::ArrayMap` | 2.00 | 2.32 | 2.14 | 2.30 | 2.30 | 2.29 | 2.01 |
 
-The experiment was performed on 25-04-2023.
- There were 1000000 repetition cycles.
- The entire benchmark took 345s.
-
+The experiment [was performed](https://github.com/yegor256/micromap/actions/workflows/benchmark.yml) on 25-04-2023.
+There were 1000000 repetition cycles.
+The entire benchmark took 295s.
 <!-- benchmark -->
 
 As you see, the highest performance gain was achieved for the maps that were smaller than ten keys.
