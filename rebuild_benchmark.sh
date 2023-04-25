@@ -62,9 +62,9 @@ lapsed=$SECONDS
     echo ''
   done
   echo ''
-  echo "The experiment was performed on $(date +%d-%m-%Y)."
-  echo " There were ${cycles} repetition cycles."
-  echo " The entire benchmark took ${SECONDS}s."
+  echo "The experiment [was performed](https://github.com/yegor256/micromap/actions/workflows/benchmark.yml) on $(date +%d-%m-%Y)."
+  echo "There were ${cycles} repetition cycles."
+  echo "The entire benchmark took ${SECONDS}s."
 } > target/benchmark/table.md
 
 perl -e '
