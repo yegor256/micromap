@@ -65,21 +65,24 @@ the numbers over 1.0 indicate performance gain,
 while the numbers below 1.0 demonstrate performance loss.
 
 <!-- benchmark -->
-| `hashbrown::HashMap` | 18.04 | 3.79 | 2.34 | 1.44 | 0.67 | 0.30 | 0.17 |
-| `indexmap::IndexMap` | 14.77 | 6.44 | 4.30 | 2.42 | 1.44 | 0.63 | 0.35 |
-| `linear_map::LinearMap` | 2.50 | 0.76 | 0.65 | 0.60 | 0.63 | 0.65 | 0.63 |
-| `linked_hash_map::LinkedHashMap` | 27.67 | 8.46 | 5.39 | 3.13 | 1.80 | 0.84 | 0.47 |
-| `litemap::LiteMap` | 4.93 | 1.39 | 0.96 | 0.80 | 0.54 | 0.30 | 0.23 |
+| | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
+| --- | --: | --: | --: | --: | --: | --: | --: |
+| `hashbrown::HashMap` | 29.12 | 5.41 | 2.80 | 1.71 | 0.68 | 0.32 | 0.16 |
+| `indexmap::IndexMap` | 20.29 | 7.49 | 4.36 | 2.72 | 1.33 | 0.63 | 0.34 |
+| `linear_map::LinearMap` | 3.03 | 0.76 | 0.63 | 0.66 | 0.56 | 0.52 | 0.66 |
+| `linked_hash_map::LinkedHashMap` | 32.52 | 9.56 | 5.30 | 4.09 | 1.73 | 0.83 | 0.44 |
+| `litemap::LiteMap` | 6.69 | 1.51 | 0.99 | 0.82 | 0.51 | 0.31 | 0.22 |
 | `micromap::Map` 👍 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
-| `nohash_hasher::BuildNoHashHasher` | 13.75 | 3.94 | 2.73 | 1.13 | 0.62 | 0.28 | 0.15 |
-| `rustc_hash::FxHashMap` | 15.37 | 3.67 | 2.28 | 1.53 | 0.61 | 0.30 | 0.16 |
-| `std::collections::BTreeMap` | 23.23 | 5.41 | 3.37 | 2.67 | 1.51 | 0.64 | 0.43 |
-| `std::collections::HashMap` | 46.50 | 6.26 | 3.98 | 2.38 | 1.35 | 0.62 | 0.36 |
-| `tinymap::array_map::ArrayMap` | 1.21 | 2.26 | 2.23 | 2.26 | 2.64 | 2.37 | 2.52 |
+| `nohash_hasher::BuildNoHashHasher` | 17.86 | 5.12 | 3.23 | 1.44 | 0.66 | 0.32 | 0.17 |
+| `rustc_hash::FxHashMap` | 18.86 | 4.89 | 2.71 | 1.83 | 0.59 | 0.29 | 0.16 |
+| `std::collections::BTreeMap` | 27.76 | 6.26 | 3.45 | 2.94 | 1.56 | 0.65 | 0.41 |
+| `std::collections::HashMap` | 29.35 | 7.56 | 4.19 | 2.83 | 1.35 | 0.64 | 0.34 |
+| `tinymap::array_map::ArrayMap` | 1.55 | 2.25 | 2.09 | 2.42 | 2.46 | 2.67 | 2.78 |
 
 The experiment was performed on 25-04-2023.
  There were 1000000 repetition cycles.
- The entire benchmark took 385s.
+ The entire benchmark took 328s.
+
 <!-- benchmark -->
 
 As you see, the highest performance gain was achieved for the maps that were smaller than ten keys.
