@@ -89,3 +89,12 @@ fn serialize_and_deserialize() -> Result<()> {
     assert_eq!(42, after.into_iter().next().unwrap().1);
     Ok(())
 }
+
+#[test]
+fn empty_map_serde() -> Result<()> {
+    let before: Map<u8, u8, 8> = Map::new();
+    let bytes: Vec<u8> = serialize(&before)?;
+    let after: Map<u8, u8, 8> = deserialize(&bytes)?;
+    assert!(after.is_empty());
+    Ok(())
+}
