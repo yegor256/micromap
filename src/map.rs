@@ -21,7 +21,6 @@
 use crate::Pair::{Absent, Present};
 use crate::{IntoIter, Iter, Map};
 use std::borrow::Borrow;
-use std::mem::MaybeUninit;
 
 impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     /// Make an iterator over all pairs.
@@ -106,12 +105,12 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
         for i in 0..self.next {
             let p = unsafe { self.pairs[i].assume_init_ref() };
             if !p.is_some() {
-                self.pairs[i] = MaybeUninit::new(Present((k, v)));
+                self.pairs[i].write(Present((k, v)));
                 return;
             }
         }
         if self.next < N {
-            self.pairs[self.next] = MaybeUninit::new(Present((k, v)));
+            self.pairs[self.next].write(Present((k, v)));
             self.next += 1;
             return;
         }
