@@ -116,3 +116,33 @@ fn insert_and_into_iterate() -> Result<()> {
     assert_eq!(58, sum);
     Ok(())
 }
+
+#[test]
+fn iterate_with_blanks() -> Result<()> {
+    let mut m: Map<&str, i32, 10> = Map::new();
+    m.insert("one", 1);
+    m.insert("two", 3);
+    m.insert("three", 5);
+    m.remove(&"two");
+    let mut sum = 0;
+    for (_k, v) in m.iter() {
+        sum += v;
+    }
+    assert_eq!(6, sum);
+    Ok(())
+}
+
+#[test]
+fn into_iterate_with_blanks() -> Result<()> {
+    let mut m: Map<&str, i32, 10> = Map::new();
+    m.insert("one", 1);
+    m.insert("two", 3);
+    m.insert("three", 5);
+    m.remove(&"two");
+    let mut sum = 0;
+    for (_k, v) in m.into_iter() {
+        sum += v;
+    }
+    assert_eq!(6, sum);
+    Ok(())
+}
