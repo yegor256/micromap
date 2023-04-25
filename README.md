@@ -67,21 +67,21 @@ while the numbers below 1.0 demonstrate performance loss.
 <!-- benchmark -->
 | | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
 | --- | --: | --: | --: | --: | --: | --: | --: |
-| `hashbrown::HashMap` | 29.12 | 5.41 | 2.80 | 1.71 | 0.68 | 0.32 | 0.16 |
-| `indexmap::IndexMap` | 20.29 | 7.49 | 4.36 | 2.72 | 1.33 | 0.63 | 0.34 |
-| `linear_map::LinearMap` | 3.03 | 0.76 | 0.63 | 0.66 | 0.56 | 0.52 | 0.66 |
-| `linked_hash_map::LinkedHashMap` | 32.52 | 9.56 | 5.30 | 4.09 | 1.73 | 0.83 | 0.44 |
-| `litemap::LiteMap` | 6.69 | 1.51 | 0.99 | 0.82 | 0.51 | 0.31 | 0.22 |
+| `hashbrown::HashMap` | 19.47 | 4.19 | 2.28 | 1.39 | 0.68 | 0.29 | 0.17 |
+| `indexmap::IndexMap` | 14.51 | 7.29 | 3.95 | 2.45 | 1.45 | 0.61 | 0.38 |
+| `linear_map::LinearMap` | 2.53 | 0.92 | 0.58 | 0.62 | 0.61 | 0.63 | 0.66 |
+| `linked_hash_map::LinkedHashMap` | 29.56 | 11.10 | 5.01 | 3.27 | 1.87 | 0.82 | 0.47 |
+| `litemap::LiteMap` | 4.78 | 1.58 | 0.94 | 0.76 | 0.53 | 0.29 | 0.24 |
 | `micromap::Map` 👍 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
-| `nohash_hasher::BuildNoHashHasher` | 17.86 | 5.12 | 3.23 | 1.44 | 0.66 | 0.32 | 0.17 |
-| `rustc_hash::FxHashMap` | 18.86 | 4.89 | 2.71 | 1.83 | 0.59 | 0.29 | 0.16 |
-| `std::collections::BTreeMap` | 27.76 | 6.26 | 3.45 | 2.94 | 1.56 | 0.65 | 0.41 |
-| `std::collections::HashMap` | 29.35 | 7.56 | 4.19 | 2.83 | 1.35 | 0.64 | 0.34 |
-| `tinymap::array_map::ArrayMap` | 1.55 | 2.25 | 2.09 | 2.42 | 2.46 | 2.67 | 2.78 |
+| `nohash_hasher::BuildNoHashHasher` | 13.04 | 4.93 | 2.48 | 1.14 | 0.61 | 0.27 | 0.16 |
+| `rustc_hash::FxHashMap` | 12.82 | 4.74 | 2.14 | 1.45 | 0.61 | 0.28 | 0.17 |
+| `std::collections::BTreeMap` | 21.79 | 5.96 | 3.24 | 2.72 | 1.52 | 0.64 | 0.46 |
+| `std::collections::HashMap` | 30.46 | 6.80 | 3.98 | 2.42 | 1.36 | 0.59 | 0.36 |
+| `tinymap::array_map::ArrayMap` | 1.59 | 2.49 | 1.99 | 2.29 | 2.68 | 2.34 | 2.65 |
 
 The experiment was performed on 25-04-2023.
  There were 1000000 repetition cycles.
- The entire benchmark took 328s.
+ The entire benchmark took 358s.
 
 <!-- benchmark -->
 
