@@ -88,7 +88,7 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
             let p = unsafe { self.pairs[i].assume_init_ref() };
             if let Present((bk, _bv)) = &p {
                 if bk == k {
-                    self.pairs[i] = MaybeUninit::new(Absent);
+                    self.pairs[i].write(Absent);
                     break;
                 }
             }
@@ -172,7 +172,7 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
             let p = unsafe { self.pairs[i].assume_init_ref() };
             if let Present((k, v)) = &p {
                 if !f(k, v) {
-                    self.pairs[i] = MaybeUninit::new(Absent);
+                    self.pairs[i].write(Absent);
                 }
             }
         }
