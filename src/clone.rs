@@ -34,7 +34,6 @@ impl<K: Clone + PartialEq, V: Clone, const N: usize> Clone for Map<K, V, N> {
 use anyhow::Result;
 
 #[test]
-#[ignore]
 fn map_can_be_cloned() -> Result<()> {
     let mut m: Map<u8, u8, 16> = Map::new();
     m.insert(0, 42);
