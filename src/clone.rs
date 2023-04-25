@@ -40,3 +40,10 @@ fn map_can_be_cloned() -> Result<()> {
     assert_eq!(42, *m.clone().get(&0).unwrap());
     Ok(())
 }
+
+#[test]
+fn empty_map_can_be_cloned() -> Result<()> {
+    let m: Map<u8, u8, 16> = Map::new();
+    assert!(m.clone().is_empty());
+    Ok(())
+}
