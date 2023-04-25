@@ -27,7 +27,8 @@ impl<'a, K: Clone, V: Clone, const N: usize> Iterator for Iter<'a, K, V, N> {
     #[must_use]
     fn next(&mut self) -> Option<Self::Item> {
         while self.pos < self.next {
-            if let Present(p) = &self.pairs[self.pos] {
+            let p = unsafe { self.pairs[self.pos].assume_init_ref() };
+            if let Present(p) = p {
                 self.pos += 1;
                 return Some((&p.0, &p.1));
             }
@@ -44,10 +45,10 @@ impl<'a, K: Clone, V: Clone, const N: usize> Iterator for IntoIter<'a, K, V, N> 
     #[must_use]
     fn next(&mut self) -> Option<Self::Item> {
         while self.pos < self.next {
-            if self.pairs[self.pos].is_some() {
-                let pair = self.pairs[self.pos].clone().unwrap();
+            let p = unsafe { self.pairs[self.pos].assume_init_ref() };
+            if p.is_some() {
                 self.pos += 1;
-                return Some(pair);
+                return Some(p.clone().unwrap());
             }
             self.pos += 1;
         }

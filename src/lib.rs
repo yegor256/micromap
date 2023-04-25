@@ -45,6 +45,7 @@
 #![allow(clippy::multiple_inherent_impl)]
 #![allow(clippy::multiple_crate_versions)]
 
+mod clone;
 mod ctors;
 mod debug;
 mod eq;
@@ -57,7 +58,7 @@ mod pair;
 mod serialization;
 
 /// A pair in the Map.
-#[derive(Clone, Default, Copy, Eq, PartialEq)]
+#[derive(Clone, Default, Eq, PartialEq)]
 enum Pair<K, V> {
     Present((K, V)),
     #[default]
@@ -72,28 +73,28 @@ enum Pair<K, V> {
 /// because it doesn't use heap. When a [`Map`] is being created, it allocates the necessary
 /// space on stack. That's why the maximum size of the map must be provided in
 /// compile time.
-#[derive(Clone, Copy)]
-pub struct Map<K: PartialEq, V: Clone, const N: usize> {
+pub struct Map<K: Clone + PartialEq, V: Clone, const N: usize> {
     next: usize,
-    pairs: [Pair<K, V>; N],
+    pairs: [MaybeUninit<Pair<K, V>>; N],
 }
 
 /// Iterator over the [`Map`].
 pub struct Iter<'a, K, V, const N: usize> {
     next: usize,
     pos: usize,
-    pairs: &'a [Pair<K, V>; N],
+    pairs: &'a [MaybeUninit<Pair<K, V>>; N],
 }
 
 /// Into-iterator over the [`Map`].
 pub struct IntoIter<'a, K, V, const N: usize> {
     next: usize,
     pos: usize,
-    pairs: &'a [Pair<K, V>; N],
+    pairs: &'a [MaybeUninit<Pair<K, V>>; N],
 }
 
 #[cfg(test)]
 use simple_logger::SimpleLogger;
+use std::mem::MaybeUninit;
 
 #[cfg(test)]
 use log::LevelFilter;

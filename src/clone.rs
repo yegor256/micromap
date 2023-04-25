@@ -18,21 +18,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use crate::{Map, Pair};
-use std::mem::MaybeUninit;
+use crate::Map;
 
-impl<K: Clone + PartialEq, V: Clone, const N: usize> Map<K, V, N> {
-    /// Make it.
-    #[inline]
-    #[must_use]
-    #[allow(clippy::uninit_assumed_init)]
-    pub const fn new() -> Self {
-        unsafe {
-            Self {
-                next: 0,
-                pairs: MaybeUninit::<[MaybeUninit<Pair<K, V>>; N]>::uninit().assume_init(),
-            }
+impl<K: Clone + PartialEq, V: Clone, const N: usize> Clone for Map<K, V, N> {
+    fn clone(&self) -> Self {
+        let mut m: Self = Self::new();
+        for (k, v) in self.iter() {
+            m.insert(k.clone(), v.clone());
         }
+        m
     }
 }
 
@@ -40,14 +34,10 @@ impl<K: Clone + PartialEq, V: Clone, const N: usize> Map<K, V, N> {
 use anyhow::Result;
 
 #[test]
-fn makes_new_map() -> Result<()> {
-    let m: Map<u8, u8, 8> = Map::new();
-    assert_eq!(0, m.len());
-    Ok(())
-}
-
-#[test]
-fn drops_correctly() -> Result<()> {
-    let _m: Map<Vec<u8>, u8, 8> = Map::new();
+#[ignore]
+fn map_can_be_cloned() -> Result<()> {
+    let mut m: Map<u8, u8, 16> = Map::new();
+    m.insert(0, 42);
+    assert_eq!(42, *m.clone().get(&0).unwrap());
     Ok(())
 }

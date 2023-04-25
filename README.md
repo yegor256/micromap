@@ -65,8 +65,6 @@ the numbers over 1.0 indicate performance gain,
 while the numbers below 1.0 demonstrate performance loss.
 
 <!-- benchmark -->
-| | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
-| --- | --: | --: | --: | --: | --: | --: | --: |
 | `hashbrown::HashMap` | 18.04 | 3.79 | 2.34 | 1.44 | 0.67 | 0.30 | 0.17 |
 | `indexmap::IndexMap` | 14.77 | 6.44 | 4.30 | 2.42 | 1.44 | 0.63 | 0.35 |
 | `linear_map::LinearMap` | 2.50 | 0.76 | 0.65 | 0.60 | 0.63 | 0.65 | 0.63 |
@@ -79,10 +77,9 @@ while the numbers below 1.0 demonstrate performance loss.
 | `std::collections::HashMap` | 46.50 | 6.26 | 3.98 | 2.38 | 1.35 | 0.62 | 0.36 |
 | `tinymap::array_map::ArrayMap` | 1.21 | 2.26 | 2.23 | 2.26 | 2.64 | 2.37 | 2.52 |
 
-The experiment was performed on 24-04-2023.
+The experiment was performed on 25-04-2023.
  There were 1000000 repetition cycles.
  The entire benchmark took 385s.
-
 <!-- benchmark -->
 
 As you see, the highest performance gain was achieved for the maps that were smaller than ten keys.

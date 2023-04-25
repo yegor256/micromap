@@ -21,8 +21,9 @@
 use crate::Pair::{Absent, Present};
 use crate::{IntoIter, Iter, Map};
 use std::borrow::Borrow;
+use std::mem::MaybeUninit;
 
-impl<K: PartialEq, V: Clone, const N: usize> Default for Map<K, V, N> {
+impl<K: Clone + PartialEq, V: Clone, const N: usize> Default for Map<K, V, N> {
     fn default() -> Self {
         Self::new()
     }
@@ -64,7 +65,8 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     pub fn len(&self) -> usize {
         let mut busy = 0;
         for i in 0..self.next {
-            if self.pairs[i].is_some() {
+            let p = unsafe { self.pairs[i].assume_init_ref() };
+            if p.is_some() {
                 busy += 1;
             }
         }
@@ -75,7 +77,8 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     #[inline]
     pub fn contains_key(&self, k: &K) -> bool {
         for i in 0..self.next {
-            if let Present((bk, _bv)) = &self.pairs[i] {
+            let p = unsafe { self.pairs[i].assume_init_ref() };
+            if let Present((bk, _bv)) = &p {
                 if bk == k {
                     return true;
                 }
@@ -88,9 +91,10 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     #[inline]
     pub fn remove(&mut self, k: &K) {
         for i in 0..self.next {
-            if let Present((bk, _bv)) = &self.pairs[i] {
+            let p = unsafe { self.pairs[i].assume_init_ref() };
+            if let Present((bk, _bv)) = &p {
                 if bk == k {
-                    self.pairs[i] = Absent;
+                    self.pairs[i] = MaybeUninit::new(Absent);
                     break;
                 }
             }
@@ -106,13 +110,14 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     pub fn insert(&mut self, k: K, v: V) {
         self.remove(&k);
         for i in 0..self.next {
-            if !self.pairs[i].is_some() {
-                self.pairs[i] = Present((k, v));
+            let p = unsafe { self.pairs[i].assume_init_ref() };
+            if !p.is_some() {
+                self.pairs[i] = MaybeUninit::new(Present((k, v)));
                 return;
             }
         }
         if self.next < N {
-            self.pairs[self.next] = Present((k, v));
+            self.pairs[self.next] = MaybeUninit::new(Present((k, v)));
             self.next += 1;
             return;
         }
@@ -127,7 +132,8 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
         K: Borrow<Q>,
     {
         for i in 0..self.next {
-            if let Present(p) = &self.pairs[i] {
+            let p = unsafe { self.pairs[i].assume_init_ref() };
+            if let Present(p) = &p {
                 if p.0.borrow() == k {
                     return Some(&p.1);
                 }
@@ -148,9 +154,11 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
         K: Borrow<Q>,
     {
         for i in 0..self.next {
-            if let Present(p) = &mut self.pairs[i] {
-                if p.0.borrow() == k {
-                    return Some(&mut self.pairs[i].as_mut().unwrap().1);
+            let p = unsafe { self.pairs[i].assume_init_ref() };
+            if let Present(p1) = &p {
+                if p1.0.borrow() == k {
+                    let p2 = unsafe { self.pairs[i].assume_init_mut() };
+                    return Some(&mut p2.as_mut().unwrap().1);
                 }
             }
         }
@@ -167,9 +175,10 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     #[inline]
     pub fn retain<F: Fn(&K, &V) -> bool>(&mut self, f: F) {
         for i in 0..self.next {
-            if let Present((k, v)) = &self.pairs[i] {
+            let p = unsafe { self.pairs[i].assume_init_ref() };
+            if let Present((k, v)) = &p {
                 if !f(k, v) {
-                    self.pairs[i] = Absent;
+                    self.pairs[i] = MaybeUninit::new(Absent);
                 }
             }
         }
