@@ -42,6 +42,16 @@ impl<K: Clone + PartialEq, V: Clone, const N: usize> Map<K, V, N> {
     }
 }
 
+impl<K: Clone + PartialEq, V: Clone, const N: usize> Drop for Map<K, V, N> {
+    fn drop(&mut self) {
+        for i in 0..self.next {
+            unsafe {
+                self.pairs[i].assume_init_drop();
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 use anyhow::Result;
 
@@ -66,7 +76,6 @@ fn drops_correctly() -> Result<()> {
 }
 
 #[test]
-#[ignore]
 fn drops_keys() {
     use std::rc::Rc;
     let mut m: Map<Rc<()>, (), 8> = Map::new();
@@ -77,7 +86,6 @@ fn drops_keys() {
 }
 
 #[test]
-#[ignore]
 fn drops_values() {
     use std::rc::Rc;
     let mut m: Map<(), Rc<()>, 8> = Map::new();
