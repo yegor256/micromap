@@ -45,15 +45,11 @@ impl<K: Clone + PartialEq, V: Clone + PartialEq, const N: usize> PartialEq for M
 
 impl<K: Clone + Eq, V: Clone + Eq, const N: usize> Eq for Map<K, V, N> {}
 
-#[cfg(test)]
-use anyhow::Result;
-
 #[test]
-fn compares_two_maps() -> Result<()> {
+fn compares_two_maps() {
     let mut m1: Map<&str, i32, 10> = Map::new();
     m1.insert("first", 42);
     let mut m2: Map<&str, i32, 10> = Map::new();
     m2.insert("first", 42);
     assert!(m1.eq(&m2));
-    Ok(())
 }

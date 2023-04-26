@@ -42,24 +42,19 @@ impl<K: Clone + Eq + Borrow<Q>, Q: Eq + ?Sized, V: Clone, const N: usize> IndexM
     }
 }
 
-#[cfg(test)]
-use anyhow::Result;
-
 #[test]
-fn index() -> Result<()> {
+fn index() {
     let mut m: Map<&str, i32, 10> = Map::new();
     m.insert("first", 42);
     assert_eq!(m["first"], 42);
-    Ok(())
 }
 
 #[test]
-fn index_mut() -> Result<()> {
+fn index_mut() {
     let mut m: Map<&str, i32, 10> = Map::new();
     m.insert("first", 42);
     m["first"] += 10;
     assert_eq!(m["first"], 52);
-    Ok(())
 }
 
 #[test]
@@ -84,9 +79,8 @@ impl Borrow<i32> for Container {
 }
 
 #[test]
-fn index_by_borrow() -> Result<()> {
+fn index_by_borrow() {
     let mut m: Map<Container, i32, 10> = Map::new();
     m.insert(Container { t: 10 }, 42);
     assert_eq!(m[&10], 42);
-    Ok(())
 }

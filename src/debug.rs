@@ -38,23 +38,18 @@ impl<K: Clone + PartialEq + Display, V: Clone + Display, const N: usize> Debug f
     }
 }
 
-#[cfg(test)]
-use anyhow::Result;
-
 #[test]
-fn debugs_map() -> Result<()> {
+fn debugs_map() {
     let mut m: Map<&str, i32, 10> = Map::new();
     m.insert("one", 42);
     m.insert("two", 16);
     assert_eq!("{one: 42, two: 16}", format!("{:?}", m));
-    Ok(())
 }
 
 #[test]
-fn displays_map() -> Result<()> {
+fn displays_map() {
     let mut m: Map<&str, i32, 10> = Map::new();
     m.insert("one", 42);
     m.insert("two", 16);
     assert_eq!("{one: 42, two: 16}", format!("{}", m));
-    Ok(())
 }

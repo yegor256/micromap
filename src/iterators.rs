@@ -71,28 +71,24 @@ impl<'a, K: Clone + PartialEq, V: Clone, const N: usize> IntoIterator for &'a Ma
 }
 
 use crate::Pair::Present;
-#[cfg(test)]
-use anyhow::Result;
 
 #[test]
-fn empty_iterator() -> Result<()> {
+fn empty_iterator() {
     let m: Map<u32, u32, 4> = Map::new();
     assert!(m.into_iter().next().is_none());
-    Ok(())
 }
 
 #[test]
-fn insert_and_jump_over_next() -> Result<()> {
+fn insert_and_jump_over_next() {
     let mut m: Map<&str, i32, 10> = Map::new();
     m.insert("foo", 42);
     let mut iter = m.into_iter();
     assert_eq!(42, iter.next().unwrap().1);
     assert!(iter.next().is_none());
-    Ok(())
 }
 
 #[test]
-fn insert_and_iterate() -> Result<()> {
+fn insert_and_iterate() {
     let mut m: Map<&str, i32, 10> = Map::new();
     m.insert("one", 42);
     m.insert("two", 16);
@@ -101,11 +97,10 @@ fn insert_and_iterate() -> Result<()> {
         sum += v;
     }
     assert_eq!(58, sum);
-    Ok(())
 }
 
 #[test]
-fn insert_and_into_iterate() -> Result<()> {
+fn insert_and_into_iterate() {
     let mut m: Map<&str, i32, 10> = Map::new();
     m.insert("one", 42);
     m.insert("two", 16);
@@ -114,11 +109,10 @@ fn insert_and_into_iterate() -> Result<()> {
         sum += v;
     }
     assert_eq!(58, sum);
-    Ok(())
 }
 
 #[test]
-fn iterate_with_blanks() -> Result<()> {
+fn iterate_with_blanks() {
     let mut m: Map<&str, i32, 10> = Map::new();
     m.insert("one", 1);
     m.insert("two", 3);
@@ -129,11 +123,10 @@ fn iterate_with_blanks() -> Result<()> {
         sum += v;
     }
     assert_eq!(6, sum);
-    Ok(())
 }
 
 #[test]
-fn into_iterate_with_blanks() -> Result<()> {
+fn into_iterate_with_blanks() {
     let mut m: Map<&str, i32, 10> = Map::new();
     m.insert("one", 1);
     m.insert("two", 3);
@@ -144,5 +137,4 @@ fn into_iterate_with_blanks() -> Result<()> {
         sum += v;
     }
     assert_eq!(6, sum);
-    Ok(())
 }

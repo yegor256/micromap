@@ -52,27 +52,21 @@ impl<K: Clone + PartialEq, V: Clone, const N: usize> Drop for Map<K, V, N> {
     }
 }
 
-#[cfg(test)]
-use anyhow::Result;
-
 #[test]
-fn makes_default_map() -> Result<()> {
+fn makes_default_map() {
     let m: Map<u8, u8, 8> = Map::default();
     assert_eq!(0, m.len());
-    Ok(())
 }
 
 #[test]
-fn makes_new_map() -> Result<()> {
+fn makes_new_map() {
     let m: Map<u8, u8, 8> = Map::new();
     assert_eq!(0, m.len());
-    Ok(())
 }
 
 #[test]
-fn drops_correctly() -> Result<()> {
+fn drops_correctly() {
     let _m: Map<Vec<u8>, u8, 8> = Map::new();
-    Ok(())
 }
 
 #[test]

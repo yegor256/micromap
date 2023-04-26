@@ -44,26 +44,20 @@ impl<K, V> Pair<K, V> {
     }
 }
 
-#[cfg(test)]
-use anyhow::Result;
-
 #[test]
-fn makes_absent_and_checks() -> Result<()> {
+fn makes_absent_and_checks() {
     let p: Pair<u8, u8> = Absent;
     assert!(!p.is_some());
-    Ok(())
 }
 
 #[test]
-fn makes_present_and_checks() -> Result<()> {
+fn makes_present_and_checks() {
     let p = Pair::Present((1, 2));
     assert!(p.is_some());
-    Ok(())
 }
 
 #[test]
-fn absent_is_mut() -> Result<()> {
+fn absent_is_mut() {
     let mut p: Pair<u8, u8> = Absent;
     assert!(!p.as_mut().is_some());
-    Ok(())
 }

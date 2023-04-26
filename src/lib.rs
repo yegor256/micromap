@@ -57,6 +57,8 @@ mod pair;
 #[cfg(feature = "serde")]
 mod serialization;
 
+use std::mem::MaybeUninit;
+
 /// A pair in the Map.
 #[derive(Clone, Default, Eq, PartialEq)]
 enum Pair<K, V> {
@@ -92,30 +94,9 @@ pub struct IntoIter<'a, K, V, const N: usize> {
     pairs: &'a [MaybeUninit<Pair<K, V>>; N],
 }
 
-#[cfg(test)]
-use simple_logger::SimpleLogger;
-use std::mem::MaybeUninit;
-
-#[cfg(test)]
-use log::LevelFilter;
-
-#[cfg(test)]
-#[ctor::ctor]
-fn init() {
-    SimpleLogger::new()
-        .without_timestamps()
-        .with_level(LevelFilter::Trace)
-        .init()
-        .unwrap();
-}
-
-#[cfg(test)]
-use anyhow::Result;
-
 #[test]
-fn map_can_be_cloned() -> Result<()> {
+fn map_can_be_cloned() {
     let mut m: Map<u8, u8, 8> = Map::new();
     m.insert(0, 42);
     assert_eq!(42, *m.clone().get(&0).unwrap());
-    Ok(())
 }

@@ -75,26 +75,21 @@ impl<'de, K: Clone + PartialEq + Deserialize<'de>, V: Clone + Deserialize<'de>, 
 }
 
 #[cfg(test)]
-use anyhow::Result;
-
-#[cfg(test)]
 use bincode::{deserialize, serialize};
 
 #[test]
-fn serialize_and_deserialize() -> Result<()> {
+fn serialize_and_deserialize() {
     let mut before: Map<u8, u8, 8> = Map::new();
     before.insert(1, 42);
-    let bytes: Vec<u8> = serialize(&before)?;
-    let after: Map<u8, u8, 8> = deserialize(&bytes)?;
+    let bytes: Vec<u8> = serialize(&before).unwrap();
+    let after: Map<u8, u8, 8> = deserialize(&bytes).unwrap();
     assert_eq!(42, after.into_iter().next().unwrap().1);
-    Ok(())
 }
 
 #[test]
-fn empty_map_serde() -> Result<()> {
+fn empty_map_serde() {
     let before: Map<u8, u8, 8> = Map::new();
-    let bytes: Vec<u8> = serialize(&before)?;
-    let after: Map<u8, u8, 8> = deserialize(&bytes)?;
+    let bytes: Vec<u8> = serialize(&before).unwrap();
+    let after: Map<u8, u8, 8> = deserialize(&bytes).unwrap();
     assert!(after.is_empty());
-    Ok(())
 }
