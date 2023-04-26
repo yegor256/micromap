@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: |-
-          git pull --tags && \
+          git fetch --tags --force && \
           latest=$(git tag --sort=creatordate | tail -1) && \
           sed -E -i "s/micromap = \"[^\"]+\"/micromap = \"${latest}\"/g" README.md
       - uses: peter-evans/create-pull-request@v5
