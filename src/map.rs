@@ -18,7 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use crate::Pair::{Absent, Present};
 use crate::{IntoIter, Iter, Map};
 use std::borrow::Borrow;
 
@@ -71,7 +70,7 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     pub fn contains_key(&self, k: &K) -> bool {
         for i in 0..self.next {
             let p = unsafe { self.pairs[i].assume_init_ref() };
-            if let Present((bk, _bv)) = &p {
+            if let Some((bk, _bv)) = &p {
                 if bk == k {
                     return true;
                 }
@@ -85,9 +84,9 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     pub fn remove(&mut self, k: &K) {
         for i in 0..self.next {
             let p = unsafe { self.pairs[i].assume_init_ref() };
-            if let Present((bk, _bv)) = &p {
+            if let Some((bk, _bv)) = &p {
                 if bk == k {
-                    self.pairs[i].write(Absent);
+                    self.pairs[i].write(None);
                     break;
                 }
             }
@@ -104,7 +103,7 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
         let mut target = self.next;
         for i in 0..self.next {
             let p = unsafe { self.pairs[i].assume_init_ref() };
-            if let Present((bk, _bv)) = &p {
+            if let Some((bk, _bv)) = &p {
                 if *bk == k {
                     target = i;
                     break;
@@ -115,7 +114,7 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
             }
         }
         assert!(target < N, "No more keys available in the map");
-        self.pairs[target].write(Present((k, v)));
+        self.pairs[target].write(Some((k, v)));
         self.next += 1;
     }
 
@@ -128,7 +127,7 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     {
         for i in 0..self.next {
             let p = unsafe { self.pairs[i].assume_init_ref() };
-            if let Present(p) = &p {
+            if let Some(p) = &p {
                 if p.0.borrow() == k {
                     return Some(&p.1);
                 }
@@ -150,7 +149,7 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     {
         for i in 0..self.next {
             let p = unsafe { self.pairs[i].assume_init_ref() };
-            if let Present(p1) = &p {
+            if let Some(p1) = &p {
                 if p1.0.borrow() == k {
                     let p2 = unsafe { self.pairs[i].assume_init_mut() };
                     return Some(&mut p2.as_mut().unwrap().1);
@@ -171,9 +170,9 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     pub fn retain<F: Fn(&K, &V) -> bool>(&mut self, f: F) {
         for i in 0..self.next {
             let p = unsafe { self.pairs[i].assume_init_ref() };
-            if let Present((k, v)) = &p {
+            if let Some((k, v)) = &p {
                 if !f(k, v) {
-                    self.pairs[i].write(Absent);
+                    self.pairs[i].write(None);
                 }
             }
         }

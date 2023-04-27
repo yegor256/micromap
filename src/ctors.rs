@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use crate::{Map, Pair};
+use crate::Map;
 use std::mem::MaybeUninit;
 
 impl<K: Clone + PartialEq, V: Clone, const N: usize> Default for Map<K, V, N> {
@@ -36,7 +36,7 @@ impl<K: Clone + PartialEq, V: Clone, const N: usize> Map<K, V, N> {
         unsafe {
             Self {
                 next: 0,
-                pairs: MaybeUninit::<[MaybeUninit<Pair<K, V>>; N]>::uninit().assume_init(),
+                pairs: MaybeUninit::<[MaybeUninit<Option<(K, V)>>; N]>::uninit().assume_init(),
             }
         }
     }

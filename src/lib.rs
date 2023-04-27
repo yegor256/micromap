@@ -53,19 +53,10 @@ mod from;
 mod index;
 mod iterators;
 mod map;
-mod pair;
 #[cfg(feature = "serde")]
 mod serialization;
 
 use std::mem::MaybeUninit;
-
-/// A pair in the Map.
-#[derive(Clone, Default, Eq, PartialEq)]
-enum Pair<K, V> {
-    Present((K, V)),
-    #[default]
-    Absent,
-}
 
 /// A faster alternative of [`std::collections::HashMap`].
 ///
@@ -77,21 +68,21 @@ enum Pair<K, V> {
 /// compile time.
 pub struct Map<K: Clone + PartialEq, V: Clone, const N: usize> {
     next: usize,
-    pairs: [MaybeUninit<Pair<K, V>>; N],
+    pairs: [MaybeUninit<Option<(K, V)>>; N],
 }
 
 /// Iterator over the [`Map`].
 pub struct Iter<'a, K, V, const N: usize> {
     next: usize,
     pos: usize,
-    pairs: &'a [MaybeUninit<Pair<K, V>>; N],
+    pairs: &'a [MaybeUninit<Option<(K, V)>>; N],
 }
 
 /// Into-iterator over the [`Map`].
 pub struct IntoIter<'a, K, V, const N: usize> {
     next: usize,
     pos: usize,
-    pairs: &'a [MaybeUninit<Pair<K, V>>; N],
+    pairs: &'a [MaybeUninit<Option<(K, V)>>; N],
 }
 
 #[test]

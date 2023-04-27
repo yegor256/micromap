@@ -28,7 +28,7 @@ impl<'a, K: Clone, V: Clone, const N: usize> Iterator for Iter<'a, K, V, N> {
     fn next(&mut self) -> Option<Self::Item> {
         while self.pos < self.next {
             let p = unsafe { self.pairs[self.pos].assume_init_ref() };
-            if let Present(p) = p {
+            if let Some(p) = p {
                 self.pos += 1;
                 return Some((&p.0, &p.1));
             }
@@ -69,8 +69,6 @@ impl<'a, K: Clone + PartialEq, V: Clone, const N: usize> IntoIterator for &'a Ma
         }
     }
 }
-
-use crate::Pair::Present;
 
 #[test]
 fn empty_iterator() {
