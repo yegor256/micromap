@@ -98,3 +98,12 @@ We will review your changes and apply them to the `master` branch shortly,
 provided they don't violate our quality standards. To avoid frustration,
 before sending us your pull request please run `cargo test` again. Also, 
 run `cargo fmt` and `cargo clippy`.
+
+Also, before you start making changes, run benchmarks:
+
+```bash
+$ rustup run nightly cargo bench
+```
+
+Then, after the changes you make, run it again. Compare the results. If your changes
+degrade performance, think twice before submitting a pull request.
