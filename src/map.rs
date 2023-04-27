@@ -42,8 +42,7 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     pub fn len(&self) -> usize {
         let mut busy = 0;
         for i in 0..self.next {
-            let p = unsafe { self.pairs[i].assume_init_ref() };
-            if p.is_some() {
+            if self.item(i).is_some() {
                 busy += 1;
             }
         }
@@ -55,8 +54,7 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     #[must_use]
     pub fn contains_key(&self, k: &K) -> bool {
         for i in 0..self.next {
-            let p = unsafe { self.pairs[i].assume_init_ref() };
-            if let Some((bk, _bv)) = &p {
+            if let Some((bk, _bv)) = self.item(i) {
                 if bk == k {
                     return true;
                 }
@@ -69,8 +67,7 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     #[inline]
     pub fn remove(&mut self, k: &K) {
         for i in 0..self.next {
-            let p = unsafe { self.pairs[i].assume_init_ref() };
-            if let Some(p) = &p {
+            if let Some(p) = self.item(i) {
                 if p.0.borrow() == k {
                     self.pairs[i].write(None);
                     break;
@@ -84,9 +81,9 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     /// # Panics
     ///
     /// It may panic if there are too many pairs in the map already. Pay attention,
-    /// it panics only in "debug" mode. In "release" mode you are going to get
+    /// it panics only in the "debug" mode. In the "release" mode, you are going to get
     /// undefined behavior. This is done for the sake of performance, in order to
-    /// avoid a repetitive check for the boundary condition on every insert.
+    /// avoid a repetitive check for the boundary condition on every `insert()`.
     #[inline]
     pub fn insert(&mut self, k: K, v: V) {
         let mut target = self.next;
@@ -96,15 +93,19 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
                 debug_assert!(i < N, "No more keys available in the map");
                 break;
             }
-            let p = unsafe { self.pairs[i].assume_init_ref() };
-            if let Some(p) = &p {
-                if *p.0.borrow() == k {
-                    target = i;
-                    break;
+            let p = self.item(i);
+            match p {
+                Some(p) => {
+                    if *p.0.borrow() == k {
+                        target = i;
+                        break;
+                    }
                 }
-            }
-            if p.is_none() && i != self.next {
-                target = i;
+                None => {
+                    if i != self.next {
+                        target = i;
+                    }
+                }
             }
             i += 1;
         }
@@ -122,8 +123,7 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
         K: Borrow<Q>,
     {
         for i in 0..self.next {
-            let p = unsafe { self.pairs[i].assume_init_ref() };
-            if let Some(p) = &p {
+            if let Some(p) = self.item(i) {
                 if p.0.borrow() == k {
                     return Some(&p.1);
                 }
@@ -165,13 +165,18 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     #[inline]
     pub fn retain<F: Fn(&K, &V) -> bool>(&mut self, f: F) {
         for i in 0..self.next {
-            let p = unsafe { self.pairs[i].assume_init_ref() };
-            if let Some((k, v)) = &p {
+            if let Some((k, v)) = self.item(i) {
                 if !f(k, v) {
                     self.pairs[i].write(None);
                 }
             }
         }
+    }
+
+    /// Internal function to get access to the element in the internal array.
+    #[inline]
+    const fn item(&self, i: usize) -> &Option<(K, V)> {
+        unsafe { self.pairs[i].assume_init_ref() }
     }
 }
 
