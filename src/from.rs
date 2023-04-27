@@ -50,6 +50,7 @@ fn from_iter() {
 
 #[test]
 #[should_panic]
+#[cfg(debug_assertions)]
 fn from_larger_iter() {
     let vec = Vec::from(TEST_ARRAY);
     let _m: Map<i32, &str, 1> = Map::from_iter(vec);

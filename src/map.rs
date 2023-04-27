@@ -97,14 +97,17 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     ///
     /// # Panics
     ///
-    /// It may panic if there are too many pairs in the map already.
+    /// It may panic if there are too many pairs in the map already. Pay attention,
+    /// it panics only in "debug" mode. In "release" mode you are going to get
+    /// undefined behavior. This is done for the sake of performance, in order to
+    /// avoid a repetitive check for the boundary condition on every insert.
     #[inline]
     pub fn insert(&mut self, k: K, v: V) {
         let mut target = self.next;
         let mut i = 0;
         loop {
             if i == self.next {
-                assert!(i < N, "No more keys available in the map");
+                debug_assert!(i < N, "No more keys available in the map");
                 self.next += 1;
                 break;
             }
@@ -205,6 +208,7 @@ fn overwrites_keys() {
 
 #[test]
 #[should_panic]
+#[cfg(debug_assertions)]
 fn cant_write_into_empty_map() {
     let mut m: Map<i32, i32, 0> = Map::new();
     m.insert(1, 42);
