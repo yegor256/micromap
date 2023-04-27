@@ -104,7 +104,7 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
                     break;
                 }
             }
-            if !p.is_some() {
+            if p.is_none() {
                 target = i;
             }
             i += 1;
