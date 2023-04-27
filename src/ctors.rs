@@ -23,6 +23,8 @@ use std::mem::MaybeUninit;
 
 impl<K: Clone + PartialEq, V: Clone, const N: usize> Default for Map<K, V, N> {
     /// Make a default empty [`Map`].
+    #[inline]
+    #[must_use]
     fn default() -> Self {
         Self::new()
     }

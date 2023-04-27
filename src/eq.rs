@@ -38,6 +38,7 @@ impl<K: Clone + PartialEq, V: Clone + PartialEq, const N: usize> PartialEq for M
     /// m2.insert(2, 1);
     /// assert_eq!(m1, m2);
     /// ```
+    #[inline]
     fn eq(&self, other: &Self) -> bool {
         return self.len() == other.len() && self.iter().all(|(k, v)| other.get(k) == Some(v));
     }
