@@ -101,20 +101,22 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     /// It may panic if there are too many pairs in the map already.
     #[inline]
     pub fn insert(&mut self, k: K, v: V) {
-        self.remove(&k);
+        let mut target = self.next;
         for i in 0..self.next {
             let p = unsafe { self.pairs[i].assume_init_ref() };
+            if let Present((bk, _bv)) = &p {
+                if *bk == k {
+                    target = i;
+                    break;
+                }
+            }
             if !p.is_some() {
-                self.pairs[i].write(Present((k, v)));
-                return;
+                target = i;
             }
         }
-        if self.next < N {
-            self.pairs[self.next].write(Present((k, v)));
-            self.next += 1;
-            return;
-        }
-        panic!("There are only {N} keys available in the map and all of them are already occupied")
+        assert!(target < N, "No more keys available in the map");
+        self.pairs[target].write(Present((k, v)));
+        self.next += 1;
     }
 
     /// Get a reference to a single value.
