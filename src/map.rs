@@ -101,7 +101,13 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     #[inline]
     pub fn insert(&mut self, k: K, v: V) {
         let mut target = self.next;
-        for i in 0..self.next {
+        let mut i = 0;
+        loop {
+            if i == self.next {
+                assert!(i < N, "No more keys available in the map");
+                self.next += 1;
+                break;
+            }
             let p = unsafe { self.pairs[i].assume_init_ref() };
             if let Some((bk, _bv)) = &p {
                 if *bk == k {
@@ -112,10 +118,9 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
             if !p.is_some() {
                 target = i;
             }
+            i += 1;
         }
-        assert!(target < N, "No more keys available in the map");
         self.pairs[target].write(Some((k, v)));
-        self.next += 1;
     }
 
     /// Get a reference to a single value.
@@ -188,6 +193,14 @@ fn insert_and_check_length() {
     assert_eq!(2, m.len());
     m.insert("first", 16);
     assert_eq!(2, m.len());
+}
+
+#[test]
+fn overwrites_keys() {
+    let mut m: Map<i32, i32, 1> = Map::new();
+    m.insert(1, 42);
+    m.insert(1, 42);
+    assert_eq!(1, m.len());
 }
 
 #[test]
