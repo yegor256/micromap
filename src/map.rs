@@ -18,32 +18,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use crate::{IntoIter, Iter, Map};
+use crate::Map;
 use std::borrow::Borrow;
 
 impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
-    /// Make an iterator over all pairs.
-    #[inline]
-    #[must_use]
-    pub const fn iter(&self) -> Iter<K, V, N> {
-        Iter {
-            next: self.next,
-            pos: 0,
-            pairs: &self.pairs,
-        }
-    }
-
-    /// Make an iterator over all pairs.
-    #[inline]
-    #[must_use]
-    pub const fn into_iter(&self) -> IntoIter<K, V, N> {
-        IntoIter {
-            next: self.next,
-            pos: 0,
-            pairs: &self.pairs,
-        }
-    }
-
     /// Is it empty?
     #[inline]
     #[must_use]

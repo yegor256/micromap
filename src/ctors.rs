@@ -22,6 +22,7 @@ use crate::Map;
 use std::mem::MaybeUninit;
 
 impl<K: Clone + PartialEq, V: Clone, const N: usize> Default for Map<K, V, N> {
+    /// Make a default empty [`Map`].
     fn default() -> Self {
         Self::new()
     }
@@ -29,6 +30,9 @@ impl<K: Clone + PartialEq, V: Clone, const N: usize> Default for Map<K, V, N> {
 
 impl<K: Clone + PartialEq, V: Clone, const N: usize> Map<K, V, N> {
     /// Make it.
+    ///
+    /// The size of the map is defined by the generic argument. For example,
+    /// this is how you make a map of four key-values pairs:
     #[inline]
     #[must_use]
     #[allow(clippy::uninit_assumed_init)]

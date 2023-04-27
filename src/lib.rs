@@ -24,7 +24,10 @@
 //! the entire array. This implementation works much faster for small maps of
 //! less than 50 keys, but definitely is not suitable for larger maps.
 //!
-//! For example, here is a map with a few keys can be created:
+//! Check [this page](https://github.com/yegor256/micromap#benchmark)
+//! for the recent benchmarking results.
+//!
+//! For example, here is how a map with a few keys can be created:
 //!
 //! ```
 //! use micromap::Map;
@@ -34,7 +37,7 @@
 //! assert_eq!(2, m.len());
 //! ```
 //!
-//! Creating a [`Map`] requires knowing the maximum size of it upfront. This is
+//! Creating a [`Map`] requires knowing the maximum size of it, upfront. This is
 //! what the third type argument `10` is for, in the example above. The array
 //! will have exactly ten elements. An attempt to add an 11th element will lead
 //! to a panic.
@@ -60,34 +63,51 @@ use std::mem::MaybeUninit;
 
 /// A faster alternative of [`std::collections::HashMap`].
 ///
+/// For example, this is how you make a map, which is allocated on stack and is capable of storing
+/// up to eight key-values pairs:
+///
+/// ```
+/// let mut m : micromap::Map<u64, &str, 8> = micromap::Map::new();
+/// m.insert(1, "Jeff Lebowski");
+/// m.insert(2, "Walter Sobchak");
+/// assert_eq!(2, m.len());
+/// ```
+///
 /// It is faster because it doesn't use a hash function at all. It simply keeps
 /// all pairs in an array and when it's necessary to find a value, it goes through
 /// all pairs comparing the needle with each pair available. Also it is faster
 /// because it doesn't use heap. When a [`Map`] is being created, it allocates the necessary
 /// space on stack. That's why the maximum size of the map must be provided in
 /// compile time.
+///
+/// It is also faster because it doesn't grow in size. When a [`Map`] is created,
+/// its size is fixed on stack. If an attempt is made to insert too many keys
+/// into it, it simply panics. Moreover, in the "release" mode it doesn't panic,
+/// but its behaviour is undefined. In the "release" mode all boundary checks
+/// are disabled, for the sake of higher performance.
 pub struct Map<K: Clone + PartialEq, V: Clone, const N: usize> {
+    /// The next available pair in the array.
     next: usize,
+    /// The fixed-size array of key-value pairs.
     pairs: [MaybeUninit<Option<(K, V)>>; N],
 }
 
 /// Iterator over the [`Map`].
 pub struct Iter<'a, K, V, const N: usize> {
+    /// The next available pair in the array.
     next: usize,
+    /// The next position in the iterator to read.
     pos: usize,
+    /// The fixed-size array of key-value pairs.
     pairs: &'a [MaybeUninit<Option<(K, V)>>; N],
 }
 
 /// Into-iterator over the [`Map`].
 pub struct IntoIter<'a, K, V, const N: usize> {
+    /// The next available pair in the array.
     next: usize,
+    /// The next position in the iterator to read.
     pos: usize,
+    /// The fixed-size array of key-value pairs.
     pairs: &'a [MaybeUninit<Option<(K, V)>>; N],
-}
-
-#[test]
-fn map_can_be_cloned() {
-    let mut m: Map<u8, u8, 8> = Map::new();
-    m.insert(0, 42);
-    assert_eq!(42, *m.clone().get(&0).unwrap());
 }

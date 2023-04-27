@@ -20,6 +20,30 @@
 
 use crate::{IntoIter, Iter, Map};
 
+impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
+    /// Make an iterator over all pairs.
+    #[inline]
+    #[must_use]
+    pub const fn iter(&self) -> Iter<K, V, N> {
+        Iter {
+            next: self.next,
+            pos: 0,
+            pairs: &self.pairs,
+        }
+    }
+
+    /// Make an iterator over all pairs.
+    #[inline]
+    #[must_use]
+    pub const fn into_iter(&self) -> IntoIter<K, V, N> {
+        IntoIter {
+            next: self.next,
+            pos: 0,
+            pairs: &self.pairs,
+        }
+    }
+}
+
 impl<'a, K: Clone, V: Clone, const N: usize> Iterator for Iter<'a, K, V, N> {
     type Item = (&'a K, &'a V);
 

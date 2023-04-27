@@ -39,6 +39,6 @@ fn map_can_be_cloned() {
 
 #[test]
 fn empty_map_can_be_cloned() {
-    let m: Map<u8, u8, 16> = Map::new();
+    let m: Map<u8, u8, 0> = Map::new();
     assert!(m.clone().is_empty());
 }
