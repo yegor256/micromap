@@ -45,6 +45,7 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
 
     /// Does the map contain this key?
     #[inline]
+    #[must_use]
     pub fn contains_key(&self, k: &K) -> bool {
         for i in 0..self.next {
             let p = unsafe { self.pairs[i].assume_init_ref() };

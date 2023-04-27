@@ -74,6 +74,7 @@ impl<'a, K: Clone + PartialEq, V: Clone, const N: usize> IntoIterator for &'a Ma
     type IntoIter = IntoIter<'a, K, V, N>;
 
     #[inline]
+    #[must_use]
     fn into_iter(self) -> Self::IntoIter {
         IntoIter {
             next: self.next,
