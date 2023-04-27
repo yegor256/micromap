@@ -144,8 +144,7 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
         K: Borrow<Q>,
     {
         for i in 0..self.next {
-            let p = unsafe { self.pairs[i].assume_init_ref() };
-            if let Some(p1) = &p {
+            if let Some(p1) = self.item(i) {
                 if p1.0.borrow() == k {
                     let p2 = unsafe { self.pairs[i].assume_init_mut() };
                     return Some(&mut p2.as_mut().unwrap().1);
