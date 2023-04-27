@@ -93,8 +93,7 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
                 debug_assert!(i < N, "No more keys available in the map");
                 break;
             }
-            let p = self.item(i);
-            match p {
+            match self.item(i) {
                 Some(p) => {
                     if *p.0.borrow() == k {
                         target = i;
