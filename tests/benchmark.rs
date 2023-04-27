@@ -135,21 +135,31 @@ fn benchmark(total: usize) -> HashMap<&'static str, Duration> {
     ret
 }
 
+/// Run it like this from the command line:
+///
+/// ```text
+/// $ cargo test --release benchmark_and_print -- --nocapture
+/// ```
 #[test]
 pub fn benchmark_and_print() {
-    let times = benchmark(100000);
+    let times = benchmark(
+        #[cfg(debug_assertions)]
+        100000,
+        #[cfg(not(debug_assertions))]
+        10000000,
+    );
     let ours = times.get("micromap::Map").unwrap();
+    let mut total = 0.0;
     for (m, d) in &times {
-        println!(
-            "{m} -> {:?} ({:.2}x)",
-            d,
-            d.as_nanos() as f64 / ours.as_nanos() as f64
-        );
+        let gain = d.as_nanos() as f64 / ours.as_nanos() as f64;
+        println!("{m} -> {:?} ({:.2}x)", d, gain);
         if d == ours {
             continue;
         }
         assert!(d.cmp(ours).is_gt());
+        total += gain;
     }
+    println!("Total gain: {:.2}", total);
 }
 
 pub fn main() {
