@@ -176,6 +176,41 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     const fn item(&self, i: usize) -> &Option<(K, V)> {
         unsafe { self.pairs[i].assume_init_ref() }
     }
+
+    /// Returns the key-value pair corresponding to the supplied key.
+    #[inline]
+    pub fn get_key_value<Q: PartialEq + ?Sized>(&self, k: &Q) -> Option<(&K, &V)>
+    where
+        K: Borrow<Q>,
+    {
+        for i in 0..self.next {
+            if let Some(p) = self.item(i) {
+                if p.0.borrow() == k {
+                    return Some((&p.0, &p.1));
+                }
+            }
+        }
+        None
+    }
+
+    /// Removes a key from the map, returning the stored key and value if the
+    /// key was previously in the map.
+    #[inline]
+    pub fn remove_entry<Q: PartialEq + ?Sized>(&mut self, k: &Q) -> Option<(K, V)>
+    where
+        K: Borrow<Q>,
+    {
+        for i in 0..self.next {
+            if let Some(p) = self.item(i) {
+                if p.0.borrow() == k {
+                    let ret = Some(p.clone());
+                    self.pairs[i].write(None);
+                    return ret;
+                }
+            }
+        }
+        None
+    }
 }
 
 #[test]
@@ -333,4 +368,36 @@ fn insert_many_and_remove() {
             m.remove(&i);
         }
     }
+}
+
+#[test]
+fn get_key_value() {
+    let mut m: Map<&str, i32, 10> = Map::new();
+    let k = "key";
+    m.insert(k, 42);
+    assert_eq!(m.get_key_value(k), Some((&k, &42)));
+    assert!(m.contains_key(&k));
+}
+
+#[test]
+fn get_absent_key_value() {
+    let mut m: Map<&str, i32, 10> = Map::new();
+    m.insert("one", 42);
+    assert_eq!(m.get_key_value("two"), None);
+}
+
+#[test]
+fn remove_entry_present() {
+    let mut m: Map<&str, i32, 10> = Map::new();
+    let k = "key";
+    m.insert(k, 42);
+    assert_eq!(m.remove_entry(k), Some((k, 42)));
+    assert!(!m.contains_key(&k));
+}
+
+#[test]
+fn remove_entry_absent() {
+    let mut m: Map<&str, i32, 10> = Map::new();
+    m.insert("one", 42);
+    assert_eq!(m.remove_entry("two"), None);
 }
