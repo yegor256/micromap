@@ -204,6 +204,13 @@ fn overwrites_keys() {
 }
 
 #[test]
+#[should_panic]
+fn cant_write_into_empty_map() {
+    let mut m: Map<i32, i32, 0> = Map::new();
+    m.insert(1, 42);
+}
+
+#[test]
 fn empty_length() {
     let m: Map<u32, u32, 10> = Map::new();
     assert_eq!(0, m.len());
