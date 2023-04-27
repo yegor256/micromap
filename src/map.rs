@@ -112,8 +112,8 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
                 break;
             }
             let p = unsafe { self.pairs[i].assume_init_ref() };
-            if let Some((bk, _bv)) = &p {
-                if *bk == k {
+            if let Some(p) = &p {
+                if *p.0.borrow() == k {
                     target = i;
                     break;
                 }
