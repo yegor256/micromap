@@ -103,7 +103,7 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
                     break;
                 }
             }
-            if p.is_none() {
+            if p.is_none() && i != self.next {
                 target = i;
             }
             i += 1;
@@ -321,15 +321,12 @@ fn retain_test() {
 }
 
 #[test]
-#[ignore]
 fn insert_many_and_remove() {
     let mut m: Map<usize, u64, 4> = Map::new();
     for _ in 0..2 {
         let cap = m.capacity();
         for i in 0..cap {
-            println!("insert({i})");
             m.insert(i, 256);
-            println!("remove({i})");
             m.remove(&i);
         }
     }
