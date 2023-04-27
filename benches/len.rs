@@ -25,34 +25,32 @@ use micromap::Map;
 use test::Bencher;
 
 #[bench]
-fn insert_same(b: &mut Bencher) {
+fn straight_length(b: &mut Bencher) {
     let mut m: Map<u64, u64, 64> = Map::new();
+    for i in 0..1000 {
+        m.insert(8, i);
+    }
     b.iter(|| {
-        for i in 0..1000 {
-            m.insert(8, i);
+        for _ in 0..1000 {
+            test::black_box(m.len());
         }
     });
 }
 
 #[bench]
-fn insert_different(b: &mut Bencher) {
-    let mut m: Map<usize, u64, 64> = Map::new();
-    b.iter(|| {
-        let cap = m.capacity();
-        for i in 0..cap {
-            m.insert(i, 256);
-        }
-    });
-}
-
-#[bench]
-fn insert_and_remove(b: &mut Bencher) {
-    let mut m: Map<usize, u64, 64> = Map::new();
-    b.iter(|| {
-        let cap = m.capacity();
-        for i in 0..cap {
-            m.insert(i, 256);
+fn fragmented_length(b: &mut Bencher) {
+    let mut m: Map<u64, u64, 64> = Map::new();
+    for i in 0..1000 {
+        m.insert(8, i);
+    }
+    for i in 0..1000 {
+        if i % 7 != 0 {
             m.remove(&i);
+        }
+    }
+    b.iter(|| {
+        for _ in 0..1000 {
+            test::black_box(m.len());
         }
     });
 }
