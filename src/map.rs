@@ -22,6 +22,13 @@ use crate::Map;
 use std::borrow::Borrow;
 
 impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
+    /// Get its total capacity.
+    #[inline]
+    #[must_use]
+    pub const fn capacity(&self) -> usize {
+        N
+    }
+
     /// Is it empty?
     #[inline]
     #[must_use]
@@ -63,8 +70,8 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     pub fn remove(&mut self, k: &K) {
         for i in 0..self.next {
             let p = unsafe { self.pairs[i].assume_init_ref() };
-            if let Some((bk, _bv)) = &p {
-                if bk == k {
+            if let Some(p) = &p {
+                if p.0.borrow() == k {
                     self.pairs[i].write(None);
                     break;
                 }
@@ -309,4 +316,19 @@ fn retain_test() {
     assert_eq!(m.len(), 6);
     m.retain(|_, &v| v > 30);
     assert_eq!(m.len(), 2);
+}
+
+#[test]
+#[ignore]
+fn insert_many_and_remove() {
+    let mut m: Map<usize, u64, 4> = Map::new();
+    for _ in 0..2 {
+        let cap = m.capacity();
+        for i in 0..cap {
+            println!("insert({i})");
+            m.insert(i, 256);
+            println!("remove({i})");
+            m.remove(&i);
+        }
+    }
 }
