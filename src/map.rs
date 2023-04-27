@@ -94,7 +94,6 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
         loop {
             if i == self.next {
                 debug_assert!(i < N, "No more keys available in the map");
-                self.next += 1;
                 break;
             }
             let p = unsafe { self.pairs[i].assume_init_ref() };
@@ -110,6 +109,9 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
             i += 1;
         }
         self.pairs[target].write(Some((k, v)));
+        if target == self.next {
+            self.next += 1;
+        }
     }
 
     /// Get a reference to a single value.
