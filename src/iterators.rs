@@ -57,15 +57,7 @@ impl<'a, K: Clone, V: Clone, const N: usize> Iterator for IntoIter<'a, K, V, N> 
     #[inline]
     #[must_use]
     fn next(&mut self) -> Option<Self::Item> {
-        while self.pos < self.next {
-            let p = unsafe { self.pairs[self.pos].assume_init_ref() };
-            if p.is_some() {
-                self.pos += 1;
-                return Some(p.clone().unwrap());
-            }
-            self.pos += 1;
-        }
-        None
+        self.iter.next().map(|p| (p.0.clone(), p.1.clone()))
     }
 }
 
@@ -76,11 +68,7 @@ impl<'a, K: Clone + PartialEq, V: Clone, const N: usize> IntoIterator for &'a Ma
     #[inline]
     #[must_use]
     fn into_iter(self) -> Self::IntoIter {
-        IntoIter {
-            next: self.next,
-            pos: 0,
-            pairs: &self.pairs,
-        }
+        IntoIter { iter: self.iter() }
     }
 }
 

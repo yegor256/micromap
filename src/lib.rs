@@ -104,10 +104,5 @@ pub struct Iter<'a, K, V, const N: usize> {
 
 /// Into-iterator over the [`Map`].
 pub struct IntoIter<'a, K, V, const N: usize> {
-    /// The next available pair in the array.
-    next: usize,
-    /// The next position in the iterator to read.
-    pos: usize,
-    /// The fixed-size array of key-value pairs.
-    pairs: &'a [MaybeUninit<Option<(K, V)>>; N],
+    iter: Iter<'a, K, V, N>,
 }
