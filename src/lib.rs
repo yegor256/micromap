@@ -102,6 +102,13 @@ pub struct Iter<'a, K, V, const N: usize> {
     pairs: &'a [MaybeUninit<Option<(K, V)>>; N],
 }
 
+/// Mutable Iterator over the [`Map`].
+pub struct IterMut<'a, K, V> {
+    next: usize,
+    pos: usize,
+    iter: core::slice::IterMut<'a, MaybeUninit<Option<(K, V)>>>,
+}
+
 /// Into-iterator over the [`Map`].
 pub struct IntoIter<'a, K, V, const N: usize> {
     iter: Iter<'a, K, V, N>,

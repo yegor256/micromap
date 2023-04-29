@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use crate::{IntoIter, Iter, Map};
+use crate::{IntoIter, Iter, IterMut, Map};
 
 impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     /// Make an iterator over all pairs.
@@ -31,6 +31,16 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
             pairs: &self.pairs,
         }
     }
+
+    /// An iterator with mutable references to the values but
+    #[inline]
+    pub fn iter_mut(&mut self) -> IterMut<K, V> {
+        IterMut {
+            next: self.next,
+            pos: 0,
+            iter: self.pairs.iter_mut(),
+        }
+    }
 }
 
 impl<'a, K: Clone, V: Clone, const N: usize> Iterator for Iter<'a, K, V, N> {
@@ -41,11 +51,26 @@ impl<'a, K: Clone, V: Clone, const N: usize> Iterator for Iter<'a, K, V, N> {
     fn next(&mut self) -> Option<Self::Item> {
         while self.pos < self.next {
             let p = unsafe { self.pairs[self.pos].assume_init_ref() };
+            self.pos += 1;
             if let Some(p) = p {
-                self.pos += 1;
                 return Some((&p.0, &p.1));
             }
+        }
+        None
+    }
+}
+
+impl<'a, K: Clone, V: Clone> Iterator for IterMut<'a, K, V> {
+    type Item = (&'a K, &'a mut V);
+
+    #[inline]
+    fn next(&mut self) -> Option<Self::Item> {
+        while self.pos < self.next {
+            let p = unsafe { self.iter.next().unwrap().assume_init_mut() };
             self.pos += 1;
+            if let Some(p) = p {
+                return Some((&p.0, &mut p.1));
+            }
         }
         None
     }
@@ -137,4 +162,29 @@ fn into_iterate_with_blanks() {
         sum += v;
     }
     assert_eq!(6, sum);
+}
+
+#[test]
+fn change_with_iter_mut() {
+    let mut m: Map<&str, i32, 10> = Map::new();
+    m.insert("one", 2);
+    m.insert("two", 3);
+    m.insert("three", 5);
+    for (_k, v) in m.iter_mut() {
+        *v *= 2;
+    }
+    let sum = m.iter().map(|p| p.1).sum::<i32>();
+    assert_eq!(20, sum);
+}
+
+#[test]
+fn iter_mut_with_blanks() {
+    let mut m: Map<&str, i32, 10> = Map::new();
+    m.insert("one", 1);
+    m.insert("two", 3);
+    m.insert("three", 5);
+    assert_eq!(m.iter_mut().count(), 3);
+    m.remove(&"two");
+    assert_eq!(m.iter_mut().count(), 2);
+    assert_eq!(m.iter_mut().last().unwrap().1, &5);
 }
