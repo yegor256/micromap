@@ -25,9 +25,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt::Formatter;
 use std::marker::PhantomData;
 
-impl<K: Clone + PartialEq + Serialize, V: Clone + Serialize, const N: usize> Serialize
-    for Map<K, V, N>
-{
+impl<K: PartialEq + Serialize, V: Serialize, const N: usize> Serialize for Map<K, V, N> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -42,8 +40,8 @@ impl<K: Clone + PartialEq + Serialize, V: Clone + Serialize, const N: usize> Ser
 
 struct Vi<K, V, const N: usize>(PhantomData<K>, PhantomData<V>);
 
-impl<'de, K: Clone + PartialEq + Deserialize<'de>, V: Clone + Deserialize<'de>, const N: usize>
-    Visitor<'de> for Vi<K, V, N>
+impl<'de, K: PartialEq + Deserialize<'de>, V: Deserialize<'de>, const N: usize> Visitor<'de>
+    for Vi<K, V, N>
 {
     type Value = Map<K, V, N>;
 
@@ -63,8 +61,8 @@ impl<'de, K: Clone + PartialEq + Deserialize<'de>, V: Clone + Deserialize<'de>, 
     }
 }
 
-impl<'de, K: Clone + PartialEq + Deserialize<'de>, V: Clone + Deserialize<'de>, const N: usize>
-    Deserialize<'de> for Map<K, V, N>
+impl<'de, K: PartialEq + Deserialize<'de>, V: Deserialize<'de>, const N: usize> Deserialize<'de>
+    for Map<K, V, N>
 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where

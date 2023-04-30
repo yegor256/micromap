@@ -21,7 +21,7 @@
 use crate::Map;
 use std::mem::MaybeUninit;
 
-impl<K: Clone + PartialEq, V: Clone, const N: usize> Default for Map<K, V, N> {
+impl<K: PartialEq, V, const N: usize> Default for Map<K, V, N> {
     /// Make a default empty [`Map`].
     #[inline]
     #[must_use]
@@ -30,7 +30,7 @@ impl<K: Clone + PartialEq, V: Clone, const N: usize> Default for Map<K, V, N> {
     }
 }
 
-impl<K: Clone + PartialEq, V: Clone, const N: usize> Map<K, V, N> {
+impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// Make it.
     ///
     /// The size of the map is defined by the generic argument. For example,
@@ -48,7 +48,7 @@ impl<K: Clone + PartialEq, V: Clone, const N: usize> Map<K, V, N> {
     }
 }
 
-impl<K: Clone + PartialEq, V: Clone, const N: usize> Drop for Map<K, V, N> {
+impl<K: PartialEq, V, const N: usize> Drop for Map<K, V, N> {
     fn drop(&mut self) {
         for i in 0..self.next {
             unsafe {

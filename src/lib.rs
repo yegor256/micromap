@@ -85,7 +85,7 @@ use std::mem::MaybeUninit;
 /// into it, it simply panics. Moreover, in the "release" mode it doesn't panic,
 /// but its behaviour is undefined. In the "release" mode all boundary checks
 /// are disabled, for the sake of higher performance.
-pub struct Map<K: Clone + PartialEq, V: Clone, const N: usize> {
+pub struct Map<K: PartialEq, V, const N: usize> {
     /// The next available pair in the array.
     next: usize,
     /// The fixed-size array of key-value pairs.

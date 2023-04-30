@@ -20,7 +20,7 @@
 
 use crate::{IntoIter, Iter, IterMut, Map};
 
-impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
+impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// Make an iterator over all pairs.
     #[inline]
     #[must_use]
@@ -43,7 +43,7 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     }
 }
 
-impl<'a, K: Clone, V: Clone, const N: usize> Iterator for Iter<'a, K, V, N> {
+impl<'a, K, V, const N: usize> Iterator for Iter<'a, K, V, N> {
     type Item = (&'a K, &'a V);
 
     #[inline]
@@ -60,7 +60,7 @@ impl<'a, K: Clone, V: Clone, const N: usize> Iterator for Iter<'a, K, V, N> {
     }
 }
 
-impl<'a, K: Clone, V: Clone> Iterator for IterMut<'a, K, V> {
+impl<'a, K, V> Iterator for IterMut<'a, K, V> {
     type Item = (&'a K, &'a mut V);
 
     #[inline]

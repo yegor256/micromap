@@ -21,7 +21,7 @@
 use crate::Map;
 use std::borrow::Borrow;
 
-impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
+impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// Get its total capacity.
     #[inline]
     #[must_use]
@@ -198,7 +198,8 @@ impl<K: PartialEq + Clone, V: Clone, const N: usize> Map<K, V, N> {
     #[inline]
     pub fn remove_entry<Q: PartialEq + ?Sized>(&mut self, k: &Q) -> Option<(K, V)>
     where
-        K: Borrow<Q>,
+        K: Borrow<Q> + Clone,
+        V: Clone,
     {
         for i in 0..self.next {
             if let Some(p) = self.item(i) {
@@ -329,9 +330,6 @@ fn insert_composite() {
     m.insert(1, c);
     assert_eq!(0, m.into_iter().next().unwrap().1.r.len());
 }
-
-#[derive(Clone, Copy)]
-struct Bar {}
 
 #[test]
 fn large_map_in_heap() {

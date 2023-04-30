@@ -22,9 +22,7 @@ use crate::Map;
 use std::borrow::Borrow;
 use std::ops::{Index, IndexMut};
 
-impl<K: Clone + Eq + Borrow<Q>, Q: Eq + ?Sized, V: Clone, const N: usize> Index<&Q>
-    for Map<K, V, N>
-{
+impl<K: Eq + Borrow<Q>, Q: Eq + ?Sized, V, const N: usize> Index<&Q> for Map<K, V, N> {
     type Output = V;
 
     #[inline]
@@ -34,9 +32,7 @@ impl<K: Clone + Eq + Borrow<Q>, Q: Eq + ?Sized, V: Clone, const N: usize> Index<
     }
 }
 
-impl<K: Clone + Eq + Borrow<Q>, Q: Eq + ?Sized, V: Clone, const N: usize> IndexMut<&Q>
-    for Map<K, V, N>
-{
+impl<K: Eq + Borrow<Q>, Q: Eq + ?Sized, V, const N: usize> IndexMut<&Q> for Map<K, V, N> {
     #[inline]
     #[must_use]
     fn index_mut(&mut self, key: &Q) -> &mut V {
@@ -68,7 +64,7 @@ fn wrong_index() -> () {
 }
 
 #[cfg(test)]
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(PartialEq, Eq)]
 struct Container {
     pub t: i32,
 }
