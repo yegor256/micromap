@@ -130,8 +130,8 @@ fn insert_and_into_iterate() {
     m.insert("one", 42);
     m.insert("two", 16);
     let mut sum = 0;
-    for (_k, v) in m.into_iter() {
-        sum += v;
+    for p in &m {
+        sum += p.1;
     }
     assert_eq!(58, sum);
 }
