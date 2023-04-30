@@ -20,6 +20,8 @@
 
 use crate::Map;
 use std::borrow::Borrow;
+use std::mem;
+use std::mem::MaybeUninit;
 
 impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// Get its total capacity.
@@ -198,15 +200,15 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     #[inline]
     pub fn remove_entry<Q: PartialEq + ?Sized>(&mut self, k: &Q) -> Option<(K, V)>
     where
-        K: Borrow<Q> + Clone,
-        V: Clone,
+        K: Borrow<Q>,
     {
         for i in 0..self.next {
             if let Some(p) = self.item(i) {
                 if p.0.borrow() == k {
-                    let ret = Some(p.clone());
-                    self.pairs[i].write(None);
-                    return ret;
+                    let ret = mem::replace(&mut self.pairs[i], MaybeUninit::new(None));
+                    unsafe {
+                        return ret.assume_init();
+                    }
                 }
             }
         }
@@ -398,4 +400,15 @@ fn remove_entry_absent() {
     let mut m: Map<&str, i32, 10> = Map::new();
     m.insert("one", 42);
     assert_eq!(m.remove_entry("two"), None);
+}
+
+#[test]
+fn drop_removed_entry() {
+    use std::rc::Rc;
+    let mut m: Map<(), Rc<()>, 8> = Map::new();
+    let v = Rc::new(());
+    m.insert((), Rc::clone(&v));
+    assert_eq!(Rc::strong_count(&v), 2);
+    m.remove_entry(&());
+    assert_eq!(Rc::strong_count(&v), 1);
 }
