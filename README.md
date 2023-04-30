@@ -64,21 +64,21 @@ while the numbers below 1.0 demonstrate performance loss.
 <!-- benchmark -->
 | | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
 | --- | --: | --: | --: | --: | --: | --: | --: |
-| `hashbrown::HashMap` | 27.00 | 8.32 | 3.93 | 2.04 | 0.81 | 0.42 | 0.21 |
-| `indexmap::IndexMap` | 20.09 | 11.48 | 6.04 | 3.17 | 1.47 | 0.77 | 0.39 |
-| `linear_map::LinearMap` | 3.35 | 1.21 | 0.88 | 0.86 | 0.75 | 0.69 | 0.93 |
-| `linked_hash_map::LinkedHashMap` | 33.11 | 14.84 | 7.56 | 4.23 | 2.29 | 1.13 | 0.55 |
-| `litemap::LiteMap` | 5.83 | 2.32 | 1.41 | 0.99 | 0.61 | 0.41 | 0.28 |
+| `hashbrown::HashMap` | 26.92 | 8.40 | 3.82 | 2.07 | 0.83 | 0.43 | 0.21 |
+| `indexmap::IndexMap` | 19.76 | 12.05 | 5.83 | 3.23 | 1.48 | 0.78 | 0.39 |
+| `linear_map::LinearMap` | 3.32 | 1.20 | 0.87 | 0.88 | 0.75 | 0.70 | 0.92 |
+| `linked_hash_map::LinkedHashMap` | 32.82 | 17.14 | 7.36 | 4.34 | 2.27 | 1.11 | 0.55 |
+| `litemap::LiteMap` | 5.77 | 2.34 | 1.37 | 1.02 | 0.61 | 0.42 | 0.27 |
 | `micromap::Map` 👍 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
-| `nohash_hasher::BuildNoHashHasher` | 18.89 | 7.87 | 4.57 | 1.74 | 0.78 | 0.41 | 0.21 |
-| `rustc_hash::FxHashMap` | 18.89 | 7.47 | 3.84 | 2.22 | 0.72 | 0.38 | 0.20 |
-| `std::collections::BTreeMap` | 26.96 | 7.83 | 4.38 | 3.20 | 1.64 | 0.75 | 0.44 |
-| `std::collections::HashMap` | 27.45 | 11.79 | 5.99 | 3.50 | 1.90 | 0.91 | 0.42 |
-| `tinymap::array_map::ArrayMap` | 1.67 | 3.49 | 2.98 | 2.90 | 2.92 | 3.49 | 3.56 |
+| `nohash_hasher::BuildNoHashHasher` | 18.36 | 7.94 | 4.44 | 1.78 | 0.78 | 0.42 | 0.20 |
+| `rustc_hash::FxHashMap` | 18.74 | 7.55 | 3.73 | 2.25 | 0.78 | 0.39 | 0.19 |
+| `std::collections::BTreeMap` | 27.51 | 8.43 | 4.25 | 3.31 | 1.72 | 0.76 | 0.44 |
+| `std::collections::HashMap` | 29.21 | 11.99 | 5.82 | 3.50 | 1.61 | 0.90 | 0.42 |
+| `tinymap::array_map::ArrayMap` | 1.66 | 3.54 | 2.89 | 2.94 | 2.95 | 3.56 | 3.53 |
 
 The experiment [was performed](https://github.com/yegor256/micromap/actions/workflows/benchmark.yml) on 30-04-2023.
 There were 1000000 repetition cycles.
-The entire benchmark took 298s.
+The entire benchmark took 297s.
 
 <!-- benchmark -->
 
