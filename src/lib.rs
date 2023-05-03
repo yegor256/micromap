@@ -47,7 +47,6 @@
 #![warn(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
 #![allow(clippy::multiple_inherent_impl)]
 #![allow(clippy::multiple_crate_versions)]
-
 mod clone;
 mod ctors;
 mod debug;
@@ -58,6 +57,7 @@ mod iterators;
 mod map;
 #[cfg(feature = "serde")]
 mod serialization;
+mod values;
 
 use std::mem::MaybeUninit;
 
@@ -110,6 +110,22 @@ pub struct IterMut<'a, K, V> {
 }
 
 /// Into-iterator over the [`Map`].
-pub struct IntoIter<'a, K, V, const N: usize> {
+pub struct IntoIter<K: PartialEq, V, const N: usize> {
+    pos: usize,
+    map: Map<K, V, N>,
+}
+
+/// An iterator over the values of the [`Map`].
+pub struct Values<'a, K: PartialEq, V, const N: usize> {
     iter: Iter<'a, K, V, N>,
+}
+
+/// Mutable iterator over the values of the [`Map`].
+pub struct ValuesMut<'a, K: PartialEq, V> {
+    iter: IterMut<'a, K, V>,
+}
+
+/// Consuming iterator over the values of the [`Map`].
+pub struct IntoValues<K: PartialEq, V, const N: usize> {
+    iter: IntoIter<K, V, N>,
 }
