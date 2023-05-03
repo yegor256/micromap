@@ -47,7 +47,6 @@
 #![warn(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
 #![allow(clippy::multiple_inherent_impl)]
 #![allow(clippy::multiple_crate_versions)]
-
 mod clone;
 mod ctors;
 mod debug;
@@ -110,6 +109,7 @@ pub struct IterMut<'a, K, V> {
 }
 
 /// Into-iterator over the [`Map`].
-pub struct IntoIter<'a, K, V, const N: usize> {
-    iter: Iter<'a, K, V, N>,
+pub struct IntoIter<K: PartialEq, V, const N: usize> {
+    pos: usize,
+    map: Map<K, V, N>,
 }

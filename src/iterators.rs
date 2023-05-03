@@ -19,6 +19,8 @@
 // SOFTWARE.
 
 use crate::{IntoIter, Iter, IterMut, Map};
+use std::mem;
+use std::mem::MaybeUninit;
 
 impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// Make an iterator over all pairs.
@@ -76,24 +78,54 @@ impl<'a, K, V> Iterator for IterMut<'a, K, V> {
     }
 }
 
-impl<'a, K: Clone, V: Clone, const N: usize> Iterator for IntoIter<'a, K, V, N> {
+impl<K: PartialEq, V, const N: usize> Iterator for IntoIter<K, V, N> {
     type Item = (K, V);
 
     #[inline]
     #[must_use]
     fn next(&mut self) -> Option<Self::Item> {
-        self.iter.next().map(|p| (p.0.clone(), p.1.clone()))
+        while self.pos < self.map.next {
+            let p = &mut self.map.pairs[self.pos];
+            self.pos += 1;
+            unsafe {
+                if p.assume_init_ref().is_some() {
+                    return mem::replace(p, MaybeUninit::new(None)).assume_init();
+                }
+            }
+        }
+        None
     }
 }
 
-impl<'a, K: Clone + PartialEq, V: Clone, const N: usize> IntoIterator for &'a Map<K, V, N> {
-    type Item = (K, V);
-    type IntoIter = IntoIter<'a, K, V, N>;
+impl<'a, K: PartialEq, V, const N: usize> IntoIterator for &'a Map<K, V, N> {
+    type Item = (&'a K, &'a V);
+    type IntoIter = Iter<'a, K, V, N>;
 
     #[inline]
     #[must_use]
     fn into_iter(self) -> Self::IntoIter {
-        IntoIter { iter: self.iter() }
+        self.iter()
+    }
+}
+
+impl<'a, K: PartialEq, V, const N: usize> IntoIterator for &'a mut Map<K, V, N> {
+    type Item = (&'a K, &'a mut V);
+    type IntoIter = IterMut<'a, K, V>;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
+    }
+}
+
+impl<K: PartialEq, V, const N: usize> IntoIterator for Map<K, V, N> {
+    type Item = (K, V);
+    type IntoIter = IntoIter<K, V, N>;
+
+    #[inline]
+    #[must_use]
+    fn into_iter(self) -> Self::IntoIter {
+        IntoIter { pos: 0, map: self }
     }
 }
 
@@ -158,7 +190,7 @@ fn into_iterate_with_blanks() {
     m.insert("three", 5);
     m.remove(&"two");
     let mut sum = 0;
-    for (_k, v) in m.into_iter() {
+    for (_k, v) in m {
         sum += v;
     }
     assert_eq!(6, sum);
@@ -187,4 +219,31 @@ fn iter_mut_with_blanks() {
     m.remove(&"two");
     assert_eq!(m.iter_mut().count(), 2);
     assert_eq!(m.iter_mut().last().unwrap().1, &5);
+}
+
+#[test]
+fn into_iter_mut() {
+    let mut m: Map<&str, i32, 10> = Map::new();
+    m.insert("one", 2);
+    m.insert("two", 3);
+    m.insert("three", 5);
+    for (_k, v) in &mut m {
+        *v *= 2;
+    }
+    let sum = m.iter().map(|p| p.1).sum::<i32>();
+    assert_eq!(20, sum);
+}
+
+#[test]
+fn into_iter_drop() {
+    use std::rc::Rc;
+    let mut m: Map<i32, Rc<()>, 8> = Map::new();
+    let v = Rc::new(());
+    let n = 8;
+    for i in 0..n {
+        m.insert(i, Rc::clone(&v));
+    }
+    assert_eq!(Rc::strong_count(&v), (n + 1) as usize);
+    let _p = m.into_iter().nth(3);
+    assert_eq!(Rc::strong_count(&v), 2); // v & p
 }
