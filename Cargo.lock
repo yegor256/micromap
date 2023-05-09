@@ -79,7 +79,7 @@ checksum = "3a04a5b2b6f54acba899926491d0a6c59d98012938ca2ab5befb281c034e8f94"
 
 [[package]]
 name = "micromap"
-version = "0.0.0"
+version = "0.0.14"
 dependencies = [
  "bincode",
  "hashbrown 0.13.2",
