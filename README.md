@@ -64,21 +64,21 @@ while the numbers below 1.0 demonstrate performance loss.
 <!-- benchmark -->
 | | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
 | --- | --: | --: | --: | --: | --: | --: | --: |
-| `hashbrown::HashMap` | 15.05 | 5.08 | 3.11 | 1.55 | 0.58 | 0.27 | 0.14 |
-| `indexmap::IndexMap` | 13.34 | 9.27 | 5.45 | 2.72 | 1.19 | 0.56 | 0.29 |
-| `linear_map::LinearMap` | 2.19 | 0.98 | 0.84 | 0.84 | 0.60 | 0.63 | 0.74 |
-| `linked_hash_map::LinkedHashMap` | 27.14 | 11.46 | 7.20 | 3.75 | 1.64 | 0.78 | 0.42 |
-| `litemap::LiteMap` | 4.06 | 2.14 | 1.47 | 0.95 | 0.56 | 0.33 | 0.23 |
+| `hashbrown::HashMap` | 20.20 | 8.34 | 4.03 | 2.05 | 0.85 | 0.43 | 0.21 |
+| `indexmap::IndexMap` | 14.83 | 11.53 | 6.20 | 3.11 | 1.55 | 0.80 | 0.40 |
+| `linear_map::LinearMap` | 2.51 | 1.19 | 0.97 | 0.87 | 0.77 | 0.70 | 0.94 |
+| `linked_hash_map::LinkedHashMap` | 24.74 | 16.33 | 8.89 | 4.87 | 2.16 | 1.13 | 0.65 |
+| `litemap::LiteMap` | 4.36 | 2.34 | 1.46 | 1.00 | 0.64 | 0.43 | 0.28 |
 | `micromap::Map` 👍 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
-| `nohash_hasher::BuildNoHashHasher` | 11.99 | 5.03 | 3.78 | 1.26 | 0.54 | 0.25 | 0.13 |
-| `rustc_hash::FxHashMap` | 11.80 | 4.76 | 3.15 | 1.70 | 0.54 | 0.26 | 0.14 |
-| `std::collections::BTreeMap` | 21.37 | 6.09 | 4.11 | 2.84 | 1.26 | 0.57 | 0.35 |
-| `std::collections::HashMap` | 18.47 | 8.28 | 5.29 | 2.77 | 1.29 | 0.61 | 0.31 |
-| `tinymap::array_map::ArrayMap` | 2.38 | 3.35 | 3.68 | 2.68 | 2.58 | 2.40 | 2.39 |
+| `nohash_hasher::BuildNoHashHasher` | 13.55 | 7.91 | 4.68 | 1.76 | 0.81 | 0.42 | 0.21 |
+| `rustc_hash::FxHashMap` | 14.08 | 7.51 | 3.93 | 2.24 | 0.74 | 0.39 | 0.20 |
+| `std::collections::BTreeMap` | 19.87 | 7.80 | 4.41 | 3.22 | 1.63 | 0.76 | 0.44 |
+| `std::collections::HashMap` | 21.93 | 11.96 | 6.14 | 3.42 | 1.65 | 0.90 | 0.47 |
+| `tinymap::array_map::ArrayMap` | 1.25 | 3.52 | 3.00 | 2.92 | 3.05 | 3.64 | 3.59 |
 
-The experiment [was performed](https://github.com/yegor256/micromap/actions/workflows/benchmark.yml) on 03-05-2023.
+The experiment [was performed](https://github.com/yegor256/micromap/actions/workflows/benchmark.yml) on 09-05-2023.
 There were 1000000 repetition cycles.
-The entire benchmark took 349s.
+The entire benchmark took 321s.
 
 <!-- benchmark -->
 
