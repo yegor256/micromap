@@ -92,7 +92,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         let mut i = 0;
         loop {
             if i == self.next {
-                debug_assert!(i < N, "No more keys available in the map");
+                debug_assert!(target < N, "No more keys available in the map");
                 break;
             }
             match self.item(i) {
@@ -411,4 +411,12 @@ fn drop_removed_entry() {
     assert_eq!(Rc::strong_count(&v), 2);
     m.remove_entry(&());
     assert_eq!(Rc::strong_count(&v), 1);
+}
+
+#[test]
+fn insert_after_remove() {
+    let mut m: Map<_, _, 1> = Map::new();
+    m.insert(1, 2);
+    m.remove(&1);
+    m.insert(1, 3);
 }
