@@ -97,15 +97,16 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
             }
             match self.item(i) {
                 Some(p) => {
-                    if *p.0.borrow() == k {
+                    if p.0 == k {
                         target = i;
+                        unsafe {
+                            self.pairs[i].assume_init_drop();
+                        }
                         break;
                     }
                 }
                 None => {
-                    if i != self.next {
-                        target = i;
-                    }
+                    target = i;
                 }
             }
             i += 1;
@@ -419,4 +420,26 @@ fn insert_after_remove() {
     m.insert(1, 2);
     m.remove(&1);
     m.insert(1, 3);
+}
+
+#[test]
+fn insert_drop_duplicate() {
+    use std::rc::Rc;
+    let mut m: Map<_, _, 1> = Map::new();
+    let v = Rc::new(());
+    m.insert((), Rc::clone(&v));
+    assert_eq!(Rc::strong_count(&v), 2);
+    m.insert((), Rc::clone(&v));
+    assert_eq!(Rc::strong_count(&v), 2);
+}
+
+#[test]
+fn insert_duplicate_after_remove() {
+    let mut m: Map<_, _, 2> = Map::new();
+    m.insert(1, 1);
+    m.insert(2, 2);
+    m.remove(&1);
+    m.insert(2, 3);
+    assert_eq!(1, m.len());
+    assert_eq!(3, m[&2]);
 }
