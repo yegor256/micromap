@@ -54,6 +54,7 @@ mod eq;
 mod from;
 mod index;
 mod iterators;
+mod keys;
 mod map;
 #[cfg(feature = "serde")]
 mod serialization;
@@ -127,5 +128,15 @@ pub struct ValuesMut<'a, K: PartialEq, V> {
 
 /// Consuming iterator over the values of the [`Map`].
 pub struct IntoValues<K: PartialEq, V, const N: usize> {
+    iter: IntoIter<K, V, N>,
+}
+
+/// A read-only iterator over the keys of the [`Map`].
+pub struct Keys<'a, K: PartialEq, V, const N: usize> {
+    iter: Iter<'a, K, V, N>,
+}
+
+/// Consuming iterator over the keys of the [`Map`].
+pub struct IntoKeys<K: PartialEq, V, const N: usize> {
     iter: IntoIter<K, V, N>,
 }
