@@ -19,8 +19,8 @@
 // SOFTWARE.
 
 use crate::Map;
-use std::fmt;
-use std::fmt::{Debug, Display, Formatter};
+use core::fmt;
+use core::fmt::{Debug, Display, Formatter};
 
 impl<K: PartialEq + Display, V: Display, const N: usize> Display for Map<K, V, N> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
@@ -32,24 +32,30 @@ impl<K: PartialEq + Display, V: Display, const N: usize> Debug for Map<K, V, N> 
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         let mut parts = vec![];
         for (k, v) in self.iter() {
-            parts.push(format!("{k}: {v}"));
+            parts.push(std::format!("{k}: {v}"));
         }
-        f.write_str(format!("{{{}}}", parts.join(", ").as_str()).as_str())
+        f.write_str(std::format!("{{{}}}", parts.join(", ").as_str()).as_str())
     }
 }
 
-#[test]
-fn debugs_map() {
-    let mut m: Map<&str, i32, 10> = Map::new();
-    m.insert("one", 42);
-    m.insert("two", 16);
-    assert_eq!("{one: 42, two: 16}", format!("{:?}", m));
-}
+#[cfg(test)]
+mod test {
 
-#[test]
-fn displays_map() {
-    let mut m: Map<&str, i32, 10> = Map::new();
-    m.insert("one", 42);
-    m.insert("two", 16);
-    assert_eq!("{one: 42, two: 16}", format!("{}", m));
+    use super::*;
+
+    #[test]
+    fn debugs_map() {
+        let mut m: Map<&str, i32, 10> = Map::new();
+        m.insert("one", 42);
+        m.insert("two", 16);
+        assert_eq!("{one: 42, two: 16}", format!("{:?}", m));
+    }
+
+    #[test]
+    fn displays_map() {
+        let mut m: Map<&str, i32, 10> = Map::new();
+        m.insert("one", 42);
+        m.insert("two", 16);
+        assert_eq!("{one: 42, two: 16}", format!("{}", m));
+    }
 }

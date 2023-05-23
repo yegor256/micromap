@@ -19,11 +19,11 @@
 // SOFTWARE.
 
 use crate::Map;
+use core::fmt::Formatter;
+use core::marker::PhantomData;
 use serde::de::{MapAccess, Visitor};
 use serde::ser::SerializeMap;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use std::fmt::Formatter;
-use std::marker::PhantomData;
 
 impl<K: PartialEq + Serialize, V: Serialize, const N: usize> Serialize for Map<K, V, N> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -45,7 +45,7 @@ impl<'de, K: PartialEq + Deserialize<'de>, V: Deserialize<'de>, const N: usize> 
 {
     type Value = Map<K, V, N>;
 
-    fn expecting(&self, formatter: &mut Formatter) -> std::fmt::Result {
+    fn expecting(&self, formatter: &mut Formatter) -> core::fmt::Result {
         formatter.write_str("a Map")
     }
 

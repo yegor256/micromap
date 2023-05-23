@@ -54,18 +54,24 @@ impl<K: PartialEq, V, const N: usize> Iterator for IntoKeys<K, V, N> {
     }
 }
 
-#[test]
-fn iterate_keys() {
-    let mut m: Map<&str, i32, 10> = Map::new();
-    m.insert("foo", 0);
-    m.insert("bar", 0);
-    assert_eq!(m.keys().collect::<Vec<_>>(), [&"foo", &"bar"]);
-}
+#[cfg(test)]
+mod test {
 
-#[test]
-fn iterate_into_keys() {
-    let mut m: Map<&str, i32, 10> = Map::new();
-    m.insert("foo", 0);
-    m.insert("bar", 0);
-    assert_eq!(m.into_keys().collect::<Vec<_>>(), ["foo", "bar"]);
+    use super::*;
+
+    #[test]
+    fn iterate_keys() {
+        let mut m: Map<&str, i32, 10> = Map::new();
+        m.insert("foo", 0);
+        m.insert("bar", 0);
+        assert_eq!(m.keys().collect::<Vec<_>>(), [&"foo", &"bar"]);
+    }
+
+    #[test]
+    fn iterate_into_keys() {
+        let mut m: Map<&str, i32, 10> = Map::new();
+        m.insert("foo", 0);
+        m.insert("bar", 0);
+        assert_eq!(m.into_keys().collect::<Vec<_>>(), ["foo", "bar"]);
+    }
 }

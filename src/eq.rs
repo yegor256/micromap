@@ -46,11 +46,17 @@ impl<K: PartialEq, V: PartialEq, const N: usize> PartialEq for Map<K, V, N> {
 
 impl<K: Eq, V: Eq, const N: usize> Eq for Map<K, V, N> {}
 
-#[test]
-fn compares_two_maps() {
-    let mut m1: Map<&str, i32, 10> = Map::new();
-    m1.insert("first", 42);
-    let mut m2: Map<&str, i32, 10> = Map::new();
-    m2.insert("first", 42);
-    assert!(m1.eq(&m2));
+#[cfg(test)]
+mod test {
+
+    use super::*;
+
+    #[test]
+    fn compares_two_maps() {
+        let mut m1: Map<&str, i32, 10> = Map::new();
+        m1.insert("first", 42);
+        let mut m2: Map<&str, i32, 10> = Map::new();
+        m2.insert("first", 42);
+        assert!(m1.eq(&m2));
+    }
 }

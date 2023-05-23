@@ -19,8 +19,8 @@
 // SOFTWARE.
 
 use crate::{IntoIter, Iter, IterMut, Map};
-use std::mem;
-use std::mem::MaybeUninit;
+use core::mem;
+use core::mem::MaybeUninit;
 
 impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// Make an iterator over all pairs.
@@ -129,121 +129,127 @@ impl<K: PartialEq, V, const N: usize> IntoIterator for Map<K, V, N> {
     }
 }
 
-#[test]
-fn empty_iterator() {
-    let m: Map<u32, u32, 4> = Map::new();
-    assert!(m.into_iter().next().is_none());
-}
+#[cfg(test)]
+mod test {
 
-#[test]
-fn insert_and_jump_over_next() {
-    let mut m: Map<&str, i32, 10> = Map::new();
-    m.insert("foo", 42);
-    let mut iter = m.into_iter();
-    assert_eq!(42, iter.next().unwrap().1);
-    assert!(iter.next().is_none());
-}
+    use super::*;
 
-#[test]
-fn insert_and_iterate() {
-    let mut m: Map<&str, i32, 10> = Map::new();
-    m.insert("one", 42);
-    m.insert("two", 16);
-    let mut sum = 0;
-    for (_k, v) in m.iter() {
-        sum += v;
+    #[test]
+    fn empty_iterator() {
+        let m: Map<u32, u32, 4> = Map::new();
+        assert!(m.into_iter().next().is_none());
     }
-    assert_eq!(58, sum);
-}
 
-#[test]
-fn insert_and_into_iterate() {
-    let mut m: Map<&str, i32, 10> = Map::new();
-    m.insert("one", 42);
-    m.insert("two", 16);
-    let mut sum = 0;
-    for p in &m {
-        sum += p.1;
+    #[test]
+    fn insert_and_jump_over_next() {
+        let mut m: Map<&str, i32, 10> = Map::new();
+        m.insert("foo", 42);
+        let mut iter = m.into_iter();
+        assert_eq!(42, iter.next().unwrap().1);
+        assert!(iter.next().is_none());
     }
-    assert_eq!(58, sum);
-}
 
-#[test]
-fn iterate_with_blanks() {
-    let mut m: Map<&str, i32, 10> = Map::new();
-    m.insert("one", 1);
-    m.insert("two", 3);
-    m.insert("three", 5);
-    m.remove(&"two");
-    let mut sum = 0;
-    for (_k, v) in m.iter() {
-        sum += v;
+    #[test]
+    fn insert_and_iterate() {
+        let mut m: Map<&str, i32, 10> = Map::new();
+        m.insert("one", 42);
+        m.insert("two", 16);
+        let mut sum = 0;
+        for (_k, v) in m.iter() {
+            sum += v;
+        }
+        assert_eq!(58, sum);
     }
-    assert_eq!(6, sum);
-}
 
-#[test]
-fn into_iterate_with_blanks() {
-    let mut m: Map<&str, i32, 10> = Map::new();
-    m.insert("one", 1);
-    m.insert("two", 3);
-    m.insert("three", 5);
-    m.remove(&"two");
-    let mut sum = 0;
-    for (_k, v) in m {
-        sum += v;
+    #[test]
+    fn insert_and_into_iterate() {
+        let mut m: Map<&str, i32, 10> = Map::new();
+        m.insert("one", 42);
+        m.insert("two", 16);
+        let mut sum = 0;
+        for p in &m {
+            sum += p.1;
+        }
+        assert_eq!(58, sum);
     }
-    assert_eq!(6, sum);
-}
 
-#[test]
-fn change_with_iter_mut() {
-    let mut m: Map<&str, i32, 10> = Map::new();
-    m.insert("one", 2);
-    m.insert("two", 3);
-    m.insert("three", 5);
-    for (_k, v) in m.iter_mut() {
-        *v *= 2;
+    #[test]
+    fn iterate_with_blanks() {
+        let mut m: Map<&str, i32, 10> = Map::new();
+        m.insert("one", 1);
+        m.insert("two", 3);
+        m.insert("three", 5);
+        m.remove(&"two");
+        let mut sum = 0;
+        for (_k, v) in m.iter() {
+            sum += v;
+        }
+        assert_eq!(6, sum);
     }
-    let sum = m.iter().map(|p| p.1).sum::<i32>();
-    assert_eq!(20, sum);
-}
 
-#[test]
-fn iter_mut_with_blanks() {
-    let mut m: Map<&str, i32, 10> = Map::new();
-    m.insert("one", 1);
-    m.insert("two", 3);
-    m.insert("three", 5);
-    assert_eq!(m.iter_mut().count(), 3);
-    m.remove(&"two");
-    assert_eq!(m.iter_mut().count(), 2);
-    assert_eq!(m.iter_mut().last().unwrap().1, &5);
-}
-
-#[test]
-fn into_iter_mut() {
-    let mut m: Map<&str, i32, 10> = Map::new();
-    m.insert("one", 2);
-    m.insert("two", 3);
-    m.insert("three", 5);
-    for (_k, v) in &mut m {
-        *v *= 2;
+    #[test]
+    fn into_iterate_with_blanks() {
+        let mut m: Map<&str, i32, 10> = Map::new();
+        m.insert("one", 1);
+        m.insert("two", 3);
+        m.insert("three", 5);
+        m.remove(&"two");
+        let mut sum = 0;
+        for (_k, v) in m {
+            sum += v;
+        }
+        assert_eq!(6, sum);
     }
-    let sum = m.iter().map(|p| p.1).sum::<i32>();
-    assert_eq!(20, sum);
-}
 
-#[test]
-fn into_iter_drop() {
-    use std::rc::Rc;
-    let mut m: Map<i32, Rc<()>, 8> = Map::new();
-    let v = Rc::new(());
-    let n = 8;
-    for i in 0..n {
-        m.insert(i, Rc::clone(&v));
+    #[test]
+    fn change_with_iter_mut() {
+        let mut m: Map<&str, i32, 10> = Map::new();
+        m.insert("one", 2);
+        m.insert("two", 3);
+        m.insert("three", 5);
+        for (_k, v) in m.iter_mut() {
+            *v *= 2;
+        }
+        let sum = m.iter().map(|p| p.1).sum::<i32>();
+        assert_eq!(20, sum);
     }
-    assert_eq!(Rc::strong_count(&v), (n + 1) as usize);
-    let _p = m.into_iter().nth(3);
-    assert_eq!(Rc::strong_count(&v), 2); // v & p
+
+    #[test]
+    fn iter_mut_with_blanks() {
+        let mut m: Map<&str, i32, 10> = Map::new();
+        m.insert("one", 1);
+        m.insert("two", 3);
+        m.insert("three", 5);
+        assert_eq!(m.iter_mut().count(), 3);
+        m.remove(&"two");
+        assert_eq!(m.iter_mut().count(), 2);
+        assert_eq!(m.iter_mut().last().unwrap().1, &5);
+    }
+
+    #[test]
+    fn into_iter_mut() {
+        let mut m: Map<&str, i32, 10> = Map::new();
+        m.insert("one", 2);
+        m.insert("two", 3);
+        m.insert("three", 5);
+        for (_k, v) in &mut m {
+            *v *= 2;
+        }
+        let sum = m.iter().map(|p| p.1).sum::<i32>();
+        assert_eq!(20, sum);
+    }
+
+    #[test]
+    fn into_iter_drop() {
+        use std::rc::Rc;
+        let mut m: Map<i32, Rc<()>, 8> = Map::new();
+        let v = Rc::new(());
+        let n = 8;
+        for i in 0..n {
+            m.insert(i, Rc::clone(&v));
+        }
+        assert_eq!(Rc::strong_count(&v), (n + 1) as usize);
+        let _p = m.into_iter().nth(3);
+        assert_eq!(Rc::strong_count(&v), 2); // v & p
+    }
 }

@@ -71,42 +71,48 @@ impl<K: PartialEq, V, const N: usize> Iterator for IntoValues<K, V, N> {
     }
 }
 
-#[test]
-fn iterate_values() {
-    let mut m: Map<&str, i32, 10> = Map::new();
-    m.insert("one", 42);
-    m.insert("two", 16);
-    assert_eq!(58, m.values().sum());
-}
+#[cfg(test)]
+mod test {
 
-#[test]
-fn iterate_values_mut() {
-    let mut m: Map<&str, i32, 10> = Map::new();
-    m.insert("one", 42);
-    m.insert("two", 16);
-    m.values_mut().for_each(|v| *v *= 2);
-    assert_eq!(116, m.values().sum());
-}
+    use super::*;
 
-#[test]
-fn iterate_values_with_blanks() {
-    let mut m: Map<&str, i32, 10> = Map::new();
-    m.insert("one", 1);
-    m.insert("two", 3);
-    m.insert("three", 5);
-    m.remove(&"two");
-    assert_eq!(m.values().collect::<Vec<_>>(), [&1, &5]);
-}
-
-#[test]
-fn into_values_drop() {
-    use std::rc::Rc;
-    let mut m: Map<i32, Rc<()>, 8> = Map::new();
-    let v = Rc::new(());
-    for i in 0..8 {
-        m.insert(i, Rc::clone(&v));
+    #[test]
+    fn iterate_values() {
+        let mut m: Map<&str, i32, 10> = Map::new();
+        m.insert("one", 42);
+        m.insert("two", 16);
+        assert_eq!(58, m.values().sum());
     }
-    assert_eq!(9, Rc::strong_count(&v));
-    m.into_values();
-    assert_eq!(1, Rc::strong_count(&v));
+
+    #[test]
+    fn iterate_values_mut() {
+        let mut m: Map<&str, i32, 10> = Map::new();
+        m.insert("one", 42);
+        m.insert("two", 16);
+        m.values_mut().for_each(|v| *v *= 2);
+        assert_eq!(116, m.values().sum());
+    }
+
+    #[test]
+    fn iterate_values_with_blanks() {
+        let mut m: Map<&str, i32, 10> = Map::new();
+        m.insert("one", 1);
+        m.insert("two", 3);
+        m.insert("three", 5);
+        m.remove(&"two");
+        assert_eq!(m.values().collect::<Vec<_>>(), [&1, &5]);
+    }
+
+    #[test]
+    fn into_values_drop() {
+        use std::rc::Rc;
+        let mut m: Map<i32, Rc<()>, 8> = Map::new();
+        let v = Rc::new(());
+        for i in 0..8 {
+            m.insert(i, Rc::clone(&v));
+        }
+        assert_eq!(9, Rc::strong_count(&v));
+        m.into_values();
+        assert_eq!(1, Rc::strong_count(&v));
+    }
 }

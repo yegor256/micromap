@@ -1,0 +1,25 @@
+name: Rust+no_std
+
+on:
+  push:
+    branches: [ '**' ]
+  pull_request:
+    branches: [ '**' ]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: '-D warnings'
+
+jobs:
+  build-nostd:
+    name: Build on no_std target (thumbv7em-none-eabi)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          targets: thumbv7em-none-eabi
+      - run: cargo build --target thumbv7em-none-eabi --release --no-default-features
+      - run: cargo build --target thumbv7em-none-eabi --release
+      - run: cargo build --target thumbv7em-none-eabi --release --features serde
