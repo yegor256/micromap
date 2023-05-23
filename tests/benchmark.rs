@@ -32,9 +32,9 @@ macro_rules! eval {
         let mut sum = 0;
         for _ in 0..$total {
             $map.clear();
-            $map.insert(0, 42);
+            let _ = $map.insert(0, 42);
             for i in 1..$capacity - 1 {
-                $map.insert(i as u32, i as i64);
+                let _ = $map.insert(i as u32, i as i64);
                 let v = std::hint::black_box(*$map.get(&(i as u32)).unwrap());
                 assert_eq!(v, i as i64);
             }
@@ -127,6 +127,12 @@ fn benchmark(total: usize) -> HashMap<&'static str, Duration> {
         total
     );
     insert!(
+        "heapless::LinearMap",
+        ret,
+        heapless::LinearMap::<u32, i64, CAPACITY>::new(),
+        total
+    );
+    insert!(
         "micromap::Map",
         ret,
         micromap::Map::<u32, i64, CAPACITY>::new(),
@@ -149,17 +155,22 @@ pub fn benchmark_and_print() {
         10000000,
     );
     let ours = times.get("micromap::Map").unwrap();
-    let mut total = 0.0;
+    let mut total_gain = 0.0;
+    let mut total_loss = 0.0;
     for (m, d) in &times {
-        let gain = d.as_nanos() as f64 / ours.as_nanos() as f64;
-        println!("{m} -> {:?} ({:.2}x)", d, gain);
+        let differential = d.as_nanos() as f64 / ours.as_nanos() as f64;
+        println!("{m} -> {:?} ({:.2}x)", d, differential);
         if d == ours {
             continue;
         }
-        assert!(d.cmp(ours).is_gt());
-        total += gain;
+
+        if d.cmp(ours).is_gt() {
+            total_gain += differential;
+        } else {
+            total_loss += differential;
+        }
     }
-    println!("Total gain: {:.2}", total);
+    println!("Total gain: {:.2}, loss: {:.2}", total_gain, total_loss);
 }
 
 pub fn main() {

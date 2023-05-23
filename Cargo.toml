@@ -16,6 +16,7 @@ serde = { version = "1.0.163", optional = true, default-features = false }
 [dev-dependencies]
 bincode = "1.3.3"
 hashbrown = "0.13.2"
+heapless = "0.7.16"
 rustc-hash = "1.1.0"
 nohash-hasher = "0.2.0"
 tinymap = "0.4.0"
