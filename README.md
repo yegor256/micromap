@@ -64,21 +64,22 @@ while the numbers below 1.0 demonstrate performance loss.
 <!-- benchmark -->
 | | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
 | --- | --: | --: | --: | --: | --: | --: | --: |
-| `hashbrown::HashMap` | 17.10 | 6.80 | 3.32 | 1.77 | 0.78 | 0.39 | 0.20 |
-| `indexmap::IndexMap` | 16.30 | 12.28 | 6.62 | 3.26 | 1.53 | 0.80 | 0.38 |
-| `linear_map::LinearMap` | 3.13 | 1.30 | 0.91 | 0.95 | 0.75 | 0.88 | 0.79 |
-| `linked_hash_map::LinkedHashMap` | 27.96 | 16.55 | 7.94 | 4.48 | 2.10 | 1.14 | 0.57 |
-| `litemap::LiteMap` | 5.19 | 2.48 | 1.50 | 1.17 | 0.66 | 0.41 | 0.27 |
+| `hashbrown::HashMap` | 14.75 | 5.40 | 3.08 | 1.62 | 0.62 | 0.29 | 0.15 |
+| `heapless::LinearMap` | 0.80 | 0.90 | 0.76 | 0.68 | 0.61 | 0.67 | 0.60 |
+| `indexmap::IndexMap` | 16.81 | 10.54 | 6.36 | 3.33 | 1.60 | 0.75 | 0.38 |
+| `linear_map::LinearMap` | 2.12 | 1.05 | 0.80 | 0.70 | 0.63 | 0.80 | 0.62 |
+| `linked_hash_map::LinkedHashMap` | 23.87 | 12.06 | 7.02 | 3.80 | 1.81 | 0.83 | 0.42 |
+| `litemap::LiteMap` | 4.46 | 2.27 | 1.49 | 1.03 | 0.58 | 0.35 | 0.22 |
 | `micromap::Map` 👍 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
-| `nohash_hasher::BuildNoHashHasher` | 13.90 | 7.05 | 3.74 | 1.55 | 0.75 | 0.36 | 0.19 |
-| `rustc_hash::FxHashMap` | 13.24 | 7.07 | 3.28 | 1.91 | 0.74 | 0.37 | 0.20 |
-| `std::collections::BTreeMap` | 21.80 | 8.42 | 4.76 | 3.55 | 1.71 | 0.82 | 0.51 |
-| `std::collections::HashMap` | 35.31 | 10.63 | 5.71 | 3.30 | 1.58 | 0.82 | 0.41 |
-| `tinymap::array_map::ArrayMap` | 1.26 | 3.68 | 3.05 | 3.04 | 3.21 | 3.18 | 3.00 |
+| `nohash_hasher::BuildNoHashHasher` | 11.39 | 5.54 | 3.63 | 1.31 | 0.57 | 0.27 | 0.14 |
+| `rustc_hash::FxHashMap` | 11.33 | 5.22 | 3.01 | 1.76 | 0.58 | 0.29 | 0.15 |
+| `std::collections::BTreeMap` | 21.28 | 6.37 | 3.91 | 3.05 | 1.30 | 0.59 | 0.37 |
+| `std::collections::HashMap` | 17.48 | 9.09 | 5.41 | 2.97 | 1.35 | 0.63 | 0.33 |
+| `tinymap::array_map::ArrayMap` | 2.32 | 3.08 | 2.99 | 2.85 | 2.85 | 2.54 | 2.47 |
 
 The experiment [was performed](https://github.com/yegor256/micromap/actions/workflows/benchmark.yml) on 23-05-2023.
 There were 1000000 repetition cycles.
-The entire benchmark took 406s.
+The entire benchmark took 418s.
 
 <!-- benchmark -->
 
