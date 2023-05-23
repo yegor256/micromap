@@ -25,5 +25,5 @@ indexmap = "1.9.3"
 litemap = "0.7.0"
 
 [features]
-default = ["std"]
+default = []
 std = []
