@@ -11,7 +11,7 @@ keywords = ["memory", "map"]
 categories = ["data-structures", "memory-management"]
 
 [dependencies]
-serde = { version = "1.0.167", optional = true, default-features = false }
+serde = { version = "1.0.168", optional = true, default-features = false }
 
 [dev-dependencies]
 bincode = "1.3.3"
