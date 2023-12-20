@@ -23,7 +23,7 @@ use crate::Map;
 impl<K: Clone + PartialEq, V: Clone, const N: usize> Clone for Map<K, V, N> {
     fn clone(&self) -> Self {
         let mut m: Self = Self::new();
-        for (k, v) in self.iter() {
+        for (k, v) in self {
             m.insert(k.clone(), v.clone());
         }
         m
