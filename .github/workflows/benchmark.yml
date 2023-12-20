@@ -9,7 +9,7 @@ jobs:
   pr:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: ./rebuild_benchmark.sh
       - uses: peter-evans/create-pull-request@v5
         with:
