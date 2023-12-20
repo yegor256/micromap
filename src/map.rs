@@ -77,6 +77,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         for i in 0..self.next {
             if let Some(p) = self.item(i) {
                 if p.0.borrow() == k {
+                    unsafe { self.pairs[i].assume_init_drop() };
                     self.pairs[i].write(None);
                     break;
                 }
@@ -166,6 +167,9 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// Remove all pairs from it, but keep the space intact for future use.
     #[inline]
     pub fn clear(&mut self) {
+        for i in 0..self.next {
+            unsafe { self.pairs[i].assume_init_drop() };
+        }
         self.next = 0;
     }
 
