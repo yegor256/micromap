@@ -54,10 +54,13 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// Does the map contain this key?
     #[inline]
     #[must_use]
-    pub fn contains_key(&self, k: &K) -> bool {
+    pub fn contains_key<Q: PartialEq + ?Sized>(&self, k: &Q) -> bool
+    where
+        K: Borrow<Q>,
+    {
         for i in 0..self.next {
             if let Some((bk, _bv)) = self.item(i) {
-                if bk == k {
+                if bk.borrow() == k {
                     return true;
                 }
             }
@@ -67,7 +70,10 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
 
     /// Remove by key.
     #[inline]
-    pub fn remove(&mut self, k: &K) {
+    pub fn remove<Q: PartialEq + ?Sized>(&mut self, k: &Q)
+    where
+        K: Borrow<Q>,
+    {
         for i in 0..self.next {
             if let Some(p) = self.item(i) {
                 if p.0.borrow() == k {
