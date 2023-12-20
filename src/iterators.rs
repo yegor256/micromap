@@ -142,8 +142,8 @@ mod test {
 
     #[test]
     fn insert_and_jump_over_next() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("foo", 42);
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("foo".to_string(), 42);
         let mut iter = m.into_iter();
         assert_eq!(42, iter.next().unwrap().1);
         assert!(iter.next().is_none());
@@ -151,9 +151,9 @@ mod test {
 
     #[test]
     fn insert_and_iterate() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("one", 42);
-        m.insert("two", 16);
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("one".to_string(), 42);
+        m.insert("two".to_string(), 16);
         let mut sum = 0;
         for (_k, v) in m.iter() {
             sum += v;
@@ -163,9 +163,9 @@ mod test {
 
     #[test]
     fn insert_and_into_iterate() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("one", 42);
-        m.insert("two", 16);
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("one".to_string(), 42);
+        m.insert("two".to_string(), 16);
         let mut sum = 0;
         for p in &m {
             sum += p.1;
@@ -175,11 +175,11 @@ mod test {
 
     #[test]
     fn iterate_with_blanks() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("one", 1);
-        m.insert("two", 3);
-        m.insert("three", 5);
-        m.remove(&"two");
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("one".to_string(), 1);
+        m.insert("two".to_string(), 3);
+        m.insert("three".to_string(), 5);
+        m.remove("two");
         let mut sum = 0;
         for (_k, v) in m.iter() {
             sum += v;
@@ -189,11 +189,11 @@ mod test {
 
     #[test]
     fn into_iterate_with_blanks() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("one", 1);
-        m.insert("two", 3);
-        m.insert("three", 5);
-        m.remove(&"two");
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("one".to_string(), 1);
+        m.insert("two".to_string(), 3);
+        m.insert("three".to_string(), 5);
+        m.remove("two");
         let mut sum = 0;
         for (_k, v) in m {
             sum += v;
@@ -203,10 +203,10 @@ mod test {
 
     #[test]
     fn change_with_iter_mut() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("one", 2);
-        m.insert("two", 3);
-        m.insert("three", 5);
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("one".to_string(), 2);
+        m.insert("two".to_string(), 3);
+        m.insert("three".to_string(), 5);
         for (_k, v) in m.iter_mut() {
             *v *= 2;
         }
@@ -216,22 +216,22 @@ mod test {
 
     #[test]
     fn iter_mut_with_blanks() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("one", 1);
-        m.insert("two", 3);
-        m.insert("three", 5);
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("one".to_string(), 1);
+        m.insert("two".to_string(), 3);
+        m.insert("three".to_string(), 5);
         assert_eq!(m.iter_mut().count(), 3);
-        m.remove(&"two");
+        m.remove("two");
         assert_eq!(m.iter_mut().count(), 2);
         assert_eq!(m.iter_mut().last().unwrap().1, &5);
     }
 
     #[test]
     fn into_iter_mut() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("one", 2);
-        m.insert("two", 3);
-        m.insert("three", 5);
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("one".to_string(), 2);
+        m.insert("two".to_string(), 3);
+        m.insert("three".to_string(), 5);
         for (_k, v) in &mut m {
             *v *= 2;
         }

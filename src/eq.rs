@@ -55,10 +55,10 @@ mod test {
 
     #[test]
     fn compares_two_maps() {
-        let mut m1: Map<&str, i32, 10> = Map::new();
-        m1.insert("first", 42);
-        let mut m2: Map<&str, i32, 10> = Map::new();
-        m2.insert("first", 42);
+        let mut m1: Map<String, i32, 10> = Map::new();
+        m1.insert("first".to_string(), 42);
+        let mut m2: Map<String, i32, 10> = Map::new();
+        m2.insert("first".to_string(), 42);
         assert!(m1.eq(&m2));
     }
 }

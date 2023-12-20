@@ -61,17 +61,20 @@ mod test {
 
     #[test]
     fn iterate_keys() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("foo", 0);
-        m.insert("bar", 0);
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("foo".to_string(), 0);
+        m.insert("bar".to_string(), 0);
         assert_eq!(m.keys().collect::<Vec<_>>(), [&"foo", &"bar"]);
     }
 
     #[test]
     fn iterate_into_keys() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("foo", 0);
-        m.insert("bar", 0);
-        assert_eq!(m.into_keys().collect::<Vec<_>>(), ["foo", "bar"]);
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("foo".to_string(), 0);
+        m.insert("bar".to_string(), 0);
+        assert_eq!(
+            m.into_keys().collect::<Vec<_>>(),
+            ["foo".to_string(), "bar".to_string()]
+        );
     }
 }

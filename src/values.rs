@@ -78,28 +78,28 @@ mod test {
 
     #[test]
     fn iterate_values() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("one", 42);
-        m.insert("two", 16);
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("one".to_string(), 42);
+        m.insert("two".to_string(), 16);
         assert_eq!(58, m.values().sum());
     }
 
     #[test]
     fn iterate_values_mut() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("one", 42);
-        m.insert("two", 16);
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("one".to_string(), 42);
+        m.insert("two".to_string(), 16);
         m.values_mut().for_each(|v| *v *= 2);
         assert_eq!(116, m.values().sum());
     }
 
     #[test]
     fn iterate_values_with_blanks() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("one", 1);
-        m.insert("two", 3);
-        m.insert("three", 5);
-        m.remove(&"two");
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("one".to_string(), 1);
+        m.insert("two".to_string(), 3);
+        m.insert("three".to_string(), 5);
+        m.remove("two");
         assert_eq!(m.values().collect::<Vec<_>>(), [&1, &5]);
     }
 

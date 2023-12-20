@@ -45,17 +45,17 @@ mod test {
 
     #[test]
     fn debugs_map() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("one", 42);
-        m.insert("two", 16);
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("one".to_string(), 42);
+        m.insert("two".to_string(), 16);
         assert_eq!("{one: 42, two: 16}", format!("{:?}", m));
     }
 
     #[test]
     fn displays_map() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("one", 42);
-        m.insert("two", 16);
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("one".to_string(), 42);
+        m.insert("two".to_string(), 16);
         assert_eq!("{one: 42, two: 16}", format!("{}", m));
     }
 }

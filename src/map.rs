@@ -231,12 +231,12 @@ mod test {
 
     #[test]
     fn insert_and_check_length() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("first", 42);
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("first".to_string(), 42);
         assert_eq!(1, m.len());
-        m.insert("second", 16);
+        m.insert("second".to_string(), 16);
         assert_eq!(2, m.len());
-        m.insert("first", 16);
+        m.insert("first".to_string(), 16);
         assert_eq!(2, m.len());
     }
 
@@ -272,10 +272,10 @@ mod test {
 
     #[test]
     fn insert_and_gets() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("one", 42);
-        m.insert("two", 16);
-        assert_eq!(16, *m.get(&"two").unwrap());
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("one".to_string(), 42);
+        m.insert("two".to_string(), 16);
+        assert_eq!(16, *m.get("two").unwrap());
     }
 
     #[test]
@@ -289,33 +289,33 @@ mod test {
 
     #[test]
     fn checks_key() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("one", 42);
-        assert!(m.contains_key(&"one"));
-        assert!(!m.contains_key(&"another"));
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("one".to_string(), 42);
+        assert!(m.contains_key("one"));
+        assert!(!m.contains_key("another"));
     }
 
     #[test]
     fn gets_missing_key() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("one", 42);
-        assert!(m.get(&"two").is_none());
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("one".to_string(), 42);
+        assert!(m.get("two").is_none());
     }
 
     #[test]
     fn mut_gets_missing_key() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("one", 42);
-        assert!(m.get_mut(&"two").is_none());
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("one".to_string(), 42);
+        assert!(m.get_mut("two").is_none());
     }
 
     #[test]
     fn removes_simple_pair() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("one", 42);
-        m.remove(&"one");
-        m.remove(&"another");
-        assert!(m.get(&"one").is_none());
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("one".to_string(), 42);
+        m.remove("one");
+        m.remove("another");
+        assert!(m.get("one").is_none());
     }
 
     #[cfg(test)]
@@ -354,8 +354,8 @@ mod test {
 
     #[test]
     fn clears_it_up() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("one", 42);
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("one".to_string(), 42);
         m.clear();
         assert_eq!(0, m.len());
     }
@@ -385,33 +385,33 @@ mod test {
 
     #[test]
     fn get_key_value() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        let k = "key";
-        m.insert(k, 42);
-        assert_eq!(m.get_key_value(k), Some((&k, &42)));
+        let mut m: Map<String, i32, 10> = Map::new();
+        let k = "key".to_string();
+        m.insert(k.clone(), 42);
+        assert_eq!(m.get_key_value(&k), Some((&k, &42)));
         assert!(m.contains_key(&k));
     }
 
     #[test]
     fn get_absent_key_value() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("one", 42);
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("one".to_string(), 42);
         assert_eq!(m.get_key_value("two"), None);
     }
 
     #[test]
     fn remove_entry_present() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        let k = "key";
-        m.insert(k, 42);
-        assert_eq!(m.remove_entry(k), Some((k, 42)));
+        let mut m: Map<String, i32, 10> = Map::new();
+        let k = "key".to_string();
+        m.insert(k.clone(), 42);
+        assert_eq!(m.remove_entry(&k), Some((k.clone(), 42)));
         assert!(!m.contains_key(&k));
     }
 
     #[test]
     fn remove_entry_absent() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("one", 42);
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("one".to_string(), 42);
         assert_eq!(m.remove_entry("two"), None);
     }
 

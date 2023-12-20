@@ -47,15 +47,15 @@ mod test {
 
     #[test]
     fn index() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("first", 42);
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("first".to_string(), 42);
         assert_eq!(m["first"], 42);
     }
 
     #[test]
     fn index_mut() {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("first", 42);
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("first".to_string(), 42);
         m["first"] += 10;
         assert_eq!(m["first"], 52);
     }
@@ -63,8 +63,8 @@ mod test {
     #[test]
     #[should_panic]
     fn wrong_index() -> () {
-        let mut m: Map<&str, i32, 10> = Map::new();
-        m.insert("first", 42);
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("first".to_string(), 42);
         assert_eq!(m["second"], 42);
     }
 
