@@ -44,7 +44,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     pub fn len(&self) -> usize {
         let mut busy = 0;
         for i in 0..self.next {
-            if self.item(i).is_some() {
+            if self.item_ref(i).is_some() {
                 busy += 1;
             }
         }
@@ -59,7 +59,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         K: Borrow<Q>,
     {
         for i in 0..self.next {
-            if let Some(p) = self.item(i) {
+            if let Some(p) = self.item_ref(i) {
                 if p.0.borrow() == k {
                     return true;
                 }
@@ -75,7 +75,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         K: Borrow<Q>,
     {
         for i in 0..self.next {
-            if let Some(p) = self.item(i) {
+            if let Some(p) = self.item_ref(i) {
                 if p.0.borrow() == k {
                     unsafe { self.pairs[i].assume_init_drop() };
                     self.pairs[i].write(None);
@@ -103,7 +103,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
                 debug_assert!(target < N, "No more keys available in the map");
                 break;
             }
-            match self.item(i) {
+            match self.item_ref(i) {
                 Some(p) => {
                     if p.0 == k {
                         target = i;
@@ -133,7 +133,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         K: Borrow<Q>,
     {
         for i in 0..self.next {
-            if let Some(p) = self.item(i) {
+            if let Some(p) = self.item_ref(i) {
                 if p.0.borrow() == k {
                     return Some(&p.1);
                 }
@@ -154,7 +154,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         K: Borrow<Q>,
     {
         for i in 0..self.next {
-            if let Some(p1) = self.item(i) {
+            if let Some(p1) = self.item_ref(i) {
                 if p1.0.borrow() == k {
                     let p2 = unsafe { self.pairs[i].assume_init_mut() };
                     return Some(&mut p2.as_mut().unwrap().1);
@@ -177,7 +177,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     #[inline]
     pub fn retain<F: Fn(&K, &V) -> bool>(&mut self, f: F) {
         for i in 0..self.next {
-            if let Some(p) = self.item(i) {
+            if let Some(p) = self.item_ref(i) {
                 if !f(&p.0, &p.1) {
                     self.pairs[i].write(None);
                 }
@@ -187,7 +187,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
 
     /// Internal function to get access to the element in the internal array.
     #[inline]
-    const fn item(&self, i: usize) -> &Option<(K, V)> {
+    const fn item_ref(&self, i: usize) -> &Option<(K, V)> {
         unsafe { self.pairs[i].assume_init_ref() }
     }
 
@@ -198,7 +198,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         K: Borrow<Q>,
     {
         for i in 0..self.next {
-            if let Some(p) = self.item(i) {
+            if let Some(p) = self.item_ref(i) {
                 if p.0.borrow() == k {
                     return Some((&p.0, &p.1));
                 }
@@ -215,7 +215,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         K: Borrow<Q>,
     {
         for i in 0..self.next {
-            if let Some(p) = self.item(i) {
+            if let Some(p) = self.item_ref(i) {
                 if p.0.borrow() == k {
                     let ret = mem::replace(&mut self.pairs[i], MaybeUninit::new(None));
                     unsafe {
