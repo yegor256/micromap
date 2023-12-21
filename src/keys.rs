@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 use crate::{IntoKeys, Keys, Map};
+use core::iter::FusedIterator;
 
 impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// An iterator visiting all keys in arbitrary order.
@@ -53,6 +54,34 @@ impl<K: PartialEq, V, const N: usize> Iterator for IntoKeys<K, V, N> {
         self.iter.next().map(|p| p.0)
     }
 }
+
+impl<'a, K, V> DoubleEndedIterator for Keys<'a, K, V> {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        self.iter.next_back().map(|p| p.0)
+    }
+}
+
+impl<K: PartialEq, V, const N: usize> DoubleEndedIterator for IntoKeys<K, V, N> {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        self.iter.next_back().map(|p| p.0)
+    }
+}
+
+impl<'a, K, V> ExactSizeIterator for Keys<'a, K, V> {
+    fn len(&self) -> usize {
+        self.iter.len()
+    }
+}
+
+impl<K: PartialEq, V, const N: usize> ExactSizeIterator for IntoKeys<K, V, N> {
+    fn len(&self) -> usize {
+        self.iter.len()
+    }
+}
+
+impl<'a, K, V> FusedIterator for Keys<'a, K, V> {}
+
+impl<K: PartialEq, V, const N: usize> FusedIterator for IntoKeys<K, V, N> {}
 
 #[cfg(test)]
 mod test {

@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 use crate::{IntoValues, Map, Values, ValuesMut};
+use core::iter::FusedIterator;
 
 impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// An iterator visiting all values in arbitrary order.
@@ -70,6 +71,48 @@ impl<K: PartialEq, V, const N: usize> Iterator for IntoValues<K, V, N> {
         self.iter.next().map(|p| p.1)
     }
 }
+
+impl<'a, K, V> DoubleEndedIterator for Values<'a, K, V> {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        self.iter.next_back().map(|p| p.1)
+    }
+}
+
+impl<'a, K, V> DoubleEndedIterator for ValuesMut<'a, K, V> {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        self.iter.next_back().map(|p| p.1)
+    }
+}
+
+impl<K: PartialEq, V, const N: usize> DoubleEndedIterator for IntoValues<K, V, N> {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        self.iter.next_back().map(|p| p.1)
+    }
+}
+
+impl<'a, K, V> ExactSizeIterator for Values<'a, K, V> {
+    fn len(&self) -> usize {
+        self.iter.len()
+    }
+}
+
+impl<'a, K, V> ExactSizeIterator for ValuesMut<'a, K, V> {
+    fn len(&self) -> usize {
+        self.iter.len()
+    }
+}
+
+impl<K: PartialEq, V, const N: usize> ExactSizeIterator for IntoValues<K, V, N> {
+    fn len(&self) -> usize {
+        self.iter.len()
+    }
+}
+
+impl<'a, K, V> FusedIterator for Values<'a, K, V> {}
+
+impl<'a, K, V> FusedIterator for ValuesMut<'a, K, V> {}
+
+impl<K: PartialEq, V, const N: usize> FusedIterator for IntoValues<K, V, N> {}
 
 #[cfg(test)]
 mod test {
