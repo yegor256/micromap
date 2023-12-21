@@ -22,7 +22,9 @@ use crate::Map;
 use core::borrow::Borrow;
 use core::ops::{Index, IndexMut};
 
-impl<K: Eq + Borrow<Q>, Q: Eq + ?Sized, V, const N: usize> Index<&Q> for Map<K, V, N> {
+impl<K: PartialEq + Borrow<Q>, Q: PartialEq + ?Sized, V, const N: usize> Index<&Q>
+    for Map<K, V, N>
+{
     type Output = V;
 
     #[inline]
@@ -32,7 +34,9 @@ impl<K: Eq + Borrow<Q>, Q: Eq + ?Sized, V, const N: usize> Index<&Q> for Map<K, 
     }
 }
 
-impl<K: Eq + Borrow<Q>, Q: Eq + ?Sized, V, const N: usize> IndexMut<&Q> for Map<K, V, N> {
+impl<K: PartialEq + Borrow<Q>, Q: PartialEq + ?Sized, V, const N: usize> IndexMut<&Q>
+    for Map<K, V, N>
+{
     #[inline]
     #[must_use]
     fn index_mut(&mut self, key: &Q) -> &mut V {
@@ -69,7 +73,7 @@ mod test {
     }
 
     #[cfg(test)]
-    #[derive(PartialEq, Eq)]
+    #[derive(PartialEq)]
     struct Container {
         pub t: i32,
     }
