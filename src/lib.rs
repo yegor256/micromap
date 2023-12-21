@@ -62,8 +62,10 @@ mod keys;
 mod map;
 #[cfg(feature = "serde")]
 mod serialization;
+mod set;
 mod values;
 
+pub use crate::set::{Set, SetIntoIter, SetIter};
 use core::mem::{ManuallyDrop, MaybeUninit};
 
 /// A faster alternative of [`std::collections::HashMap`].
