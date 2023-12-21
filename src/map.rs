@@ -23,6 +23,43 @@ use core::borrow::Borrow;
 use core::mem;
 use core::mem::MaybeUninit;
 
+mod internal {
+    use crate::Map;
+    use core::mem::MaybeUninit;
+
+    impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
+        /// Internal function to get access via reference to the element in the internal array.
+        #[inline]
+        pub(crate) const fn item_ref(&self, i: usize) -> &Option<(K, V)> {
+            unsafe { self.pairs[i].assume_init_ref() }
+        }
+
+        /// Internal function to get mutable access via reference to the element in the internal array.
+        #[inline]
+        pub(crate) fn item_mut(&mut self, i: usize) -> &mut Option<(K, V)> {
+            unsafe { self.pairs[i].assume_init_mut() }
+        }
+
+        /// Internal function to get access to the element in the internal array.
+        #[inline]
+        pub(crate) fn item(&mut self, i: usize) -> &mut MaybeUninit<Option<(K, V)>> {
+            &mut self.pairs[i]
+        }
+
+        /// Internal function to get access to the element in the internal array.
+        #[inline]
+        pub(crate) fn item_drop(&mut self, i: usize) {
+            unsafe { self.pairs[i].assume_init_drop() };
+        }
+
+        /// Internal function to get access to the element in the internal array.
+        #[inline]
+        pub(crate) fn item_write(&mut self, i: usize, val: Option<(K, V)>) {
+            self.pairs[i].write(val);
+        }
+    }
+}
+
 impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// Get its total capacity.
     #[inline]
@@ -77,8 +114,9 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         for i in 0..self.next {
             if let Some(p) = self.item_ref(i) {
                 if p.0.borrow() == k {
-                    unsafe { self.pairs[i].assume_init_drop() };
-                    self.pairs[i].write(None);
+                    let item = self.item(i);
+                    unsafe { item.assume_init_drop() };
+                    item.write(None);
                     break;
                 }
             }
@@ -107,9 +145,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
                 Some(p) => {
                     if p.0 == k {
                         target = i;
-                        unsafe {
-                            self.pairs[i].assume_init_drop();
-                        }
+                        self.item_drop(i);
                         break;
                     }
                 }
@@ -119,7 +155,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
             }
             i += 1;
         }
-        self.pairs[target].write(Some((k, v)));
+        self.item_write(target, Some((k, v)));
         if target == self.next {
             self.next += 1;
         }
@@ -156,7 +192,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         for i in 0..self.next {
             if let Some(p1) = self.item_ref(i) {
                 if p1.0.borrow() == k {
-                    let p2 = unsafe { self.pairs[i].assume_init_mut() };
+                    let p2 = self.item_mut(i);
                     return Some(&mut p2.as_mut().unwrap().1);
                 }
             }
@@ -168,7 +204,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     #[inline]
     pub fn clear(&mut self) {
         for i in 0..self.next {
-            unsafe { self.pairs[i].assume_init_drop() };
+            self.item_drop(i);
         }
         self.next = 0;
     }
@@ -179,16 +215,10 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         for i in 0..self.next {
             if let Some(p) = self.item_ref(i) {
                 if !f(&p.0, &p.1) {
-                    self.pairs[i].write(None);
+                    self.item_write(i, None);
                 }
             }
         }
-    }
-
-    /// Internal function to get access to the element in the internal array.
-    #[inline]
-    const fn item_ref(&self, i: usize) -> &Option<(K, V)> {
-        unsafe { self.pairs[i].assume_init_ref() }
     }
 
     /// Returns the key-value pair corresponding to the supplied key.
@@ -217,7 +247,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         for i in 0..self.next {
             if let Some(p) = self.item_ref(i) {
                 if p.0.borrow() == k {
-                    let ret = mem::replace(&mut self.pairs[i], MaybeUninit::new(None));
+                    let ret = mem::replace(self.item(i), MaybeUninit::new(None));
                     unsafe {
                         return ret.assume_init();
                     }

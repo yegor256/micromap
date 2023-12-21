@@ -51,9 +51,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
 impl<K: PartialEq, V, const N: usize> Drop for Map<K, V, N> {
     fn drop(&mut self) {
         for i in 0..self.next {
-            unsafe {
-                self.pairs[i].assume_init_drop();
-            }
+            self.item_drop(i);
         }
     }
 }

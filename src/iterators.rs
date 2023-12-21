@@ -85,7 +85,7 @@ impl<K: PartialEq, V, const N: usize> Iterator for IntoIter<K, V, N> {
     #[must_use]
     fn next(&mut self) -> Option<Self::Item> {
         while self.pos < self.map.next {
-            let p = &mut self.map.pairs[self.pos];
+            let p = self.map.item(self.pos);
             self.pos += 1;
             unsafe {
                 if p.assume_init_ref().is_some() {
