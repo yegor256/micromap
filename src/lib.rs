@@ -99,19 +99,14 @@ pub struct Map<K: PartialEq, V, const N: usize> {
 }
 
 /// Iterator over the [`Map`].
-pub struct Iter<'a, K, V, const N: usize> {
-    /// The next available pair in the array.
-    next: usize,
-    /// The next position in the iterator to read.
-    pos: usize,
-    /// The fixed-size array of key-value pairs.
-    pairs: &'a [MaybeUninit<(K, V)>; N],
+#[repr(transparent)]
+pub struct Iter<'a, K, V> {
+    iter: core::slice::Iter<'a, MaybeUninit<(K, V)>>,
 }
 
 /// Mutable Iterator over the [`Map`].
+#[repr(transparent)]
 pub struct IterMut<'a, K, V> {
-    next: usize,
-    pos: usize,
     iter: core::slice::IterMut<'a, MaybeUninit<(K, V)>>,
 }
 
@@ -122,26 +117,31 @@ pub struct IntoIter<K: PartialEq, V, const N: usize> {
 }
 
 /// An iterator over the values of the [`Map`].
-pub struct Values<'a, K: PartialEq, V, const N: usize> {
-    iter: Iter<'a, K, V, N>,
+#[repr(transparent)]
+pub struct Values<'a, K, V> {
+    iter: Iter<'a, K, V>,
 }
 
 /// Mutable iterator over the values of the [`Map`].
-pub struct ValuesMut<'a, K: PartialEq, V> {
+#[repr(transparent)]
+pub struct ValuesMut<'a, K, V> {
     iter: IterMut<'a, K, V>,
 }
 
 /// Consuming iterator over the values of the [`Map`].
+#[repr(transparent)]
 pub struct IntoValues<K: PartialEq, V, const N: usize> {
     iter: IntoIter<K, V, N>,
 }
 
 /// A read-only iterator over the keys of the [`Map`].
-pub struct Keys<'a, K: PartialEq, V, const N: usize> {
-    iter: Iter<'a, K, V, N>,
+#[repr(transparent)]
+pub struct Keys<'a, K, V> {
+    iter: Iter<'a, K, V>,
 }
 
 /// Consuming iterator over the keys of the [`Map`].
+#[repr(transparent)]
 pub struct IntoKeys<K: PartialEq, V, const N: usize> {
     iter: IntoIter<K, V, N>,
 }

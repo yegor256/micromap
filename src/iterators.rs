@@ -25,11 +25,9 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// Make an iterator over all pairs.
     #[inline]
     #[must_use]
-    pub const fn iter(&self) -> Iter<K, V, N> {
+    pub fn iter(&self) -> Iter<K, V> {
         Iter {
-            next: self.len,
-            pos: 0,
-            pairs: &self.pairs,
+            iter: self.pairs[0..self.len].iter(),
         }
     }
 
@@ -37,25 +35,21 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     #[inline]
     pub fn iter_mut(&mut self) -> IterMut<K, V> {
         IterMut {
-            next: self.len,
-            pos: 0,
-            iter: self.pairs.iter_mut(),
+            iter: self.pairs[0..self.len].iter_mut(),
         }
     }
 }
 
-impl<'a, K, V, const N: usize> Iterator for Iter<'a, K, V, N> {
+impl<'a, K, V> Iterator for Iter<'a, K, V> {
     type Item = (&'a K, &'a V);
 
     #[inline]
     #[must_use]
     fn next(&mut self) -> Option<Self::Item> {
-        if self.pos < self.next {
-            let p = unsafe { self.pairs[self.pos].assume_init_ref() };
-            self.pos += 1;
-            return Some((&p.0, &p.1));
-        }
-        None
+        self.iter.next().map(|p| {
+            let p = unsafe { p.assume_init_ref() };
+            (&p.0, &p.1)
+        })
     }
 }
 
@@ -64,12 +58,10 @@ impl<'a, K, V> Iterator for IterMut<'a, K, V> {
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        if self.pos < self.next {
-            let p = unsafe { self.iter.next().unwrap().assume_init_mut() };
-            self.pos += 1;
-            return Some((&p.0, &mut p.1));
-        }
-        None
+        self.iter.next().map(|p| {
+            let p = unsafe { p.assume_init_mut() };
+            (&p.0, &mut p.1)
+        })
     }
 }
 
@@ -82,15 +74,16 @@ impl<K: PartialEq, V, const N: usize> Iterator for IntoIter<K, V, N> {
         if self.pos < self.map.len {
             let p = self.map.item_read(self.pos);
             self.pos += 1;
-            return Some(p);
+            Some(p)
+        } else {
+            None
         }
-        None
     }
 }
 
 impl<'a, K: PartialEq, V, const N: usize> IntoIterator for &'a Map<K, V, N> {
     type Item = (&'a K, &'a V);
-    type IntoIter = Iter<'a, K, V, N>;
+    type IntoIter = Iter<'a, K, V>;
 
     #[inline]
     #[must_use]

@@ -23,7 +23,7 @@ use crate::{IntoKeys, Keys, Map};
 impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// An iterator visiting all keys in arbitrary order.
     #[inline]
-    pub const fn keys(&self) -> Keys<'_, K, V, N> {
+    pub fn keys(&self) -> Keys<'_, K, V> {
         Keys { iter: self.iter() }
     }
 
@@ -36,7 +36,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     }
 }
 
-impl<'a, K: PartialEq, V, const N: usize> Iterator for Keys<'a, K, V, N> {
+impl<'a, K, V> Iterator for Keys<'a, K, V> {
     type Item = &'a K;
 
     #[inline]
