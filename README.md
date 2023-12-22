@@ -2,7 +2,6 @@
 [![crates.io](https://img.shields.io/crates/v/micromap.svg)](https://crates.io/crates/micromap)
 [![codecov](https://codecov.io/gh/yegor256/micromap/branch/master/graph/badge.svg)](https://codecov.io/gh/yegor256/micromap)
 [![Hits-of-Code](https://hitsofcode.com/github/yegor256/micromap)](https://hitsofcode.com/view/github/yegor256/micromap)
-![Lines of code](https://img.shields.io/tokei/lines/github/yegor256/micromap)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/yegor256/micromap/blob/master/LICENSE.txt)
 [![docs.rs](https://img.shields.io/docsrs/micromap)](https://docs.rs/micromap/latest/micromap/)
 
