@@ -144,9 +144,10 @@ fn benchmark(total: usize) -> HashMap<&'static str, Duration> {
 /// Run it like this from the command line:
 ///
 /// ```text
-/// $ cargo test --release benchmark_and_print -- --nocapture
+/// $ cargo test --test benchmark -- --include-ignored --nocapture
 /// ```
 #[test]
+#[ignore]
 pub fn benchmark_and_print() {
     let times = benchmark(
         #[cfg(debug_assertions)]
