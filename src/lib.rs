@@ -50,11 +50,10 @@
 #![allow(clippy::multiple_inherent_impl)]
 #![allow(clippy::multiple_crate_versions)]
 
-#[cfg(feature = "std")]
-mod debug;
-
 mod clone;
 mod ctors;
+mod debug;
+mod display;
 mod eq;
 mod from;
 mod index;
