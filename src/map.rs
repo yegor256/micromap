@@ -20,30 +20,27 @@
 
 use crate::Map;
 use core::borrow::Borrow;
-use core::mem;
-use core::mem::MaybeUninit;
 
 mod internal {
     use crate::Map;
-    use core::mem::MaybeUninit;
 
     impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         /// Internal function to get access via reference to the element in the internal array.
         #[inline]
-        pub(crate) const fn item_ref(&self, i: usize) -> &Option<(K, V)> {
+        pub(crate) const fn item_ref(&self, i: usize) -> &(K, V) {
             unsafe { self.pairs[i].assume_init_ref() }
         }
 
         /// Internal function to get mutable access via reference to the element in the internal array.
         #[inline]
-        pub(crate) fn item_mut(&mut self, i: usize) -> &mut Option<(K, V)> {
-            unsafe { self.pairs[i].assume_init_mut() }
+        pub(crate) fn item_mut(&mut self, i: usize) -> &mut V {
+            &mut unsafe { self.pairs[i].assume_init_mut() }.1
         }
 
         /// Internal function to get access to the element in the internal array.
         #[inline]
-        pub(crate) fn item(&mut self, i: usize) -> &mut MaybeUninit<Option<(K, V)>> {
-            &mut self.pairs[i]
+        pub(crate) fn item_read(&mut self, i: usize) -> (K, V) {
+            unsafe { self.pairs[i].assume_init_read() }
         }
 
         /// Internal function to get access to the element in the internal array.
@@ -54,8 +51,34 @@ mod internal {
 
         /// Internal function to get access to the element in the internal array.
         #[inline]
-        pub(crate) fn item_write(&mut self, i: usize, val: Option<(K, V)>) {
+        pub(crate) fn item_write(&mut self, i: usize, val: (K, V)) {
             self.pairs[i].write(val);
+        }
+
+        /// Remove an index (by swapping the last one here and reducing the length)
+        #[inline]
+        pub(crate) fn remove_index_drop(&mut self, i: usize) {
+            self.item_drop(i);
+
+            self.len -= 1;
+            if i != self.len {
+                let value = self.item_read(self.len);
+                self.item_write(i, value);
+            }
+        }
+
+        /// Remove an index (by swapping the last one here and reducing the length)
+        #[inline]
+        pub(crate) fn remove_index_read(&mut self, i: usize) -> (K, V) {
+            let result = self.item_read(i);
+
+            self.len -= 1;
+            if i != self.len {
+                let value = self.item_read(self.len);
+                self.item_write(i, value);
+            }
+
+            result
         }
     }
 }
@@ -71,21 +94,15 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// Is it empty?
     #[inline]
     #[must_use]
-    pub fn is_empty(&self) -> bool {
+    pub const fn is_empty(&self) -> bool {
         self.len() == 0
     }
 
     /// Return the total number of pairs inside.
     #[inline]
     #[must_use]
-    pub fn len(&self) -> usize {
-        let mut busy = 0;
-        for i in 0..self.next {
-            if self.item_ref(i).is_some() {
-                busy += 1;
-            }
-        }
-        busy
+    pub const fn len(&self) -> usize {
+        self.len
     }
 
     /// Does the map contain this key?
@@ -95,11 +112,10 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     where
         K: Borrow<Q>,
     {
-        for i in 0..self.next {
-            if let Some(p) = self.item_ref(i) {
-                if p.0.borrow() == k {
-                    return true;
-                }
+        for i in 0..self.len {
+            let p = self.item_ref(i);
+            if p.0.borrow() == k {
+                return true;
             }
         }
         false
@@ -111,14 +127,11 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     where
         K: Borrow<Q>,
     {
-        for i in 0..self.next {
-            if let Some(p) = self.item_ref(i) {
-                if p.0.borrow() == k {
-                    let item = self.item(i);
-                    unsafe { item.assume_init_drop() };
-                    item.write(None);
-                    break;
-                }
+        for i in 0..self.len {
+            let p = self.item_ref(i);
+            if p.0.borrow() == k {
+                self.remove_index_drop(i);
+                break;
             }
         }
     }
@@ -133,31 +146,25 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// avoid a repetitive check for the boundary condition on every `insert()`.
     #[inline]
     pub fn insert(&mut self, k: K, v: V) {
-        let mut target = self.next;
+        let mut target = self.len;
         let mut i = 0;
         loop {
-            if i == self.next {
+            if i == self.len {
                 #[cfg(feature = "std")]
                 debug_assert!(target < N, "No more keys available in the map");
                 break;
             }
-            match self.item_ref(i) {
-                Some(p) => {
-                    if p.0 == k {
-                        target = i;
-                        self.item_drop(i);
-                        break;
-                    }
-                }
-                None => {
-                    target = i;
-                }
+            let p = self.item_ref(i);
+            if p.0 == k {
+                target = i;
+                self.item_drop(i);
+                break;
             }
             i += 1;
         }
-        self.item_write(target, Some((k, v)));
-        if target == self.next {
-            self.next += 1;
+        self.item_write(target, (k, v));
+        if target == self.len {
+            self.len += 1;
         }
     }
 
@@ -168,11 +175,10 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     where
         K: Borrow<Q>,
     {
-        for i in 0..self.next {
-            if let Some(p) = self.item_ref(i) {
-                if p.0.borrow() == k {
-                    return Some(&p.1);
-                }
+        for i in 0..self.len {
+            let p = self.item_ref(i);
+            if p.0.borrow() == k {
+                return Some(&p.1);
             }
         }
         None
@@ -189,12 +195,10 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     where
         K: Borrow<Q>,
     {
-        for i in 0..self.next {
-            if let Some(p1) = self.item_ref(i) {
-                if p1.0.borrow() == k {
-                    let p2 = self.item_mut(i);
-                    return Some(&mut p2.as_mut().unwrap().1);
-                }
+        for i in 0..self.len {
+            let p = self.item_ref(i);
+            if p.0.borrow() == k {
+                return Some(self.item_mut(i));
             }
         }
         None
@@ -203,20 +207,24 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// Remove all pairs from it, but keep the space intact for future use.
     #[inline]
     pub fn clear(&mut self) {
-        for i in 0..self.next {
+        for i in 0..self.len {
             self.item_drop(i);
         }
-        self.next = 0;
+        self.len = 0;
     }
 
     /// Retains only the elements specified by the predicate.
     #[inline]
     pub fn retain<F: Fn(&K, &V) -> bool>(&mut self, f: F) {
-        for i in 0..self.next {
-            if let Some(p) = self.item_ref(i) {
-                if !f(&p.0, &p.1) {
-                    self.item_write(i, None);
-                }
+        let mut i = 0;
+        while i < self.len {
+            let p = self.item_ref(i);
+            if f(&p.0, &p.1) {
+                // do not remove -> next index
+                i += 1;
+            } else {
+                self.remove_index_drop(i);
+                // recheck the same index
             }
         }
     }
@@ -227,11 +235,10 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     where
         K: Borrow<Q>,
     {
-        for i in 0..self.next {
-            if let Some(p) = self.item_ref(i) {
-                if p.0.borrow() == k {
-                    return Some((&p.0, &p.1));
-                }
+        for i in 0..self.len {
+            let p = self.item_ref(i);
+            if p.0.borrow() == k {
+                return Some((&p.0, &p.1));
             }
         }
         None
@@ -244,14 +251,10 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     where
         K: Borrow<Q>,
     {
-        for i in 0..self.next {
-            if let Some(p) = self.item_ref(i) {
-                if p.0.borrow() == k {
-                    let ret = mem::replace(self.item(i), MaybeUninit::new(None));
-                    unsafe {
-                        return ret.assume_init();
-                    }
-                }
+        for i in 0..self.len {
+            let p = self.item_ref(i);
+            if p.0.borrow() == k {
+                return Some(self.remove_index_read(i));
             }
         }
         None

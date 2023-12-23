@@ -64,7 +64,7 @@ mod map;
 mod serialization;
 mod values;
 
-use core::mem::MaybeUninit;
+use core::mem::{ManuallyDrop, MaybeUninit};
 
 /// A faster alternative of [`std::collections::HashMap`].
 ///
@@ -93,9 +93,9 @@ use core::mem::MaybeUninit;
 /// are disabled, for the sake of higher performance.
 pub struct Map<K: PartialEq, V, const N: usize> {
     /// The next available pair in the array.
-    next: usize,
+    len: usize,
     /// The fixed-size array of key-value pairs.
-    pairs: [MaybeUninit<Option<(K, V)>>; N],
+    pairs: [MaybeUninit<(K, V)>; N],
 }
 
 /// Iterator over the [`Map`].
@@ -105,20 +105,20 @@ pub struct Iter<'a, K, V, const N: usize> {
     /// The next position in the iterator to read.
     pos: usize,
     /// The fixed-size array of key-value pairs.
-    pairs: &'a [MaybeUninit<Option<(K, V)>>; N],
+    pairs: &'a [MaybeUninit<(K, V)>; N],
 }
 
 /// Mutable Iterator over the [`Map`].
 pub struct IterMut<'a, K, V> {
     next: usize,
     pos: usize,
-    iter: core::slice::IterMut<'a, MaybeUninit<Option<(K, V)>>>,
+    iter: core::slice::IterMut<'a, MaybeUninit<(K, V)>>,
 }
 
 /// Into-iterator over the [`Map`].
 pub struct IntoIter<K: PartialEq, V, const N: usize> {
     pos: usize,
-    map: Map<K, V, N>,
+    map: ManuallyDrop<Map<K, V, N>>,
 }
 
 /// An iterator over the values of the [`Map`].

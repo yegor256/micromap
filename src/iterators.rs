@@ -19,8 +19,7 @@
 // SOFTWARE.
 
 use crate::{IntoIter, Iter, IterMut, Map};
-use core::mem;
-use core::mem::MaybeUninit;
+use core::mem::ManuallyDrop;
 
 impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// Make an iterator over all pairs.
@@ -28,7 +27,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     #[must_use]
     pub const fn iter(&self) -> Iter<K, V, N> {
         Iter {
-            next: self.next,
+            next: self.len,
             pos: 0,
             pairs: &self.pairs,
         }
@@ -38,7 +37,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     #[inline]
     pub fn iter_mut(&mut self) -> IterMut<K, V> {
         IterMut {
-            next: self.next,
+            next: self.len,
             pos: 0,
             iter: self.pairs.iter_mut(),
         }
@@ -51,12 +50,10 @@ impl<'a, K, V, const N: usize> Iterator for Iter<'a, K, V, N> {
     #[inline]
     #[must_use]
     fn next(&mut self) -> Option<Self::Item> {
-        while self.pos < self.next {
+        if self.pos < self.next {
             let p = unsafe { self.pairs[self.pos].assume_init_ref() };
             self.pos += 1;
-            if let Some(p) = p {
-                return Some((&p.0, &p.1));
-            }
+            return Some((&p.0, &p.1));
         }
         None
     }
@@ -67,12 +64,10 @@ impl<'a, K, V> Iterator for IterMut<'a, K, V> {
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        while self.pos < self.next {
+        if self.pos < self.next {
             let p = unsafe { self.iter.next().unwrap().assume_init_mut() };
             self.pos += 1;
-            if let Some(p) = p {
-                return Some((&p.0, &mut p.1));
-            }
+            return Some((&p.0, &mut p.1));
         }
         None
     }
@@ -84,14 +79,10 @@ impl<K: PartialEq, V, const N: usize> Iterator for IntoIter<K, V, N> {
     #[inline]
     #[must_use]
     fn next(&mut self) -> Option<Self::Item> {
-        while self.pos < self.map.next {
-            let p = self.map.item(self.pos);
+        if self.pos < self.map.len {
+            let p = self.map.item_read(self.pos);
             self.pos += 1;
-            unsafe {
-                if p.assume_init_ref().is_some() {
-                    return mem::replace(p, MaybeUninit::new(None)).assume_init();
-                }
-            }
+            return Some(p);
         }
         None
     }
@@ -125,7 +116,18 @@ impl<K: PartialEq, V, const N: usize> IntoIterator for Map<K, V, N> {
     #[inline]
     #[must_use]
     fn into_iter(self) -> Self::IntoIter {
-        IntoIter { pos: 0, map: self }
+        IntoIter {
+            pos: 0,
+            map: ManuallyDrop::new(self),
+        }
+    }
+}
+
+impl<K: PartialEq, V, const N: usize> Drop for IntoIter<K, V, N> {
+    fn drop(&mut self) {
+        for i in self.pos..self.map.len {
+            self.map.item_drop(i);
+        }
     }
 }
 

@@ -41,8 +41,8 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     pub const fn new() -> Self {
         unsafe {
             Self {
-                next: 0,
-                pairs: MaybeUninit::<[MaybeUninit<Option<(K, V)>>; N]>::uninit().assume_init(),
+                len: 0,
+                pairs: MaybeUninit::<[MaybeUninit<(K, V)>; N]>::uninit().assume_init(),
             }
         }
     }
@@ -50,7 +50,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
 
 impl<K: PartialEq, V, const N: usize> Drop for Map<K, V, N> {
     fn drop(&mut self) {
-        for i in 0..self.next {
+        for i in 0..self.len {
             self.item_drop(i);
         }
     }
