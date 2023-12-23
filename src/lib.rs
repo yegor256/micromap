@@ -34,7 +34,7 @@
 //! let mut m : Map<u64, &str, 10> = Map::new();
 //! m.insert(1, "Hello, world!");
 //! m.insert(2, "Good bye!");
-//! #[cfg(std)]
+//! # #[cfg(std)]
 //! assert_eq!(2, m.len());
 //! ```
 //!
@@ -76,7 +76,7 @@ use core::mem::MaybeUninit;
 /// let mut m : micromap::Map<u64, &str, 8> = micromap::Map::new();
 /// m.insert(1, "Jeff Lebowski");
 /// m.insert(2, "Walter Sobchak");
-/// #[cfg(std)]
+/// # #[cfg(std)]
 /// assert_eq!(2, m.len());
 /// ```
 ///

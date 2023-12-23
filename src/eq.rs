@@ -30,14 +30,14 @@ impl<K: PartialEq, V: PartialEq, const N: usize> PartialEq for Map<K, V, N> {
     /// let mut m2: micromap::Map<u8, i32, 10> = micromap::Map::new();
     /// m1.insert(1, 42);
     /// m2.insert(1, 42);
-    /// #[cfg(std)]
+    /// # #[cfg(std)]
     /// assert_eq!(m1, m2);
     /// // two maps with different order of key-value pairs are still equal:
     /// m1.insert(2, 1);
     /// m1.insert(3, 16);
     /// m2.insert(3, 16);
     /// m2.insert(2, 1);
-    /// #[cfg(std)]
+    /// # #[cfg(std)]
     /// assert_eq!(m1, m2);
     /// ```
     #[inline]
