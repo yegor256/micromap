@@ -59,8 +59,8 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         K: Borrow<Q>,
     {
         for i in 0..self.next {
-            if let Some((bk, _bv)) = self.item(i) {
-                if bk.borrow() == k {
+            if let Some(p) = self.item(i) {
+                if p.0.borrow() == k {
                     return true;
                 }
             }
@@ -177,8 +177,8 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     #[inline]
     pub fn retain<F: Fn(&K, &V) -> bool>(&mut self, f: F) {
         for i in 0..self.next {
-            if let Some((k, v)) = self.item(i) {
-                if !f(k, v) {
+            if let Some(p) = self.item(i) {
+                if !f(&p.0, &p.1) {
                     self.pairs[i].write(None);
                 }
             }
