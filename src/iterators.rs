@@ -27,17 +27,13 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     #[inline]
     #[must_use]
     pub fn iter(&self) -> Iter<K, V> {
-        Iter {
-            iter: self.pairs[0..self.len].iter(),
-        }
+        self.into_iter()
     }
 
     /// An iterator with mutable references to the values but
     #[inline]
     pub fn iter_mut(&mut self) -> IterMut<K, V> {
-        IterMut {
-            iter: self.pairs[0..self.len].iter_mut(),
-        }
+        self.into_iter()
     }
 }
 
@@ -89,7 +85,9 @@ impl<'a, K: PartialEq, V, const N: usize> IntoIterator for &'a Map<K, V, N> {
     #[inline]
     #[must_use]
     fn into_iter(self) -> Self::IntoIter {
-        self.iter()
+        Iter {
+            iter: self.pairs[0..self.len].iter(),
+        }
     }
 }
 
@@ -99,7 +97,9 @@ impl<'a, K: PartialEq, V, const N: usize> IntoIterator for &'a mut Map<K, V, N> 
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
+        IterMut {
+            iter: self.pairs[0..self.len].iter_mut(),
+        }
     }
 }
 
