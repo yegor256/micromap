@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use crate::Map;
+use crate::{Entry, Map, OccupiedEntry, VacantEntry};
 use core::borrow::Borrow;
 
 mod internal {
@@ -146,6 +146,12 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// avoid a repetitive check for the boundary condition on every `insert()`.
     #[inline]
     pub fn insert(&mut self, k: K, v: V) -> Option<V> {
+        let (_, existing_value) = self.insert_i(k, v);
+        existing_value
+    }
+
+    #[inline]
+    pub(crate) fn insert_i(&mut self, k: K, v: V) -> (usize, Option<V>) {
         let mut target = self.len;
         let mut i = 0;
         let mut existing_value = None;
@@ -168,7 +174,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
             self.len += 1;
         }
 
-        existing_value
+        (target, existing_value)
     }
 
     /// Get a reference to a single value.
@@ -261,6 +267,22 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
             }
         }
         None
+    }
+
+    pub fn entry(&mut self, k: K) -> Entry<'_, K, V, N> {
+        for i in 0..self.len {
+            let p = self.item_ref(i);
+            if p.0 == k {
+                return Entry::Occupied(OccupiedEntry {
+                    index: i,
+                    table: self,
+                });
+            }
+        }
+        Entry::Vacant(VacantEntry {
+            key: k,
+            table: self,
+        })
     }
 }
 
