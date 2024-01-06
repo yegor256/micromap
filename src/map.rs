@@ -123,17 +123,17 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
 
     /// Remove by key.
     #[inline]
-    pub fn remove<Q: PartialEq + ?Sized>(&mut self, k: &Q)
+    pub fn remove<Q: PartialEq + ?Sized>(&mut self, k: &Q) -> Option<V>
     where
         K: Borrow<Q>,
     {
         for i in 0..self.len {
             let p = self.item_ref(i);
             if p.0.borrow() == k {
-                self.remove_index_drop(i);
-                break;
+                return Some(self.remove_index_read(i).1);
             }
         }
+        None
     }
 
     /// Insert a single pair into the map.
@@ -145,9 +145,10 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// undefined behavior. This is done for the sake of performance, in order to
     /// avoid a repetitive check for the boundary condition on every `insert()`.
     #[inline]
-    pub fn insert(&mut self, k: K, v: V) {
+    pub fn insert(&mut self, k: K, v: V) -> Option<V> {
         let mut target = self.len;
         let mut i = 0;
+        let mut existing_value = None;
         loop {
             if i == self.len {
                 #[cfg(feature = "std")]
@@ -157,7 +158,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
             let p = self.item_ref(i);
             if p.0 == k {
                 target = i;
-                self.item_drop(i);
+                existing_value = Some(self.item_read(i).1);
                 break;
             }
             i += 1;
@@ -166,6 +167,8 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         if target == self.len {
             self.len += 1;
         }
+
+        existing_value
     }
 
     /// Get a reference to a single value.
@@ -269,19 +272,19 @@ mod test {
     #[test]
     fn insert_and_check_length() {
         let mut m: Map<String, i32, 10> = Map::new();
-        m.insert("first".to_string(), 42);
+        assert_eq!(m.insert("first".to_string(), 42), None);
         assert_eq!(1, m.len());
-        m.insert("second".to_string(), 16);
+        assert_eq!(m.insert("second".to_string(), 16), None);
         assert_eq!(2, m.len());
-        m.insert("first".to_string(), 16);
+        assert_eq!(m.insert("first".to_string(), 16), Some(42));
         assert_eq!(2, m.len());
     }
 
     #[test]
     fn overwrites_keys() {
         let mut m: Map<i32, i32, 1> = Map::new();
-        m.insert(1, 42);
-        m.insert(1, 42);
+        assert_eq!(m.insert(1, 42), None);
+        assert_eq!(m.insert(1, 42), Some(42));
         assert_eq!(1, m.len());
     }
 
@@ -290,7 +293,7 @@ mod test {
     #[cfg(debug_assertions)]
     fn cant_write_into_empty_map() {
         let mut m: Map<i32, i32, 0> = Map::new();
-        m.insert(1, 42);
+        assert_eq!(m.insert(1, 42), None);
     }
 
     #[test]
@@ -303,22 +306,22 @@ mod test {
     fn is_empty_check() {
         let mut m: Map<u32, u32, 10> = Map::new();
         assert!(m.is_empty());
-        m.insert(42, 42);
+        assert_eq!(m.insert(42, 42), None);
         assert!(!m.is_empty());
     }
 
     #[test]
     fn insert_and_gets() {
         let mut m: Map<String, i32, 10> = Map::new();
-        m.insert("one".to_string(), 42);
-        m.insert("two".to_string(), 16);
+        assert_eq!(m.insert("one".to_string(), 42), None);
+        assert_eq!(m.insert("two".to_string(), 16), None);
         assert_eq!(16, *m.get("two").unwrap());
     }
 
     #[test]
     fn insert_and_gets_mut() {
         let mut m: Map<i32, [i32; 3], 10> = Map::new();
-        m.insert(42, [1, 2, 3]);
+        assert_eq!(m.insert(42, [1, 2, 3]), None);
         let a = m.get_mut(&42).unwrap();
         a[0] = 500;
         assert_eq!(500, m.get(&42).unwrap()[0]);
@@ -327,7 +330,7 @@ mod test {
     #[test]
     fn checks_key() {
         let mut m: Map<String, i32, 10> = Map::new();
-        m.insert("one".to_string(), 42);
+        assert_eq!(m.insert("one".to_string(), 42), None);
         assert!(m.contains_key("one"));
         assert!(!m.contains_key("another"));
     }
@@ -335,28 +338,28 @@ mod test {
     #[test]
     fn gets_missing_key() {
         let mut m: Map<String, i32, 10> = Map::new();
-        m.insert("one".to_string(), 42);
+        assert_eq!(m.insert("one".to_string(), 42), None);
         assert!(m.get("two").is_none());
     }
 
     #[test]
     fn mut_gets_missing_key() {
         let mut m: Map<String, i32, 10> = Map::new();
-        m.insert("one".to_string(), 42);
+        assert_eq!(m.insert("one".to_string(), 42), None);
         assert!(m.get_mut("two").is_none());
     }
 
     #[test]
     fn removes_simple_pair() {
         let mut m: Map<String, i32, 10> = Map::new();
-        m.insert("one".to_string(), 42);
-        m.remove("one");
-        m.remove("another");
+        assert_eq!(m.insert("one".to_string(), 42), None);
+        assert_eq!(m.remove("one"), Some(42));
+        assert_eq!(m.remove("another"), None);
         assert!(m.get("one").is_none());
     }
 
     #[cfg(test)]
-    #[derive(Clone)]
+    #[derive(Clone, PartialEq, Debug)]
     struct Foo {
         v: [u32; 3],
     }
@@ -365,12 +368,12 @@ mod test {
     fn insert_struct() {
         let mut m: Map<u8, Foo, 8> = Map::new();
         let foo = Foo { v: [1, 2, 100] };
-        m.insert(1, foo);
+        assert_eq!(m.insert(1, foo), None);
         assert_eq!(100, m.into_iter().next().unwrap().1.v[2]);
     }
 
     #[cfg(test)]
-    #[derive(Clone)]
+    #[derive(Clone, PartialEq, Debug)]
     struct Composite {
         r: Map<u8, u8, 1>,
     }
@@ -379,7 +382,7 @@ mod test {
     fn insert_composite() {
         let mut m: Map<u8, Composite, 8> = Map::new();
         let c = Composite { r: Map::new() };
-        m.insert(1, c);
+        assert_eq!(m.insert(1, c), None);
         assert_eq!(0, m.into_iter().next().unwrap().1.r.len());
     }
 
@@ -392,7 +395,7 @@ mod test {
     #[test]
     fn clears_it_up() {
         let mut m: Map<String, i32, 10> = Map::new();
-        m.insert("one".to_string(), 42);
+        assert_eq!(m.insert("one".to_string(), 42), None);
         m.clear();
         assert_eq!(0, m.len());
     }
@@ -414,8 +417,8 @@ mod test {
         for _ in 0..2 {
             let cap = m.capacity();
             for i in 0..cap {
-                m.insert(i, 256);
-                m.remove(&i);
+                assert_eq!(m.insert(i, 256), None);
+                assert_eq!(m.remove(&i), Some(256));
             }
         }
     }
@@ -424,7 +427,7 @@ mod test {
     fn get_key_value() {
         let mut m: Map<String, i32, 10> = Map::new();
         let k = "key".to_string();
-        m.insert(k.clone(), 42);
+        assert_eq!(m.insert(k.clone(), 42), None);
         assert_eq!(m.get_key_value(&k), Some((&k, &42)));
         assert!(m.contains_key(&k));
     }
@@ -432,7 +435,7 @@ mod test {
     #[test]
     fn get_absent_key_value() {
         let mut m: Map<String, i32, 10> = Map::new();
-        m.insert("one".to_string(), 42);
+        assert_eq!(m.insert("one".to_string(), 42), None);
         assert_eq!(m.get_key_value("two"), None);
     }
 
@@ -440,7 +443,7 @@ mod test {
     fn remove_entry_present() {
         let mut m: Map<String, i32, 10> = Map::new();
         let k = "key".to_string();
-        m.insert(k.clone(), 42);
+        assert_eq!(m.insert(k.clone(), 42), None);
         assert_eq!(m.remove_entry(&k), Some((k.clone(), 42)));
         assert!(!m.contains_key(&k));
     }
@@ -448,7 +451,7 @@ mod test {
     #[test]
     fn remove_entry_absent() {
         let mut m: Map<String, i32, 10> = Map::new();
-        m.insert("one".to_string(), 42);
+        assert_eq!(m.insert("one".to_string(), 42), None);
         assert_eq!(m.remove_entry("two"), None);
     }
 
@@ -457,18 +460,18 @@ mod test {
         use std::rc::Rc;
         let mut m: Map<(), Rc<()>, 8> = Map::new();
         let v = Rc::new(());
-        m.insert((), Rc::clone(&v));
+        assert_eq!(m.insert((), Rc::clone(&v)), None);
         assert_eq!(Rc::strong_count(&v), 2);
-        m.remove_entry(&());
+        assert_eq!(m.remove_entry(&()), Some(((), Rc::clone(&v))));
         assert_eq!(Rc::strong_count(&v), 1);
     }
 
     #[test]
     fn insert_after_remove() {
         let mut m: Map<_, _, 1> = Map::new();
-        m.insert(1, 2);
-        m.remove(&1);
-        m.insert(1, 3);
+        assert_eq!(m.insert(1, 2), None);
+        assert_eq!(m.remove(&1), Some(2));
+        assert_eq!(m.insert(1, 3), None);
     }
 
     #[test]
@@ -476,19 +479,19 @@ mod test {
         use std::rc::Rc;
         let mut m: Map<_, _, 1> = Map::new();
         let v = Rc::new(());
-        m.insert((), Rc::clone(&v));
+        assert_eq!(m.insert((), Rc::clone(&v)), None);
         assert_eq!(Rc::strong_count(&v), 2);
-        m.insert((), Rc::clone(&v));
+        assert_eq!(m.insert((), Rc::clone(&v)), Some(Rc::clone(&v)));
         assert_eq!(Rc::strong_count(&v), 2);
     }
 
     #[test]
     fn insert_duplicate_after_remove() {
         let mut m: Map<_, _, 2> = Map::new();
-        m.insert(1, 1);
-        m.insert(2, 2);
-        m.remove(&1);
-        m.insert(2, 3);
+        assert_eq!(m.insert(1, 1), None);
+        assert_eq!(m.insert(2, 2), None);
+        assert_eq!(m.remove(&1), Some(1));
+        assert_eq!(m.insert(2, 3), Some(2));
         assert_eq!(1, m.len());
         assert_eq!(3, m[&2]);
     }
