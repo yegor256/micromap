@@ -55,18 +55,6 @@ impl<K: PartialEq, V, const N: usize> Iterator for IntoKeys<K, V, N> {
     }
 }
 
-impl<'a, K, V> DoubleEndedIterator for Keys<'a, K, V> {
-    fn next_back(&mut self) -> Option<Self::Item> {
-        self.iter.next_back().map(|p| p.0)
-    }
-}
-
-impl<K: PartialEq, V, const N: usize> DoubleEndedIterator for IntoKeys<K, V, N> {
-    fn next_back(&mut self) -> Option<Self::Item> {
-        self.iter.next_back().map(|p| p.0)
-    }
-}
-
 impl<'a, K, V> ExactSizeIterator for Keys<'a, K, V> {
     fn len(&self) -> usize {
         self.iter.len()

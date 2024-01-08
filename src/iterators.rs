@@ -125,37 +125,6 @@ impl<K: PartialEq, V, const N: usize> Drop for IntoIter<K, V, N> {
     }
 }
 
-impl<'a, K, V> DoubleEndedIterator for Iter<'a, K, V> {
-    fn next_back(&mut self) -> Option<Self::Item> {
-        self.iter.next_back().map(|p| {
-            let p = unsafe { p.assume_init_ref() };
-            (&p.0, &p.1)
-        })
-    }
-}
-
-impl<'a, K, V> DoubleEndedIterator for IterMut<'a, K, V> {
-    fn next_back(&mut self) -> Option<Self::Item> {
-        self.iter.next_back().map(|p| {
-            let p = unsafe { p.assume_init_mut() };
-            (&p.0, &mut p.1)
-        })
-    }
-}
-
-impl<K: PartialEq, V, const N: usize> DoubleEndedIterator for IntoIter<K, V, N> {
-    fn next_back(&mut self) -> Option<Self::Item> {
-        if self.pos < self.map.len {
-            self.map.len -= 1;
-            let i = self.map.len;
-            let p = self.map.item_read(i);
-            Some(p)
-        } else {
-            None
-        }
-    }
-}
-
 impl<'a, K, V> ExactSizeIterator for Iter<'a, K, V> {
     fn len(&self) -> usize {
         self.iter.len()

@@ -72,24 +72,6 @@ impl<K: PartialEq, V, const N: usize> Iterator for IntoValues<K, V, N> {
     }
 }
 
-impl<'a, K, V> DoubleEndedIterator for Values<'a, K, V> {
-    fn next_back(&mut self) -> Option<Self::Item> {
-        self.iter.next_back().map(|p| p.1)
-    }
-}
-
-impl<'a, K, V> DoubleEndedIterator for ValuesMut<'a, K, V> {
-    fn next_back(&mut self) -> Option<Self::Item> {
-        self.iter.next_back().map(|p| p.1)
-    }
-}
-
-impl<K: PartialEq, V, const N: usize> DoubleEndedIterator for IntoValues<K, V, N> {
-    fn next_back(&mut self) -> Option<Self::Item> {
-        self.iter.next_back().map(|p| p.1)
-    }
-}
-
 impl<'a, K, V> ExactSizeIterator for Values<'a, K, V> {
     fn len(&self) -> usize {
         self.iter.len()

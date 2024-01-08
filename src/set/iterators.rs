@@ -76,18 +76,6 @@ impl<T: PartialEq, const N: usize> IntoIterator for Set<T, N> {
     }
 }
 
-impl<'a, T> DoubleEndedIterator for SetIter<'a, T> {
-    fn next_back(&mut self) -> Option<Self::Item> {
-        self.iter.next_back()
-    }
-}
-
-impl<T: PartialEq, const N: usize> DoubleEndedIterator for SetIntoIter<T, N> {
-    fn next_back(&mut self) -> Option<Self::Item> {
-        self.iter.next_back()
-    }
-}
-
 impl<'a, T> ExactSizeIterator for SetIter<'a, T> {
     fn len(&self) -> usize {
         self.iter.len()
