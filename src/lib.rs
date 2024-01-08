@@ -66,7 +66,7 @@ mod set;
 mod values;
 
 pub use crate::set::{Set, SetIntoIter, SetIter};
-use core::mem::{ManuallyDrop, MaybeUninit};
+use core::mem::MaybeUninit;
 
 /// A faster alternative of [`std::collections::HashMap`].
 ///
@@ -113,9 +113,9 @@ pub struct IterMut<'a, K, V> {
 }
 
 /// Into-iterator over the [`Map`].
+#[repr(transparent)]
 pub struct IntoIter<K: PartialEq, V, const N: usize> {
-    pos: usize,
-    map: ManuallyDrop<Map<K, V, N>>,
+    map: Map<K, V, N>,
 }
 
 /// An iterator over the values of the [`Map`].

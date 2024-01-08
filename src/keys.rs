@@ -101,7 +101,7 @@ mod test {
         m.insert("bar".to_string(), 0);
         assert_eq!(
             m.into_keys().collect::<Vec<_>>(),
-            ["foo".to_string(), "bar".to_string()]
+            ["bar".to_string(), "foo".to_string()]
         );
     }
 }

@@ -20,7 +20,6 @@
 
 use crate::{IntoIter, Iter, IterMut, Map};
 use core::iter::FusedIterator;
-use core::mem::ManuallyDrop;
 
 impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// Make an iterator over all pairs.
@@ -78,10 +77,9 @@ impl<K: PartialEq, V, const N: usize> Iterator for IntoIter<K, V, N> {
     #[inline]
     #[must_use]
     fn next(&mut self) -> Option<Self::Item> {
-        if self.pos < self.map.len {
-            let p = self.map.item_read(self.pos);
-            self.pos += 1;
-            Some(p)
+        if self.map.len > 0 {
+            self.map.len -= 1;
+            Some(self.map.item_read(self.map.len))
         } else {
             None
         }
@@ -89,7 +87,7 @@ impl<K: PartialEq, V, const N: usize> Iterator for IntoIter<K, V, N> {
 
     #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
-        (self.map.len - self.pos, Some(self.map.len - self.pos))
+        (self.map.len, Some(self.map.len))
     }
 }
 
@@ -125,18 +123,7 @@ impl<K: PartialEq, V, const N: usize> IntoIterator for Map<K, V, N> {
     #[inline]
     #[must_use]
     fn into_iter(self) -> Self::IntoIter {
-        IntoIter {
-            pos: 0,
-            map: ManuallyDrop::new(self),
-        }
-    }
-}
-
-impl<K: PartialEq, V, const N: usize> Drop for IntoIter<K, V, N> {
-    fn drop(&mut self) {
-        for i in self.pos..self.map.len {
-            self.map.item_drop(i);
-        }
+        IntoIter { map: self }
     }
 }
 
@@ -154,7 +141,7 @@ impl<'a, K, V> ExactSizeIterator for IterMut<'a, K, V> {
 
 impl<K: PartialEq, V, const N: usize> ExactSizeIterator for IntoIter<K, V, N> {
     fn len(&self) -> usize {
-        self.map.len - self.pos
+        self.map.len
     }
 }
 
