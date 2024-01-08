@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use crate::Set;
+use crate::{Set, SetDrain};
 use core::borrow::Borrow;
 
 impl<T: PartialEq, const N: usize> Set<T, N> {
@@ -41,6 +41,15 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     #[must_use]
     pub const fn len(&self) -> usize {
         self.map.len()
+    }
+
+    /// Clears the set, returning all elements as an iterator. Keeps the allocated memory for reuse.
+    ///
+    /// If the returned iterator is dropped before being fully consumed, it drops the remaining elements. The returned iterator keeps a mutable borrow on the set to optimize its implementation.
+    pub fn drain(&mut self) -> SetDrain<'_, T> {
+        SetDrain {
+            iter: self.map.drain(),
+        }
     }
 
     /// Does the set contain this key?

@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use crate::{Entry, Map, OccupiedEntry, VacantEntry};
+use crate::{Drain, Entry, Map, OccupiedEntry, VacantEntry};
 use core::borrow::Borrow;
 
 mod internal {
@@ -103,6 +103,17 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     #[must_use]
     pub const fn len(&self) -> usize {
         self.len
+    }
+
+    /// Clears the map, returning all key-value pairs as an iterator. Keeps the allocated memory for reuse.
+    ///
+    /// If the returned iterator is dropped before being fully consumed, it drops the remaining key-value pairs. The returned iterator keeps a mutable borrow on the map to optimize its implementation.
+    pub fn drain(&mut self) -> Drain<'_, K, V> {
+        let drain = Drain {
+            iter: self.pairs[0..self.len].iter_mut(),
+        };
+        self.len = 0;
+        drain
     }
 
     /// Does the map contain this key?

@@ -54,6 +54,7 @@ mod clone;
 mod ctors;
 mod debug;
 mod display;
+mod drain;
 mod entry;
 mod eq;
 mod from;
@@ -66,7 +67,7 @@ mod serialization;
 mod set;
 mod values;
 
-pub use crate::set::{Set, SetIntoIter, SetIter};
+pub use crate::set::{Set, SetDrain, SetIntoIter, SetIter};
 use core::mem::MaybeUninit;
 
 /// A faster alternative of [`std::collections::HashMap`].
@@ -174,4 +175,11 @@ pub struct OccupiedEntry<'a, K: 'a + PartialEq, V: 'a, const N: usize> {
 pub struct VacantEntry<'a, K: 'a + PartialEq, V: 'a, const N: usize> {
     key: K,
     table: &'a mut Map<K, V, N>,
+}
+
+/// A draining iterator over the entries of a `Map`.
+///
+/// This struct is created by the drain method on `Map`. See its documentation for more.
+pub struct Drain<'a, K: 'a, V: 'a> {
+    iter: core::slice::IterMut<'a, MaybeUninit<(K, V)>>,
 }
