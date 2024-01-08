@@ -44,6 +44,11 @@ impl<'a, K, V> Iterator for Keys<'a, K, V> {
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next().map(|p| p.0)
     }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        self.iter.size_hint()
+    }
 }
 
 impl<K: PartialEq, V, const N: usize> Iterator for IntoKeys<K, V, N> {
@@ -52,6 +57,11 @@ impl<K: PartialEq, V, const N: usize> Iterator for IntoKeys<K, V, N> {
     #[inline]
     fn next(&mut self) -> Option<K> {
         self.iter.next().map(|p| p.0)
+    }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        self.iter.size_hint()
     }
 }
 

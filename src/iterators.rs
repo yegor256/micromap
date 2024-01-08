@@ -48,6 +48,11 @@ impl<'a, K, V> Iterator for Iter<'a, K, V> {
             (&p.0, &p.1)
         })
     }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        self.iter.size_hint()
+    }
 }
 
 impl<'a, K, V> Iterator for IterMut<'a, K, V> {
@@ -59,6 +64,11 @@ impl<'a, K, V> Iterator for IterMut<'a, K, V> {
             let p = unsafe { p.assume_init_mut() };
             (&p.0, &mut p.1)
         })
+    }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        self.iter.size_hint()
     }
 }
 
@@ -75,6 +85,11 @@ impl<K: PartialEq, V, const N: usize> Iterator for IntoIter<K, V, N> {
         } else {
             None
         }
+    }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (self.map.len - self.pos, Some(self.map.len - self.pos))
     }
 }
 
