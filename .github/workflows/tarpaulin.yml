@@ -5,7 +5,7 @@ on:
     branches:
       - master
 jobs:
-  check:
+  tarpaulin:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -19,4 +19,5 @@ jobs:
           args: '--all-features --exclude-files src/lib.rs -- --test-threads 1'
       - uses: codecov/codecov-action@v3
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
