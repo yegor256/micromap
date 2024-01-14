@@ -52,6 +52,11 @@ impl<'a, K, V> Iterator for Values<'a, K, V> {
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next().map(|p| p.1)
     }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        self.iter.size_hint()
+    }
 }
 
 impl<'a, K, V> Iterator for ValuesMut<'a, K, V> {
@@ -60,6 +65,11 @@ impl<'a, K, V> Iterator for ValuesMut<'a, K, V> {
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next().map(|p| p.1)
+    }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        self.iter.size_hint()
     }
 }
 
@@ -70,23 +80,10 @@ impl<K: PartialEq, V, const N: usize> Iterator for IntoValues<K, V, N> {
     fn next(&mut self) -> Option<V> {
         self.iter.next().map(|p| p.1)
     }
-}
 
-impl<'a, K, V> DoubleEndedIterator for Values<'a, K, V> {
-    fn next_back(&mut self) -> Option<Self::Item> {
-        self.iter.next_back().map(|p| p.1)
-    }
-}
-
-impl<'a, K, V> DoubleEndedIterator for ValuesMut<'a, K, V> {
-    fn next_back(&mut self) -> Option<Self::Item> {
-        self.iter.next_back().map(|p| p.1)
-    }
-}
-
-impl<K: PartialEq, V, const N: usize> DoubleEndedIterator for IntoValues<K, V, N> {
-    fn next_back(&mut self) -> Option<Self::Item> {
-        self.iter.next_back().map(|p| p.1)
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        self.iter.size_hint()
     }
 }
 

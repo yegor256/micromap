@@ -20,7 +20,6 @@
 
 use crate::{IntoIter, Iter, IterMut, Map};
 use core::iter::FusedIterator;
-use core::mem::ManuallyDrop;
 
 impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// Make an iterator over all pairs.
@@ -48,6 +47,11 @@ impl<'a, K, V> Iterator for Iter<'a, K, V> {
             (&p.0, &p.1)
         })
     }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        self.iter.size_hint()
+    }
 }
 
 impl<'a, K, V> Iterator for IterMut<'a, K, V> {
@@ -60,6 +64,11 @@ impl<'a, K, V> Iterator for IterMut<'a, K, V> {
             (&p.0, &mut p.1)
         })
     }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        self.iter.size_hint()
+    }
 }
 
 impl<K: PartialEq, V, const N: usize> Iterator for IntoIter<K, V, N> {
@@ -68,13 +77,17 @@ impl<K: PartialEq, V, const N: usize> Iterator for IntoIter<K, V, N> {
     #[inline]
     #[must_use]
     fn next(&mut self) -> Option<Self::Item> {
-        if self.pos < self.map.len {
-            let p = self.map.item_read(self.pos);
-            self.pos += 1;
-            Some(p)
+        if self.map.len > 0 {
+            self.map.len -= 1;
+            Some(self.map.item_read(self.map.len))
         } else {
             None
         }
+    }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (self.map.len, Some(self.map.len))
     }
 }
 
@@ -110,49 +123,7 @@ impl<K: PartialEq, V, const N: usize> IntoIterator for Map<K, V, N> {
     #[inline]
     #[must_use]
     fn into_iter(self) -> Self::IntoIter {
-        IntoIter {
-            pos: 0,
-            map: ManuallyDrop::new(self),
-        }
-    }
-}
-
-impl<K: PartialEq, V, const N: usize> Drop for IntoIter<K, V, N> {
-    fn drop(&mut self) {
-        for i in self.pos..self.map.len {
-            self.map.item_drop(i);
-        }
-    }
-}
-
-impl<'a, K, V> DoubleEndedIterator for Iter<'a, K, V> {
-    fn next_back(&mut self) -> Option<Self::Item> {
-        self.iter.next_back().map(|p| {
-            let p = unsafe { p.assume_init_ref() };
-            (&p.0, &p.1)
-        })
-    }
-}
-
-impl<'a, K, V> DoubleEndedIterator for IterMut<'a, K, V> {
-    fn next_back(&mut self) -> Option<Self::Item> {
-        self.iter.next_back().map(|p| {
-            let p = unsafe { p.assume_init_mut() };
-            (&p.0, &mut p.1)
-        })
-    }
-}
-
-impl<K: PartialEq, V, const N: usize> DoubleEndedIterator for IntoIter<K, V, N> {
-    fn next_back(&mut self) -> Option<Self::Item> {
-        if self.pos < self.map.len {
-            self.map.len -= 1;
-            let i = self.map.len;
-            let p = self.map.item_read(i);
-            Some(p)
-        } else {
-            None
-        }
+        IntoIter { map: self }
     }
 }
 
@@ -170,7 +141,7 @@ impl<'a, K, V> ExactSizeIterator for IterMut<'a, K, V> {
 
 impl<K: PartialEq, V, const N: usize> ExactSizeIterator for IntoIter<K, V, N> {
     fn len(&self) -> usize {
-        self.map.len - self.pos
+        self.map.len
     }
 }
 

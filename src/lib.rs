@@ -54,6 +54,8 @@ mod clone;
 mod ctors;
 mod debug;
 mod display;
+mod drain;
+mod entry;
 mod eq;
 mod from;
 mod index;
@@ -65,8 +67,8 @@ mod serialization;
 mod set;
 mod values;
 
-pub use crate::set::{Set, SetIntoIter, SetIter};
-use core::mem::{ManuallyDrop, MaybeUninit};
+pub use crate::set::{Set, SetDrain, SetIntoIter, SetIter};
+use core::mem::MaybeUninit;
 
 /// A faster alternative of [`std::collections::HashMap`].
 ///
@@ -113,9 +115,9 @@ pub struct IterMut<'a, K, V> {
 }
 
 /// Into-iterator over the [`Map`].
+#[repr(transparent)]
 pub struct IntoIter<K: PartialEq, V, const N: usize> {
-    pos: usize,
-    map: ManuallyDrop<Map<K, V, N>>,
+    map: Map<K, V, N>,
 }
 
 /// An iterator over the values of the [`Map`].
@@ -146,4 +148,38 @@ pub struct Keys<'a, K, V> {
 #[repr(transparent)]
 pub struct IntoKeys<K: PartialEq, V, const N: usize> {
     iter: IntoIter<K, V, N>,
+}
+
+/// A view into a single entry in a map, which may either be vacant or occupied.
+///
+/// This `enum` is constructed from the [`entry`] method on [`Map`].
+///
+/// [`entry`]: Map::entry
+pub enum Entry<'a, K: 'a + PartialEq, V: 'a, const N: usize> {
+    /// An occupied entry.
+    Occupied(OccupiedEntry<'a, K, V, N>),
+
+    /// A vacant entry.
+    Vacant(VacantEntry<'a, K, V, N>),
+}
+
+/// A view into an occupied entry in a `Map`.
+/// It is part of the [`Entry`] enum.
+pub struct OccupiedEntry<'a, K: 'a + PartialEq, V: 'a, const N: usize> {
+    index: usize,
+    table: &'a mut Map<K, V, N>,
+}
+
+/// A view into a vacant entry in a `Map`.
+/// It is part of the [`Entry`] enum.
+pub struct VacantEntry<'a, K: 'a + PartialEq, V: 'a, const N: usize> {
+    key: K,
+    table: &'a mut Map<K, V, N>,
+}
+
+/// A draining iterator over the entries of a `Map`.
+///
+/// This struct is created by the drain method on `Map`. See its documentation for more.
+pub struct Drain<'a, K: 'a, V: 'a> {
+    iter: core::slice::IterMut<'a, MaybeUninit<(K, V)>>,
 }

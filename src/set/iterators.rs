@@ -40,6 +40,11 @@ impl<'a, T> Iterator for SetIter<'a, T> {
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next()
     }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        self.iter.size_hint()
+    }
 }
 
 impl<T: PartialEq, const N: usize> Iterator for SetIntoIter<T, N> {
@@ -49,6 +54,11 @@ impl<T: PartialEq, const N: usize> Iterator for SetIntoIter<T, N> {
     #[must_use]
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next()
+    }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        self.iter.size_hint()
     }
 }
 
@@ -73,18 +83,6 @@ impl<T: PartialEq, const N: usize> IntoIterator for Set<T, N> {
         SetIntoIter {
             iter: self.map.into_keys(),
         }
-    }
-}
-
-impl<'a, T> DoubleEndedIterator for SetIter<'a, T> {
-    fn next_back(&mut self) -> Option<Self::Item> {
-        self.iter.next_back()
-    }
-}
-
-impl<T: PartialEq, const N: usize> DoubleEndedIterator for SetIntoIter<T, N> {
-    fn next_back(&mut self) -> Option<Self::Item> {
-        self.iter.next_back()
     }
 }
 

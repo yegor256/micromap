@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use crate::Set;
+use crate::{Set, SetDrain};
 use core::borrow::Borrow;
 
 impl<T: PartialEq, const N: usize> Set<T, N> {
@@ -43,6 +43,15 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
         self.map.len()
     }
 
+    /// Clears the set, returning all elements as an iterator. Keeps the allocated memory for reuse.
+    ///
+    /// If the returned iterator is dropped before being fully consumed, it drops the remaining elements. The returned iterator keeps a mutable borrow on the set to optimize its implementation.
+    pub fn drain(&mut self) -> SetDrain<'_, T> {
+        SetDrain {
+            iter: self.map.drain(),
+        }
+    }
+
     /// Does the set contain this key?
     #[inline]
     #[must_use]
@@ -53,16 +62,21 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
         self.map.contains_key(k)
     }
 
-    /// Remove by key.
+    /// Removes a value from the set. Returns whether the value was present in the set.
     #[inline]
-    pub fn remove<Q: PartialEq + ?Sized>(&mut self, k: &Q)
+    pub fn remove<Q: PartialEq + ?Sized>(&mut self, k: &Q) -> bool
     where
         T: Borrow<Q>,
     {
-        self.map.remove(k);
+        self.map.remove(k).is_some()
     }
 
-    /// Insert a single pair into the set.
+    /// Adds a value to the set.
+    ///
+    /// Returns whether the value was newly inserted. That is:
+    ///
+    /// If the set did not previously contain this value, true is returned.
+    /// If the set already contained this value, false is returned, and the set is not modified: original value is not replaced, and the value passed as argument is dropped.
     ///
     /// # Panics
     ///
@@ -71,8 +85,8 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     /// undefined behavior. This is done for the sake of performance, in order to
     /// avoid a repetitive check for the boundary condition on every `insert()`.
     #[inline]
-    pub fn insert(&mut self, k: T) {
-        self.map.insert(k, ());
+    pub fn insert(&mut self, k: T) -> bool {
+        self.map.insert(k, ()).is_none()
     }
 
     /// Get a reference to a single value.

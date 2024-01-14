@@ -2,6 +2,7 @@ mod clone;
 mod ctors;
 mod debug;
 mod display;
+mod drain;
 mod eq;
 mod from;
 mod functions;
@@ -53,4 +54,10 @@ pub struct SetIter<'a, T> {
 #[allow(clippy::module_name_repetitions)]
 pub struct SetIntoIter<T: PartialEq, const N: usize> {
     iter: crate::IntoKeys<T, (), N>,
+}
+
+#[repr(transparent)]
+#[allow(clippy::module_name_repetitions)]
+pub struct SetDrain<'a, T: PartialEq> {
+    iter: crate::Drain<'a, T, ()>,
 }
