@@ -17,7 +17,7 @@ jobs:
         with:
           version: '0.22.0'
           args: '--all-features --exclude-files src/lib.rs -- --test-threads 1'
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
