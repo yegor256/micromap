@@ -151,10 +151,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     ///
     /// # Panics
     ///
-    /// It may panic if there are too many pairs in the map already. Pay attention,
-    /// it panics only in the "debug" mode. In the "release" mode, you are going to get
-    /// undefined behavior. This is done for the sake of performance, in order to
-    /// avoid a repetitive check for the boundary condition on every `insert()`.
+    /// It may panic if there are too many pairs in the map already.
     #[inline]
     pub fn insert(&mut self, k: K, v: V) -> Option<V> {
         let (_, existing_value) = self.insert_i(k, v);
@@ -168,8 +165,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         let mut existing_value = None;
         loop {
             if i == self.len {
-                #[cfg(feature = "std")]
-                debug_assert!(target < N, "No more keys available in the map");
+                assert!(target < N, "No more keys available in the map");
                 break;
             }
             let p = self.item_ref(i);
