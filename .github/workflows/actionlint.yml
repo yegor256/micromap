@@ -15,8 +15,9 @@ jobs:
       - name: Download actionlint
         id: get_actionlint
         run: |
-          curl -sSfL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | sh -s --
-          sudo mv bin/actionlint /usr/local/bin/actionlint
+          curl -sSfL https://github.com/rhysd/actionlint/releases/latest/download/actionlint_linux_amd64.zip -o actionlint.zip
+          unzip actionlint.zip
+          sudo mv actionlint /usr/local/bin
         shell: bash
       - name: Check workflow files
         run: actionlint
