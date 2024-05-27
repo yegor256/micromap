@@ -14,7 +14,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Download actionlint
         id: get_actionlint
-        run: bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | sh -s --
+          sudo mv bin/actionlint /usr/local/bin/actionlint
         shell: bash
       - name: Check workflow files
         run: actionlint
