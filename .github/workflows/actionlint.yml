@@ -14,13 +14,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Download actionlint
         id: get_actionlint
-        run: |
-          curl -sSfL https://github.com/rhysd/actionlint/releases/latest/download/actionlint_linux_amd64.zip -o actionlint.zip
-          unzip actionlint.zip
-          sudo mv actionlint /usr/local/bin
+        run: bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
         shell: bash
       - name: Check workflow files
-        run: actionlint
+        run: ${{ steps.get_actionlint.outputs.executable }} -color -ignore 'actions-rs/toolchain@v1'
         shell: bash
-
-  
