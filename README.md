@@ -1,3 +1,5 @@
+# The Fastest HashMap in Rust
+
 [![cargo](https://github.com/yegor256/micromap/actions/workflows/cargo.yml/badge.svg)](https://github.com/yegor256/micromap/actions/workflows/cargo.yml)
 [![crates.io](https://img.shields.io/crates/v/micromap.svg)](https://crates.io/crates/micromap)
 [![codecov](https://codecov.io/gh/yegor256/micromap/branch/master/graph/badge.svg)](https://codecov.io/gh/yegor256/micromap)
@@ -5,7 +7,8 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/yegor256/micromap/blob/master/LICENSE.txt)
 [![docs.rs](https://img.shields.io/docsrs/micromap)](https://docs.rs/micromap/latest/micromap/)
 
-A much faster alternative of [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html), 
+A much faster alternative of
+[`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html),
 for very small maps. 
 It is also faster than
 [FxHashMap](https://github.com/rust-lang/rustc-hash),
@@ -14,9 +17,10 @@ It is also faster than
 [IndexMap](https://crates.io/crates/indexmap),
 and _all_ others.
 The smaller the map, the higher the performance. 
-It was observed that when a map contains more than 20 keys, it may be better to use the standard 
-[`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html), since
-the performance of `micromap::Map` _may_ start to degrade. 
+It was observed that when a map contains more than 20 keys,
+it may be better to use the standard
+[`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html),
+since the performance of `micromap::Map` _may_ start to degrade.
 See the [benchmarking results](#benchmark) below.
 
 **WELCOME**: 
@@ -41,21 +45,23 @@ m.insert(2, "bar");
 assert_eq!(2, m.len());
 ```
 
-Pay attention, here the map is created with an extra generic argument `10`. This is 
-the total size of the map, which is allocated on stack when `::new()` is called. 
-Unlike `HashMap`, the `Map` doesn't use heap at all. If more than ten keys will be
-added to the map, it will panic.
+Pay attention, here the map is created with an extra generic argument `10`.
+This is the total size of the map, which is allocated on stack when `::new()`
+is called. Unlike `HashMap`, the `Map` doesn't use heap at all. If more than
+ten keys will be added to the map, it will panic.
 
-Read [the API documentation](https://docs.rs/micromap/latest/micromap/). The struct
-[`micromap::Map`](https://docs.rs/micromap/latest/micromap/struct.Map.html) is designed as closely similar to 
-[`std::collections::HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html) as possible.
+Read [the API documentation](https://docs.rs/micromap/latest/micromap/).
+The struct
+[`micromap::Map`](https://docs.rs/micromap/latest/micromap/struct.Map.html)
+is designed as closely similar to
+[`std::collections::HashMap`][std] as possible.
 
 ## Benchmark
 
 There is a summary of a simple benchmark, where we compared `micromap::Map` with
 a few other Rust maps, changing the total capacity of the map (horizontal axis).
 We applied the same interactions 
-([`benchmark.rs`](https://github.com/yegor256/micromap/blob/master/tests/benchmark.rs)) 
+([`benchmark.rs`][rs])
 to them and measured how fast they performed. In the following table, 
 the numbers over 1.0 indicate performance gain, 
 while the numbers below 1.0 demonstrate performance loss.
@@ -76,14 +82,15 @@ while the numbers below 1.0 demonstrate performance loss.
 | `std::collections::HashMap` | 20.56 | 15.50 | 9.31 | 5.62 | 2.06 | 1.14 | 0.56 |
 | `tinymap::array_map::ArrayMap` | 1.99 | 4.81 | 4.88 | 5.17 | 4.18 | 4.84 | 4.74 |
 
-The experiment [was performed](https://github.com/yegor256/micromap/actions/workflows/benchmark.yml) on 31-03-2024.
+The experiment [was performed][yml] on 31-03-2024.
 There were 1000000 repetition cycles.
 The entire benchmark took 197s.
 Uname: 'Linux'.
 
 <!-- benchmark -->
 
-As you see, the highest performance gain was achieved for the maps that were smaller than ten keys.
+As you see, the highest performance gain was achieved for the maps that
+were smaller than ten keys.
 For the maps of just a few keys, the gain was enormous.
 
 ## How to Contribute
@@ -91,10 +98,11 @@ For the maps of just a few keys, the gain was enormous.
 First, install [Rust](https://www.rust-lang.org/tools/install) and then:
 
 ```bash
-$ cargo test -vv
+cargo test -vv
 ```
 
-If everything goes well, fork repository, make changes, send us a [pull request](https://www.yegor256.com/2014/04/15/github-guidelines.html).
+If everything goes well, fork repository, make changes, send us a
+[pull request](https://www.yegor256.com/2014/04/15/github-guidelines.html).
 We will review your changes and apply them to the `master` branch shortly,
 provided they don't violate our quality standards. To avoid frustration,
 before sending us your pull request please run `cargo test` again. Also, 
@@ -103,8 +111,13 @@ run `cargo fmt` and `cargo clippy`.
 Also, before you start making changes, run benchmarks:
 
 ```bash
-$ rustup run nightly cargo bench
+rustup run nightly cargo bench
 ```
 
-Then, after the changes you make, run it again. Compare the results. If your changes
+Then, after the changes you make, run it again. Compare the results.
+If your changes
 degrade performance, think twice before submitting a pull request.
+
+[std]: https://doc.rust-lang.org/std/collections/struct.HashMap.html
+[yml]: https://github.com/yegor256/micromap/actions/workflows/benchmark.yml
+[rs]: https://github.com/yegor256/micromap/blob/master/tests/benchmark.rs
