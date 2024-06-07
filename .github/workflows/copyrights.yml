@@ -18,38 +18,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ---
-name: license
+name: copyrights
 'on':
   push:
-    branches:
-      - master
   pull_request:
-    branches:
-      - master
 jobs:
-  license:
+  copyrights:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - shell: bash
-        run: |
-          header="Copyright (c) 2023-$(date +%Y) Yegor Bugayenko"
-          failed="false"
-          while IFS= read -r file; do
-            if ! grep -q "${header}" "${file}"; then
-              failed="true"
-              echo "⚠️ Copyright header is not found in: ${file}"
-            else
-              echo "File looks good: ${file}"
-            fi
-          done < <(find . -type f \( \
-            -name "LICENSE.txt" -o \
-            -name "*.sh" -o \
-            -name "*.rs" -o \
-            -name "*.yml" \
-            \) \
-            -not -path './target/**' \
-            -print)
-          if [ "${failed}" = "true" ]; then
-            exit 1
-          fi
+      - uses: yegor256/copyrights-action@0.0.1
