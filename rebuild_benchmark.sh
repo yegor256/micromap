@@ -31,7 +31,7 @@ sed -E -i 's/\[dev-dependencies\]//g' Cargo.toml
 micromap="micromap::Map"
 capacities="2 4 8 16 32 64 128"
 cycles=1000000
-first=$(echo ${capacities} | cut -f1 -d' ')
+first=$(echo "${capacities}" | cut -f1 -d' ')
 
 rm -rf target/benchmark
 mkdir -p target/benchmark
@@ -39,9 +39,8 @@ SECONDS=0
 for capacity in ${capacities}; do
   sed -E -i "s/CAPACITY: usize = [0-9]+/CAPACITY: usize = ${capacity}/g" src/bin/benchmark.rs
   cargo build --release
-  ./target/release/benchmark ${cycles} > target/benchmark/${capacity}.out
+  ./target/release/benchmark "${cycles}" > "target/benchmark/${capacity}.out"
 done
-lapsed=$SECONDS
 
 {
   echo -n '| |'
@@ -54,7 +53,7 @@ lapsed=$SECONDS
     echo -n " --: |"
   done
   echo ''
-  maps=$(cut -f 1 target/benchmark/${first}.out)
+  maps=$(cut -f 1 "target/benchmark/${first}.out")
   for map in ${maps}; do
     echo -n "| \`${map}\`"
       if [ "${map}" == "${micromap}" ]; then
@@ -71,9 +70,9 @@ lapsed=$SECONDS
         their=1
       fi
       echo -n ' '
-      if [ "$(expr $their / $our / 1000 / 1000)" -gt 0 ]; then
+      if [ "$(expr "${their}" / "${our}" / 1000 / 1000)" -gt 0 ]; then
         perl -e "printf(\"%dM\", ${their} / ${our} / 1000 / 1000);"
-      elif [ "$(expr $their / $our / 1000)" -gt 0 ]; then
+      elif [ "$(expr "${their}" / "${our}" / 1000)" -gt 0 ]; then
         perl -e "printf(\"%dK\", ${their} / ${our} / 1000);"
       else
         perl -e "printf(\"%.02f\", ${their} / ${our});"
