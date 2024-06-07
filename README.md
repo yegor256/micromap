@@ -9,23 +9,23 @@
 
 A much faster alternative of
 [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html),
-for very small maps. 
+for very small maps.
 It is also faster than
 [FxHashMap](https://github.com/rust-lang/rustc-hash),
 [hashbrown](https://github.com/rust-lang/hashbrown),
 [ArrayMap](https://github.com/robjtede/tinymap),
 [IndexMap](https://crates.io/crates/indexmap),
 and _all_ others.
-The smaller the map, the higher the performance. 
+The smaller the map, the higher the performance.
 It was observed that when a map contains more than 20 keys,
 it may be better to use the standard
 [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html),
 since the performance of `micromap::Map` _may_ start to degrade.
 See the [benchmarking results](#benchmark) below.
 
-**WELCOME**: 
-Not all functions that you might expect to have in a map are implemented. 
-I will appreciate if you contribute by implementing these 
+**WELCOME**:
+Not all functions that you might expect to have in a map are implemented.
+I will appreciate if you contribute by implementing these
 [missing functions](https://github.com/yegor256/micromap/issues).
 
 First, add this to `Cargo.toml`:
@@ -60,10 +60,10 @@ is designed as closely similar to
 
 There is a summary of a simple benchmark, where we compared `micromap::Map` with
 a few other Rust maps, changing the total capacity of the map (horizontal axis).
-We applied the same interactions 
+We applied the same interactions
 ([`benchmark.rs`][rs])
-to them and measured how fast they performed. In the following table, 
-the numbers over 1.0 indicate performance gain, 
+to them and measured how fast they performed. In the following table,
+the numbers over 1.0 indicate performance gain,
 while the numbers below 1.0 demonstrate performance loss.
 
 <!-- benchmark -->
@@ -105,7 +105,7 @@ If everything goes well, fork repository, make changes, send us a
 [pull request](https://www.yegor256.com/2014/04/15/github-guidelines.html).
 We will review your changes and apply them to the `master` branch shortly,
 provided they don't violate our quality standards. To avoid frustration,
-before sending us your pull request please run `cargo test` again. Also, 
+before sending us your pull request please run `cargo test` again. Also,
 run `cargo fmt` and `cargo clippy`.
 
 Also, before you start making changes, run benchmarks:
