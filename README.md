@@ -69,22 +69,22 @@ while the numbers below 1.0 demonstrate performance loss.
 <!-- benchmark -->
 | | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
 | --- | --: | --: | --: | --: | --: | --: | --: |
-| `hashbrown::HashMap` | 21.74 | 12.00 | 6.82 | 3.87 | 1.29 | 0.61 | 0.32 |
-| `heapless::LinearMap` | 0.96 | 1.50 | 1.33 | 1.38 | 0.89 | 1.14 | 1.17 |
-| `indexmap::IndexMap` | 12.80 | 12.51 | 7.99 | 5.75 | 1.89 | 0.90 | 0.49 |
-| `linear_map::LinearMap` | 1.49 | 1.56 | 1.08 | 1.30 | 1.01 | 0.90 | 0.91 |
-| `linked_hash_map::LinkedHashMap` | 27.98 | 21.70 | 12.78 | 8.20 | 2.99 | 1.42 | 0.80 |
-| `litemap::LiteMap` | 1.55 | 2.12 | 1.68 | 1.57 | 1.02 | 0.78 | 0.54 |
+| `hashbrown::HashMap` | 21.09 | 11.96 | 6.66 | 3.90 | 1.24 | 0.65 | 0.32 |
+| `heapless::LinearMap` | 0.98 | 1.50 | 1.30 | 1.59 | 1.03 | 1.00 | 0.91 |
+| `indexmap::IndexMap` | 12.55 | 12.51 | 7.78 | 5.20 | 1.76 | 0.96 | 0.49 |
+| `linear_map::LinearMap` | 1.66 | 1.55 | 1.11 | 1.30 | 0.74 | 0.92 | 0.89 |
+| `linked_hash_map::LinkedHashMap` | 28.17 | 21.88 | 12.68 | 8.13 | 2.81 | 1.51 | 0.80 |
+| `litemap::LiteMap` | 1.52 | 2.12 | 1.65 | 1.47 | 0.96 | 0.85 | 0.55 |
 | `micromap::Map` 👍 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
-| `nohash_hasher::BuildNoHashHasher` | 20.74 | 12.44 | 7.83 | 3.49 | 1.33 | 0.61 | 0.36 |
-| `rustc_hash::FxHashMap` | 20.96 | 12.19 | 6.93 | 4.72 | 1.10 | 0.53 | 0.30 |
-| `std::collections::BTreeMap` | 19.57 | 8.60 | 5.40 | 4.91 | 2.38 | 1.16 | 0.74 |
-| `std::collections::HashMap` | 21.54 | 14.65 | 9.15 | 5.80 | 2.16 | 1.05 | 0.58 |
-| `tinymap::array_map::ArrayMap` | 1.63 | 4.57 | 4.90 | 5.45 | 4.24 | 4.38 | 4.81 |
+| `nohash_hasher::BuildNoHashHasher` | 20.60 | 12.41 | 7.76 | 3.49 | 1.21 | 0.64 | 0.33 |
+| `rustc_hash::FxHashMap` | 21.05 | 12.23 | 6.81 | 4.55 | 1.03 | 0.58 | 0.29 |
+| `std::collections::BTreeMap` | 19.06 | 9.06 | 5.60 | 4.97 | 2.27 | 1.23 | 0.71 |
+| `std::collections::HashMap` | 21.17 | 14.67 | 9.03 | 5.80 | 2.05 | 1.09 | 0.78 |
+| `tinymap::array_map::ArrayMap` | 2.00 | 4.69 | 4.78 | 5.55 | 4.26 | 4.69 | 4.77 |
 
-The experiment [was performed](https://github.com/yegor256/micromap/actions/workflows/benchmark.yml) on 16-07-2024.
+The experiment [was performed][action] on 04-09-2024.
 There were 1000000 repetition cycles.
-The entire benchmark took 196s.
+The entire benchmark took 193s.
 Uname: 'Linux'.
 
 <!-- benchmark -->
