@@ -82,7 +82,7 @@ done
     echo ''
   done
   echo ''
-  echo "The experiment [was performed](https://github.com/yegor256/micromap/actions/workflows/benchmark.yml) on $(date +%d-%m-%Y)."
+  echo "The experiment [was performed][action] on $(date +%d-%m-%Y)."
   echo "There were ${cycles} repetition cycles."
   echo "The entire benchmark took ${SECONDS}s."
   echo "Uname: '$(uname)'."

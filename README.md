@@ -119,5 +119,5 @@ If your changes
 degrade performance, think twice before submitting a pull request.
 
 [std]: https://doc.rust-lang.org/std/collections/struct.HashMap.html
-[yml]: https://github.com/yegor256/micromap/actions/workflows/benchmark.yml
 [rs]: https://github.com/yegor256/micromap/blob/master/tests/benchmark.rs
+[action]: https://github.com/yegor256/micromap/actions/workflows/benchmark.yml
