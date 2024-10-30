@@ -1,4 +1,4 @@
-# The Fastest HashMap in Rust
+# The Fastest Linear Map in Rust
 
 [![cargo](https://github.com/yegor256/micromap/actions/workflows/cargo.yml/badge.svg)](https://github.com/yegor256/micromap/actions/workflows/cargo.yml)
 [![crates.io](https://img.shields.io/crates/v/micromap.svg)](https://crates.io/crates/micromap)
