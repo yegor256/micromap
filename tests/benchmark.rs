@@ -54,6 +54,7 @@ macro_rules! eval {
 macro_rules! insert {
     ($name:expr, $ret:expr, $map:expr, $total:expr) => {{
         let start = Instant::now();
+        #[allow(unused_mut)]
         let mut m = $map;
         eval!(m, $total, CAPACITY);
         let e = start.elapsed();
@@ -132,6 +133,11 @@ fn benchmark(total: usize) -> HashMap<&'static str, Duration> {
         heapless::LinearMap::<u32, i64, CAPACITY>::new(),
         total
     );
+    {
+        let m = flurry::HashMap::<u32, i64>::new();
+        let p = m.pin();
+        insert!("flurry::HashMap", ret, p, total);
+    }
     insert!(
         "micromap::Map",
         ret,
