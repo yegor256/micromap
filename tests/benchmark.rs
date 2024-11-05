@@ -136,12 +136,7 @@ fn benchmark(total: usize) -> HashMap<&'static str, Duration> {
     {
         let m = flurry::HashMap::<u32, i64>::new();
         let p = m.pin();
-        insert!(
-        "flurry::HashMap",
-        ret,
-        p,
-        total
-    );
+        insert!("flurry::HashMap", ret, p, total);
     }
     insert!(
         "micromap::Map",
