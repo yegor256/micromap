@@ -19,7 +19,7 @@
 # SOFTWARE.
 ---
 name: pdd
-on:
+'on':
   push:
     branches:
       - master

@@ -19,7 +19,7 @@
 # SOFTWARE.
 ---
 name: benchmark
-on:
+'on':
   push:
     branches:
       - master

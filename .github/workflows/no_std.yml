@@ -19,7 +19,7 @@
 # SOFTWARE.
 ---
 name: Rust+no_std
-on:
+'on':
   push:
     branches: [ '**' ]
   pull_request:
