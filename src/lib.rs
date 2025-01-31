@@ -92,9 +92,7 @@ use core::mem::MaybeUninit;
 ///
 /// It is also faster because it doesn't grow in size. When a [`Map`] is created,
 /// its size is fixed on stack. If an attempt is made to insert too many keys
-/// into it, it simply panics. Moreover, in the "release" mode it doesn't panic,
-/// but its behaviour is undefined. In the "release" mode all boundary checks
-/// are disabled, for the sake of higher performance.
+/// into it, it simply panics.
 pub struct Map<K: PartialEq, V, const N: usize> {
     /// The next available pair in the array.
     len: usize,
