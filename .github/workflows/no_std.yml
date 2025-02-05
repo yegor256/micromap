@@ -30,7 +30,7 @@ env:
 jobs:
   build-nostd:
     name: Build on no_std target (thumbv7em-none-eabi)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@master
