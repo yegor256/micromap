@@ -20,74 +20,77 @@ rm -rf target/benchmark
 mkdir -p target/benchmark
 SECONDS=0
 for capacity in ${capacities}; do
-  sed -E -i "s/CAPACITY: usize = [0-9]+/CAPACITY: usize = ${capacity}/g" src/bin/benchmark.rs
-  cargo build --release
-  ./target/release/benchmark "${cycles}" > "target/benchmark/${capacity}.out"
+    sed -E -i "s/CAPACITY: usize = [0-9]+/CAPACITY: usize = ${capacity}/g" \
+        src/bin/benchmark.rs
+    cargo build --release
+    ./target/release/benchmark "${cycles}" > "target/benchmark/${capacity}.out"
 done
 
 {
-  echo -n '| |'
-  for capacity in ${capacities}; do
-    echo -n " ${capacity} |"
-  done
-  echo ''
-  echo -n '| --- |'
-  for capacity in ${capacities}; do
-    echo -n " --: |"
-  done
-  echo ''
-  maps=$(cut -f 1 "target/benchmark/${first}.out")
-  for map in ${maps}; do
-    echo -n "| \`${map}\`"
-      if [ "${map}" == "${micromap}" ]; then
-        echo -n ' 👍'
-      fi
-    echo -n ' |'
+    echo -n '| |'
     for capacity in ${capacities}; do
-      our=$(grep "${micromap}" "target/benchmark/${capacity}.out" | cut -f 2)
-      if [ "${our}" -eq "0" ]; then
-        our=1
-      fi
-      their=$(grep "${map}" "target/benchmark/${capacity}.out" | cut -f 2)
-      if [ "${their}" -eq "0" ]; then
-        their=1
-      fi
-      echo -n ' '
-      if [ $(( "${their}" / "${our}" / 1000 / 1000 )) -gt 0 ]; then
-        perl -e "printf(\"%dM\", ${their} / ${our} / 1000 / 1000);"
-      elif [ $(( "${their}" / "${our}" / 1000 )) -gt 0 ]; then
-        perl -e "printf(\"%dK\", ${their} / ${our} / 1000);"
-      else
-        perl -e "printf(\"%.02f\", ${their} / ${our});"
-      fi
-      echo -n ' |'
+        echo -n " ${capacity} |"
     done
     echo ''
-  done
-  echo ''
-  echo "The experiment [was performed][action] on $(date +%d-%m-%Y)."
-  echo "There were ${cycles} repetition cycles."
-  echo "The entire benchmark took ${SECONDS}s."
-  echo "Uname: '$(uname)'."
+    echo -n '| --- |'
+    for capacity in ${capacities}; do
+        echo -n " --: |"
+    done
+    echo ''
+    maps=$(cut -f 1 "target/benchmark/${first}.out")
+    for map in ${maps}; do
+        echo -n "| \`${map}\`"
+        if [ "${map}" == "${micromap}" ]; then
+            echo -n ' 👍'
+        fi
+        echo -n ' |'
+        for capacity in ${capacities}; do
+            our=$(grep "${micromap}" "target/benchmark/${capacity}.out" \
+                | cut -f 2)
+            if [ "${our}" -eq "0" ]; then
+                our=1
+            fi
+            their=$(grep "${map}" "target/benchmark/${capacity}.out" \
+                | cut -f 2)
+            if [ "${their}" -eq "0" ]; then
+                their=1
+            fi
+            echo -n ' '
+            if [ $(( "${their}" / "${our}" / 1000 / 1000 )) -gt 0 ]; then
+                perl -e "printf(\"%dM\", ${their} / ${our} / 1000 / 1000);"
+            elif [ $(( "${their}" / "${our}" / 1000 )) -gt 0 ]; then
+                perl -e "printf(\"%dK\", ${their} / ${our} / 1000);"
+            else
+                perl -e "printf(\"%.02f\", ${their} / ${our});"
+            fi
+            echo -n ' |'
+        done
+        echo ''
+    done
+    echo ''
+    echo "The experiment [was performed][action] on $(date +%d-%m-%Y)."
+    echo "There were ${cycles} repetition cycles."
+    echo "The entire benchmark took ${SECONDS}s."
+    echo "Uname: '$(uname)'."
 } > target/benchmark/table.md
 
 perl -e '
-  my $readme;
-  my $file = "README.md";
-  open(my $r, "<", $file);
-  { local $/; $readme = <$r>; }
-  close($r);
-  my $sep = "<!-- benchmark -->";
-  my @p = split(/\Q$sep\E/, $readme);
-  my $table = "target/benchmark/table.md";
-  open(my $t, "<", $table);
-  { local $/; $table = <$t>; }
-  close($t);
-  $p[1] = "\n" . $table . "\n";
-  my $new = join($sep, @p);
-  open(my $w, ">", $file);
-  print $w join($sep, @p);
-  close($w);
+    my $readme;
+    my $file = "README.md";
+    open(my $r, "<", $file);
+    { local $/; $readme = <$r>; }
+    close($r);
+    my $sep = "<!-- benchmark -->";
+    my @p = split(/\Q$sep\E/, $readme);
+    my $table = "target/benchmark/table.md";
+    open(my $t, "<", $table);
+    { local $/; $table = <$t>; }
+    close($t);
+    $p[1] = "\n" . $table . "\n";
+    my $new = join($sep, @p);
+    open(my $w, ">", $file);
+    print $w join($sep, @p);
+    close($w);
 '
 
 git restore Cargo.toml
