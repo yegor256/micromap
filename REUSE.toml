@@ -21,7 +21,6 @@ path = [
     ".pdd",
     ".xcop",
     "Cargo.lock",
-    "Cargo.toml",
     "Gemfile.lock",
     "README.md",
     "renovate.json",
