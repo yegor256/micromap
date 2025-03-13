@@ -106,13 +106,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     where
         K: Borrow<Q>,
     {
-        for i in 0..self.len {
-            let p = self.item_ref(i);
-            if p.0.borrow() == k {
-                return true;
-            }
-        }
-        false
+        self.iter().any(|(x, _)| x.borrow() == k)
     }
 
     /// Remove by key.
