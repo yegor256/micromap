@@ -110,13 +110,13 @@ impl<K: PartialEq, V, const N: usize> IntoIterator for Map<K, V, N> {
     }
 }
 
-impl<'a, K, V> ExactSizeIterator for Iter<'a, K, V> {
+impl<K, V> ExactSizeIterator for Iter<'_, K, V> {
     fn len(&self) -> usize {
         self.iter.len()
     }
 }
 
-impl<'a, K, V> ExactSizeIterator for IterMut<'a, K, V> {
+impl<K, V> ExactSizeIterator for IterMut<'_, K, V> {
     fn len(&self) -> usize {
         self.iter.len()
     }
@@ -128,9 +128,9 @@ impl<K: PartialEq, V, const N: usize> ExactSizeIterator for IntoIter<K, V, N> {
     }
 }
 
-impl<'a, K, V> FusedIterator for Iter<'a, K, V> {}
+impl<K, V> FusedIterator for Iter<'_, K, V> {}
 
-impl<'a, K, V> FusedIterator for IterMut<'a, K, V> {}
+impl<K, V> FusedIterator for IterMut<'_, K, V> {}
 
 impl<K: PartialEq, V, const N: usize> FusedIterator for IntoIter<K, V, N> {}
 
