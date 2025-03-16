@@ -4,7 +4,7 @@
 use crate::Drain;
 use core::iter::FusedIterator;
 
-impl<'a, K, V> Drop for Drain<'a, K, V> {
+impl<K, V> Drop for Drain<'_, K, V> {
     fn drop(&mut self) {
         for pair in &mut self.iter {
             unsafe { pair.assume_init_drop() };
@@ -12,7 +12,7 @@ impl<'a, K, V> Drop for Drain<'a, K, V> {
     }
 }
 
-impl<'a, K: PartialEq, V> Iterator for Drain<'a, K, V> {
+impl<K: PartialEq, V> Iterator for Drain<'_, K, V> {
     type Item = (K, V);
 
     #[inline]
@@ -27,11 +27,11 @@ impl<'a, K: PartialEq, V> Iterator for Drain<'a, K, V> {
     }
 }
 
-impl<'a, K: PartialEq, V> ExactSizeIterator for Drain<'a, K, V> {
+impl<K: PartialEq, V> ExactSizeIterator for Drain<'_, K, V> {
     #[inline]
     fn len(&self) -> usize {
         self.iter.len()
     }
 }
 
-impl<'a, K: PartialEq, V> FusedIterator for Drain<'a, K, V> {}
+impl<K: PartialEq, V> FusedIterator for Drain<'_, K, V> {}

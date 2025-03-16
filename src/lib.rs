@@ -163,6 +163,7 @@ pub struct VacantEntry<'a, K: 'a + PartialEq, V: 'a, const N: usize> {
 /// A draining iterator over the entries of a `Map`.
 ///
 /// This struct is created by the drain method on `Map`. See its documentation for more.
+#[deny(clippy::needless_lifetimes)]
 pub struct Drain<'a, K: 'a, V: 'a> {
     iter: core::slice::IterMut<'a, MaybeUninit<(K, V)>>,
 }

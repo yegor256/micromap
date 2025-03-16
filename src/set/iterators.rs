@@ -69,7 +69,7 @@ impl<T: PartialEq, const N: usize> IntoIterator for Set<T, N> {
     }
 }
 
-impl<'a, T> ExactSizeIterator for SetIter<'a, T> {
+impl<T> ExactSizeIterator for SetIter<'_, T> {
     fn len(&self) -> usize {
         self.iter.len()
     }
@@ -81,6 +81,6 @@ impl<T: PartialEq, const N: usize> ExactSizeIterator for SetIntoIter<T, N> {
     }
 }
 
-impl<'a, T> FusedIterator for SetIter<'a, T> {}
+impl<T> FusedIterator for SetIter<'_, T> {}
 
 impl<T: PartialEq, const N: usize> FusedIterator for SetIntoIter<T, N> {}

@@ -70,13 +70,13 @@ impl<K: PartialEq, V, const N: usize> Iterator for IntoValues<K, V, N> {
     }
 }
 
-impl<'a, K, V> ExactSizeIterator for Values<'a, K, V> {
+impl<K, V> ExactSizeIterator for Values<'_, K, V> {
     fn len(&self) -> usize {
         self.iter.len()
     }
 }
 
-impl<'a, K, V> ExactSizeIterator for ValuesMut<'a, K, V> {
+impl<K, V> ExactSizeIterator for ValuesMut<'_, K, V> {
     fn len(&self) -> usize {
         self.iter.len()
     }
@@ -88,10 +88,8 @@ impl<K: PartialEq, V, const N: usize> ExactSizeIterator for IntoValues<K, V, N> 
     }
 }
 
-impl<'a, K, V> FusedIterator for Values<'a, K, V> {}
-
-impl<'a, K, V> FusedIterator for ValuesMut<'a, K, V> {}
-
+impl<K, V> FusedIterator for Values<'_, K, V> {}
+impl<K, V> FusedIterator for ValuesMut<'_, K, V> {}
 impl<K: PartialEq, V, const N: usize> FusedIterator for IntoValues<K, V, N> {}
 
 #[cfg(test)]

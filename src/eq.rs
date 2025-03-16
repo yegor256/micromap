@@ -25,7 +25,7 @@ impl<K: PartialEq, V: PartialEq, const N: usize> PartialEq for Map<K, V, N> {
     /// ```
     #[inline]
     fn eq(&self, other: &Self) -> bool {
-        return self.len() == other.len() && self.iter().all(|(k, v)| other.get(k) == Some(v));
+        self.len() == other.len() && self.iter().all(|(k, v)| other.get(k) == Some(v))
     }
 }
 
