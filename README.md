@@ -69,22 +69,22 @@ while the numbers below 1.0 demonstrate performance loss.
 <!-- benchmark -->
 | | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
 | --- | --: | --: | --: | --: | --: | --: | --: |
-| `hashbrown::HashMap` | 21.21 | 11.82 | 6.48 | 3.88 | 1.20 | 0.59 | 0.28 |
-| `heapless::LinearMap` | 1.19 | 1.51 | 1.22 | 1.40 | 0.83 | 0.98 | 0.87 |
-| `indexmap::IndexMap` | 13.03 | 12.09 | 7.49 | 4.82 | 1.68 | 0.89 | 0.45 |
-| `linear_map::LinearMap` | 1.69 | 1.56 | 1.15 | 1.11 | 0.75 | 1.18 | 0.83 |
-| `linked_hash_map::LinkedHashMap` | 26.05 | 21.61 | 12.48 | 7.85 | 2.69 | 1.41 | 0.76 |
-| `litemap::LiteMap` | 1.68 | 2.30 | 6.61 | 4.58 | 1.69 | 0.88 | 0.56 |
+| `hashbrown::HashMap` | 20.31 | 11.03 | 6.95 | 2.55 | 1.14 | 0.65 | 0.28 |
+| `heapless::LinearMap` | 1.19 | 1.43 | 1.26 | 0.88 | 0.83 | 1.27 | 1.21 |
+| `indexmap::IndexMap` | 20.98 | 11.92 | 7.73 | 3.11 | 1.73 | 0.91 | 0.48 |
+| `linear_map::LinearMap` | 1.55 | 1.63 | 0.99 | 0.67 | 0.79 | 0.89 | 0.90 |
+| `linked_hash_map::LinkedHashMap` | 26.20 | 21.63 | 12.56 | 5.00 | 2.65 | 1.46 | 0.78 |
+| `litemap::LiteMap` | 1.56 | 2.08 | 4.86 | 2.33 | 1.70 | 0.94 | 0.58 |
 | `micromap::Map` 👍 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
-| `nohash_hasher::BuildNoHashHasher` | 20.78 | 12.19 | 8.44 | 3.38 | 1.18 | 0.65 | 0.32 |
-| `rustc_hash::FxHashMap` | 20.95 | 12.19 | 6.60 | 4.10 | 1.03 | 0.54 | 0.28 |
-| `std::collections::BTreeMap` | 21.02 | 8.87 | 5.34 | 4.64 | 2.18 | 1.17 | 0.68 |
-| `std::collections::HashMap` | 20.86 | 14.55 | 8.84 | 5.37 | 1.91 | 1.10 | 0.51 |
-| `tinymap::array_map::ArrayMap` | 1.66 | 4.65 | 4.60 | 5.20 | 3.54 | 4.34 | 4.15 |
+| `nohash_hasher::BuildNoHashHasher` | 20.33 | 11.50 | 7.33 | 2.16 | 1.20 | 0.62 | 0.33 |
+| `rustc_hash::FxHashMap` | 20.51 | 11.31 | 7.16 | 2.65 | 1.09 | 0.55 | 0.29 |
+| `std::collections::BTreeMap` | 20.05 | 9.73 | 5.46 | 3.22 | 1.90 | 1.09 | 0.70 |
+| `std::collections::HashMap` | 20.54 | 14.13 | 9.37 | 3.48 | 1.97 | 1.07 | 0.56 |
+| `tinymap::array_map::ArrayMap` | 2.00 | 4.24 | 4.41 | 3.03 | 3.52 | 4.21 | 4.32 |
 
-The experiment [was performed][action] on 05-11-2024.
+The experiment [was performed][action] on 16-03-2025.
 There were 1000000 repetition cycles.
-The entire benchmark took 197s.
+The entire benchmark took 194s.
 Uname: 'Linux'.
 
 <!-- benchmark -->
