@@ -22,6 +22,7 @@ macro_rules! eval {
                 assert_eq!(v, i as i64);
             }
             for i in 1..$capacity - 1 {
+                #[allow(deprecated)]
                 $map.remove(&(i as u32));
             }
             if $map.iter().find(|(_k, v)| **v == 0).is_some() {
