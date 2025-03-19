@@ -17,6 +17,9 @@ jobs:
         with:
           toolchain: stable
           override: true
+      - run: |-
+          wget https://nz2.archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.24_amd64.deb && \
+          sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2.24_amd64.deb
       - uses: actions-rs/tarpaulin@v0.1
         with:
           version: '0.22.0'
