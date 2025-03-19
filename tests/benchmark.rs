@@ -22,6 +22,7 @@ macro_rules! eval {
                 assert_eq!(v, i as i64);
             }
             for i in 1..$capacity - 1 {
+                // for [`indexmap::IndexMap`]`, no logic changes. (or use .swap_remove(key))
                 #[allow(deprecated)]
                 $map.remove(&(i as u32));
             }
