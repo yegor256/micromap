@@ -16,7 +16,6 @@ impl<K: PartialEq, V> Iterator for Drain<'_, K, V> {
     type Item = (K, V);
 
     #[inline]
-    #[must_use]
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next().map(|p| unsafe { p.assume_init_read() })
     }

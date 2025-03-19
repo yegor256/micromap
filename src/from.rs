@@ -5,7 +5,6 @@ use crate::Map;
 
 impl<K: PartialEq, V, const N: usize> FromIterator<(K, V)> for Map<K, V, N> {
     #[inline]
-    #[must_use]
     fn from_iter<T: IntoIterator<Item = (K, V)>>(iter: T) -> Self {
         let mut m: Self = Self::new();
         for (k, v) in iter {
@@ -17,7 +16,6 @@ impl<K: PartialEq, V, const N: usize> FromIterator<(K, V)> for Map<K, V, N> {
 
 impl<K: PartialEq, V, const N: usize> From<[(K, V); N]> for Map<K, V, N> {
     #[inline]
-    #[must_use]
     fn from(arr: [(K, V); N]) -> Self {
         Self::from_iter(arr)
     }

@@ -7,7 +7,6 @@ use core::mem::MaybeUninit;
 impl<K: PartialEq, V, const N: usize> Default for Map<K, V, N> {
     /// Make a default empty [`Map`].
     #[inline]
-    #[must_use]
     fn default() -> Self {
         Self::new()
     }

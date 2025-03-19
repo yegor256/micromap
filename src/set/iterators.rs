@@ -19,7 +19,6 @@ impl<'a, T> Iterator for SetIter<'a, T> {
     type Item = &'a T;
 
     #[inline]
-    #[must_use]
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next()
     }
@@ -34,7 +33,6 @@ impl<T: PartialEq, const N: usize> Iterator for SetIntoIter<T, N> {
     type Item = T;
 
     #[inline]
-    #[must_use]
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next()
     }
@@ -50,7 +48,6 @@ impl<'a, T: PartialEq, const N: usize> IntoIterator for &'a Set<T, N> {
     type IntoIter = SetIter<'a, T>;
 
     #[inline]
-    #[must_use]
     fn into_iter(self) -> Self::IntoIter {
         self.iter()
     }
@@ -61,7 +58,6 @@ impl<T: PartialEq, const N: usize> IntoIterator for Set<T, N> {
     type IntoIter = SetIntoIter<T, N>;
 
     #[inline]
-    #[must_use]
     fn into_iter(self) -> Self::IntoIter {
         SetIntoIter {
             iter: self.map.into_keys(),

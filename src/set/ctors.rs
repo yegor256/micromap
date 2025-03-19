@@ -6,7 +6,6 @@ use crate::{Map, Set};
 impl<T: PartialEq, const N: usize> Default for Set<T, N> {
     /// Make a default empty [`Set`].
     #[inline]
-    #[must_use]
     fn default() -> Self {
         Self::new()
     }

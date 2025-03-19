@@ -8,7 +8,6 @@ impl<K: PartialEq> Iterator for SetDrain<'_, K> {
     type Item = K;
 
     #[inline]
-    #[must_use]
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next().map(|(k, ())| k)
     }

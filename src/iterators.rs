@@ -23,7 +23,6 @@ impl<'a, K, V> Iterator for Iter<'a, K, V> {
     type Item = (&'a K, &'a V);
 
     #[inline]
-    #[must_use]
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next().map(|p| {
             let p = unsafe { p.assume_init_ref() };
@@ -58,7 +57,6 @@ impl<K: PartialEq, V, const N: usize> Iterator for IntoIter<K, V, N> {
     type Item = (K, V);
 
     #[inline]
-    #[must_use]
     fn next(&mut self) -> Option<Self::Item> {
         if self.map.len > 0 {
             self.map.len -= 1;
@@ -79,7 +77,6 @@ impl<'a, K: PartialEq, V, const N: usize> IntoIterator for &'a Map<K, V, N> {
     type IntoIter = Iter<'a, K, V>;
 
     #[inline]
-    #[must_use]
     fn into_iter(self) -> Self::IntoIter {
         Iter {
             iter: self.pairs[0..self.len].iter(),
@@ -104,7 +101,6 @@ impl<K: PartialEq, V, const N: usize> IntoIterator for Map<K, V, N> {
     type IntoIter = IntoIter<K, V, N>;
 
     #[inline]
-    #[must_use]
     fn into_iter(self) -> Self::IntoIter {
         IntoIter { map: self }
     }
