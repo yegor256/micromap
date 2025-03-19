@@ -22,7 +22,7 @@ jobs:
           sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2.24_amd64.deb
       - uses: actions-rs/tarpaulin@v0.1
         with:
-          version: '0.32.3'
+          version: '0.22.0' # the last version that supports tarpaulin@v0.1, which is no longer maintained.
           args: '--all-features --exclude-files src/lib.rs -- --test-threads 1'
       - uses: codecov/codecov-action@v5
         with:

@@ -29,8 +29,7 @@ macro_rules! eval {
             if $map.iter().find(|(_k, v)| **v == 0).is_some() {
                 $map.clear();
             }
-            let p = std::hint::black_box($map.iter().find(|(_k, v)| **v == 42).unwrap().1);
-            sum += p
+            sum += std::hint::black_box($map.iter().find(|(_k, v)| **v == 42).unwrap().1);
         }
         std::hint::black_box(sum)
     }};
@@ -41,6 +40,16 @@ macro_rules! insert {
         let start = Instant::now();
         let mut m = $map;
         eval!(m, $total, CAPACITY);
+        let e = start.elapsed();
+        $ret.insert($name, e);
+    }};
+}
+
+macro_rules! insert_flurry {
+    ($name:expr, $ret:expr, $map:expr, $total:expr) => {{
+        let start = Instant::now();
+        let m = $map;
+        eval!(m.pin(), $total, CAPACITY);
         let e = start.elapsed();
         $ret.insert($name, e);
     }};
@@ -115,6 +124,12 @@ fn benchmark(total: usize) -> HashMap<&'static str, Duration> {
         "heapless::LinearMap",
         ret,
         heapless::LinearMap::<u32, i64, CAPACITY>::new(),
+        total
+    );
+    insert_flurry!(
+        "flurry::HashMap",
+        ret,
+        flurry::HashMap::<u32, i64>::new(),
         total
     );
     insert!(
