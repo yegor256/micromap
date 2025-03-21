@@ -65,7 +65,7 @@ impl<K, V> FusedIterator for Keys<'_, K, V> {}
 impl<K: PartialEq, V, const N: usize> FusedIterator for IntoKeys<K, V, N> {}
 
 #[cfg(test)]
-mod test {
+mod tests {
 
     use super::*;
 
@@ -74,7 +74,9 @@ mod test {
         let mut m: Map<String, i32, 10> = Map::new();
         m.insert("foo".to_string(), 0);
         m.insert("bar".to_string(), 0);
-        assert_eq!(m.keys().collect::<Vec<_>>(), [&"foo", &"bar"]);
+        let keys = m.keys();
+        assert_eq!(keys.len(), 2);
+        assert_eq!(keys.collect::<Vec<_>>(), [&"foo", &"bar"]);
     }
 
     #[test]
@@ -82,8 +84,10 @@ mod test {
         let mut m: Map<String, i32, 10> = Map::new();
         m.insert("foo".to_string(), 0);
         m.insert("bar".to_string(), 0);
+        let keys = m.into_keys();
+        assert_eq!(keys.len(), 2);
         assert_eq!(
-            m.into_keys().collect::<Vec<_>>(),
+            keys.collect::<Vec<_>>(),
             ["bar".to_string(), "foo".to_string()]
         );
     }

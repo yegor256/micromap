@@ -22,7 +22,7 @@ impl<K: PartialEq, V, const N: usize> From<[(K, V); N]> for Map<K, V, N> {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
 
     use super::*;
 

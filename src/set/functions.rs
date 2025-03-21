@@ -35,10 +35,10 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
         }
     }
 
-    /// Does the set contain this key?
+    /// Returns true if the set contains a value.
     #[inline]
     #[must_use]
-    pub fn contains_key<Q: PartialEq + ?Sized>(&self, k: &Q) -> bool
+    pub fn contains<Q: PartialEq + ?Sized>(&self, k: &Q) -> bool
     where
         T: Borrow<Q>,
     {

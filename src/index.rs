@@ -26,7 +26,7 @@ impl<K: PartialEq + Borrow<Q>, Q: PartialEq + ?Sized, V, const N: usize> IndexMu
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
 
     use super::*;
 

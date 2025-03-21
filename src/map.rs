@@ -275,7 +275,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
 
     use super::*;
 

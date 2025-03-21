@@ -11,7 +11,7 @@ impl<T: PartialEq + Debug, const N: usize> Debug for Set<T, N> {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
 
     use super::*;
 

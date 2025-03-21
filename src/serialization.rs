@@ -56,21 +56,25 @@ impl<'de, K: PartialEq + Deserialize<'de>, V: Deserialize<'de>, const N: usize> 
 }
 
 #[cfg(test)]
-use bincode::{deserialize, serialize};
+mod tests {
 
-#[test]
-fn serialize_and_deserialize() {
-    let mut before: Map<u8, u8, 8> = Map::new();
-    before.insert(1, 42);
-    let bytes: Vec<u8> = serialize(&before).unwrap();
-    let after: Map<u8, u8, 8> = deserialize(&bytes).unwrap();
-    assert_eq!(42, after.into_iter().next().unwrap().1);
-}
+    use crate::Map;
+    use bincode::{deserialize, serialize};
 
-#[test]
-fn empty_map_serde() {
-    let before: Map<u8, u8, 8> = Map::new();
-    let bytes: Vec<u8> = serialize(&before).unwrap();
-    let after: Map<u8, u8, 8> = deserialize(&bytes).unwrap();
-    assert!(after.is_empty());
+    #[test]
+    fn serialize_and_deserialize() {
+        let mut before: Map<u8, u8, 8> = Map::new();
+        before.insert(1, 42);
+        let bytes: Vec<u8> = serialize(&before).unwrap();
+        let after: Map<u8, u8, 8> = deserialize(&bytes).unwrap();
+        assert_eq!(42, after.into_iter().next().unwrap().1);
+    }
+
+    #[test]
+    fn empty_map_serde() {
+        let before: Map<u8, u8, 8> = Map::new();
+        let bytes: Vec<u8> = serialize(&before).unwrap();
+        let after: Map<u8, u8, 8> = deserialize(&bytes).unwrap();
+        assert!(after.is_empty());
+    }
 }

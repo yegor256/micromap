@@ -131,7 +131,7 @@ impl<K, V> FusedIterator for IterMut<'_, K, V> {}
 impl<K: PartialEq, V, const N: usize> FusedIterator for IntoIter<K, V, N> {}
 
 #[cfg(test)]
-mod test {
+mod tests {
 
     use super::*;
 
@@ -252,5 +252,24 @@ mod test {
         assert_eq!(Rc::strong_count(&v), (n + 1) as usize);
         let _p = m.into_iter().nth(3);
         assert_eq!(Rc::strong_count(&v), 2); // v & p
+    }
+
+    #[test]
+    fn iter_size_hint() {
+        let mut m: Map<char, u32, 4> = Map::new();
+        m.insert('a', 97);
+        m.insert('c', 99);
+        let it = m.iter();
+        assert_eq!(it.len(), 2);
+        let mut it_mut = m.iter_mut();
+        assert!(it_mut.next().is_some());
+        assert_eq!(it_mut.len(), 1);
+        assert_eq!(it_mut.len(), it_mut.size_hint().0);
+        let mut it_into = m.into_iter();
+        assert!(it_into.next().is_some());
+        assert!(it_into.next().is_some());
+        assert!(it_into.next().is_none());
+        assert!(it_into.next().is_none());
+        assert_eq!(it_into.len(), 0);
     }
 }

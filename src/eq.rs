@@ -32,7 +32,7 @@ impl<K: PartialEq, V: PartialEq, const N: usize> PartialEq for Map<K, V, N> {
 impl<K: Eq, V: Eq, const N: usize> Eq for Map<K, V, N> {}
 
 #[cfg(test)]
-mod test {
+mod tests {
 
     use super::*;
 

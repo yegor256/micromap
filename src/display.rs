@@ -24,7 +24,7 @@ impl<K: PartialEq + Display, V: Display, const N: usize> Display for Map<K, V, N
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
 
     use super::*;
 

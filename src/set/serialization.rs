@@ -52,21 +52,25 @@ impl<'de, T: PartialEq + Deserialize<'de>, const N: usize> Deserialize<'de> for 
 }
 
 #[cfg(test)]
-use bincode::{deserialize, serialize};
+mod tests {
 
-#[test]
-fn serialize_and_deserialize() {
-    let mut before: Set<u8, 8> = Set::new();
-    before.insert(1);
-    let bytes: Vec<u8> = serialize(&before).unwrap();
-    let after: Set<u8, 8> = deserialize(&bytes).unwrap();
-    assert_eq!(1, after.into_iter().next().unwrap());
-}
+    use crate::Set;
+    use bincode::{deserialize, serialize};
 
-#[test]
-fn empty_set_serde() {
-    let before: Set<u8, 8> = Set::new();
-    let bytes: Vec<u8> = serialize(&before).unwrap();
-    let after: Set<u8, 8> = deserialize(&bytes).unwrap();
-    assert!(after.is_empty());
+    #[test]
+    fn serialize_and_deserialize() {
+        let mut before: Set<u8, 8> = Set::new();
+        before.insert(1);
+        let bytes: Vec<u8> = serialize(&before).unwrap();
+        let after: Set<u8, 8> = deserialize(&bytes).unwrap();
+        assert_eq!(1, after.into_iter().next().unwrap());
+    }
+
+    #[test]
+    fn empty_set_serde() {
+        let before: Set<u8, 8> = Set::new();
+        let bytes: Vec<u8> = serialize(&before).unwrap();
+        let after: Set<u8, 8> = deserialize(&bytes).unwrap();
+        assert!(after.is_empty());
+    }
 }

@@ -11,7 +11,7 @@ impl<K: PartialEq + Debug, V: Debug, const N: usize> Debug for Map<K, V, N> {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
 
     use super::*;
 

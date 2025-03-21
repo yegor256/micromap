@@ -93,7 +93,7 @@ impl<K, V> FusedIterator for ValuesMut<'_, K, V> {}
 impl<K: PartialEq, V, const N: usize> FusedIterator for IntoValues<K, V, N> {}
 
 #[cfg(test)]
-mod test {
+mod tests {
 
     use super::*;
 
@@ -102,7 +102,9 @@ mod test {
         let mut m: Map<String, i32, 10> = Map::new();
         m.insert("one".to_string(), 42);
         m.insert("two".to_string(), 16);
-        assert_eq!(58, m.values().sum());
+        let it = m.values();
+        assert_eq!(it.len(), 2);
+        assert_eq!(58, it.sum());
     }
 
     #[test]
@@ -110,7 +112,11 @@ mod test {
         let mut m: Map<String, i32, 10> = Map::new();
         m.insert("one".to_string(), 42);
         m.insert("two".to_string(), 16);
-        m.values_mut().for_each(|v| *v *= 2);
+        let it_mut = m.values_mut();
+        assert_eq!(it_mut.len(), 2);
+        assert_eq!(it_mut.len(), it_mut.size_hint().0);
+        assert_eq!(it_mut.len(), it_mut.size_hint().1.unwrap());
+        it_mut.for_each(|v| *v *= 2);
         assert_eq!(116, m.values().sum());
     }
 
@@ -133,7 +139,12 @@ mod test {
             m.insert(i, Rc::clone(&v));
         }
         assert_eq!(9, Rc::strong_count(&v));
-        m.into_values();
+        let mut values = m.into_values();
+        assert!(values.next().is_some());
+        assert_eq!(values.len(), 7);
+        assert!(values.next().is_some());
+        assert_eq!(values.len(), values.size_hint().0);
+        drop(values);
         assert_eq!(1, Rc::strong_count(&v));
     }
 }

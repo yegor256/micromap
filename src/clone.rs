@@ -15,7 +15,7 @@ impl<K: Clone + PartialEq, V: Clone, const N: usize> Clone for Map<K, V, N> {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
 
     use super::*;
 

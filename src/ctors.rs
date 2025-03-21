@@ -39,7 +39,7 @@ impl<K: PartialEq, V, const N: usize> Drop for Map<K, V, N> {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
 
     use super::*;
 
