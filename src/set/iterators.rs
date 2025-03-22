@@ -15,6 +15,15 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     }
 }
 
+impl<T> Clone for SetIter<'_, T> {
+    #[inline]
+    fn clone(&self) -> Self {
+        SetIter {
+            iter: self.iter.clone(),
+        }
+    }
+}
+
 impl<'a, T> Iterator for SetIter<'a, T> {
     type Item = &'a T;
 
