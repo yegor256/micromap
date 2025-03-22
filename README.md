@@ -53,7 +53,7 @@ ten keys will be added to the map, it will panic.
 Read [the API documentation](https://docs.rs/micromap/latest/micromap/).
 The struct
 [`micromap::Map`](https://docs.rs/micromap/latest/micromap/struct.Map.html)
-is designed as closely similar to
+is designed to be as closely similar to
 [`std::collections::HashMap`][std] as possible.
 
 ## Benchmark
