@@ -53,7 +53,7 @@ ten keys will be added to the map, it will panic.
 Read [the API documentation](https://docs.rs/micromap/latest/micromap/).
 The struct
 [`micromap::Map`](https://docs.rs/micromap/latest/micromap/struct.Map.html)
-is designed as closely similar to
+is designed to be as closely similar to
 [`std::collections::HashMap`][std] as possible.
 
 ## Benchmark
@@ -69,23 +69,23 @@ while the numbers below 1.0 demonstrate performance loss.
 <!-- benchmark -->
 | | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
 | --- | --: | --: | --: | --: | --: | --: | --: |
-| `flurry::HashMap` | 266.44 | 88.52 | 43.08 | 16.95 | 9.24 | 4.90 | 2.60 |
-| `hashbrown::HashMap` | 20.71 | 11.20 | 6.98 | 2.47 | 1.24 | 0.68 | 0.28 |
-| `heapless::LinearMap` | 1.11 | 1.46 | 1.24 | 0.88 | 0.80 | 0.97 | 1.13 |
-| `indexmap::IndexMap` | 13.56 | 12.83 | 7.64 | 3.17 | 1.68 | 0.88 | 0.48 |
-| `linear_map::LinearMap` | 1.67 | 1.56 | 1.06 | 0.68 | 0.78 | 1.06 | 0.90 |
-| `linked_hash_map::LinkedHashMap` | 27.44 | 20.78 | 13.20 | 5.15 | 2.64 | 1.40 | 0.76 |
-| `litemap::LiteMap` | 1.73 | 2.48 | 6.20 | 2.59 | 1.74 | 0.91 | 0.58 |
+| `flurry::HashMap` | 303.27 | 91.93 | 44.16 | 17.50 | 9.58 | 4.73 | 2.72 |
+| `hashbrown::HashMap` | 21.42 | 11.14 | 6.95 | 2.37 | 1.31 | 0.67 | 0.29 |
+| `heapless::LinearMap` | 1.09 | 1.45 | 1.26 | 0.89 | 0.82 | 0.96 | 1.16 |
+| `indexmap::IndexMap` | 13.31 | 12.11 | 7.74 | 3.16 | 1.76 | 0.88 | 0.48 |
+| `linear_map::LinearMap` | 1.65 | 1.55 | 1.31 | 0.68 | 0.83 | 0.84 | 0.93 |
+| `linked_hash_map::LinkedHashMap` | 26.31 | 21.00 | 12.69 | 5.17 | 2.73 | 1.38 | 0.80 |
+| `litemap::LiteMap` | 1.65 | 2.54 | 6.13 | 2.93 | 1.84 | 0.88 | 0.60 |
 | `micromap::Map` 👍 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
-| `nohash_hasher::BuildNoHashHasher` | 20.73 | 11.52 | 7.31 | 2.39 | 1.15 | 0.60 | 0.35 |
-| `rustc_hash::FxHashMap` | 20.77 | 11.45 | 7.00 | 2.24 | 1.00 | 0.58 | 0.30 |
-| `std::collections::BTreeMap` | 19.83 | 9.35 | 5.44 | 3.09 | 1.82 | 1.06 | 0.71 |
-| `std::collections::HashMap` | 20.30 | 14.59 | 8.84 | 3.62 | 1.91 | 1.00 | 0.55 |
-| `tinymap::array_map::ArrayMap` | 1.99 | 4.32 | 5.12 | 3.45 | 3.69 | 4.25 | 4.52 |
+| `nohash_hasher::BuildNoHashHasher` | 20.81 | 11.47 | 7.76 | 2.41 | 1.19 | 0.59 | 0.36 |
+| `rustc_hash::FxHashMap` | 20.82 | 11.34 | 7.08 | 2.24 | 1.04 | 0.57 | 0.32 |
+| `std::collections::BTreeMap` | 19.80 | 9.26 | 5.48 | 3.12 | 1.89 | 1.02 | 0.73 |
+| `std::collections::HashMap` | 20.92 | 14.48 | 8.85 | 3.62 | 1.99 | 0.98 | 0.57 |
+| `tinymap::array_map::ArrayMap` | 1.92 | 4.26 | 5.17 | 3.40 | 3.81 | 4.34 | 4.65 |
 
-The experiment [was performed][action] on 20-03-2025.
+The experiment [was performed][action] on 22-03-2025.
 There were 1000000 repetition cycles.
-The entire benchmark took 245s.
+The entire benchmark took 254s.
 Uname: 'Linux'.
 
 <!-- benchmark -->
