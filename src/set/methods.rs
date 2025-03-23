@@ -104,3 +104,102 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
         self.map.remove_entry(k).map(|p| p.0)
     }
 }
+
+/// Specialized methods available only on [`Set`].
+impl<T: PartialEq, const N: usize> Set<T, N> {
+    /// Returns `true` if `self` has no elements in common with `other`.
+    /// This is equivalent to checking for an empty intersection.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use micromap::Set;
+    ///
+    /// let a = Set::from([1, 2, 3]);
+    /// let mut b: Set<u32, 5> = Set::new();
+    ///
+    /// assert_eq!(a.is_disjoint(&b), true);
+    /// b.insert(4);
+    /// assert_eq!(a.is_disjoint(&b), true);
+    /// b.insert(1);
+    /// assert_eq!(a.is_disjoint(&b), false);
+    /// ```
+    pub fn is_disjoint<const M: usize>(&self, other: &'_ Set<T, M>) -> bool {
+        if self.len() <= other.len() {
+            self.iter().all(|v| !other.contains(v))
+        } else {
+            other.iter().all(|v| !self.contains(v))
+        }
+    }
+
+    /// Returns `true` if the set is a subset of another,
+    /// i.e., `other` contains at least all the values in `self`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use micromap::Set;
+    ///
+    /// let sup = Set::from([1, 2, 3]);
+    /// let mut set: Set<u32, 5> = Set::new();
+    ///
+    /// assert_eq!(set.is_subset(&sup), true);
+    /// set.insert(2);
+    /// assert_eq!(set.is_subset(&sup), true);
+    /// set.insert(4);
+    /// assert_eq!(set.is_subset(&sup), false);
+    /// ```
+    pub fn is_subset<const M: usize>(&self, other: &'_ Set<T, M>) -> bool {
+        if self.len() <= other.len() {
+            self.iter().all(|v| other.contains(v))
+        } else {
+            false
+        }
+    }
+
+    /// Returns `true` if the set is a superset of another,
+    /// i.e., `self` contains at least all the values in `other`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use micromap::Set;
+    ///
+    /// let sub = Set::from([1, 2]);
+    /// let mut set: Set<u32, 5> = Set::new();
+    ///
+    /// assert_eq!(set.is_superset(&sub), false);
+    ///
+    /// set.insert(0);
+    /// set.insert(1);
+    /// assert_eq!(set.is_superset(&sub), false);
+    ///
+    /// set.insert(2);
+    /// assert_eq!(set.is_superset(&sub), true);
+    /// ```
+    #[inline]
+    pub fn is_superset<const M: usize>(&self, other: &'_ Set<T, M>) -> bool {
+        other.is_subset(self)
+    }
+
+    /// Adds a value to the set, replacing the existing value, if any, that is equal to the given
+    /// one. Returns the replaced value.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use micromap::Set;
+    ///
+    /// let mut set: Set<_, 5> = Set::new();
+    /// set.insert(Vec::<i32>::new());
+    ///
+    /// assert_eq!(set.get(&[][..]).unwrap().capacity(), 0);
+    /// set.replace(Vec::with_capacity(10));
+    /// assert_eq!(set.get(&[][..]).unwrap().capacity(), 10);
+    /// ```
+    #[inline]
+    pub fn replace(&mut self, value: T) -> Option<T> {
+        let (_, existing_pair) = self.map.insert_i(value, ());
+        existing_pair.map(|(k, ())| k)
+    }
+}

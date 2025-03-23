@@ -8,8 +8,8 @@ mod display;
 mod drain;
 mod eq;
 mod from;
-mod functions;
 mod iterators;
+mod methods;
 #[cfg(feature = "serde")]
 mod serialization;
 

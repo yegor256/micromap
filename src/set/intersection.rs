@@ -111,9 +111,8 @@ impl<'a, T: PartialEq, const M: usize> Iterator for Intersection<'a, T, M> {
     }
 }
 
-#[cfg(feature = "std")]
-impl<T: std::fmt::Debug + PartialEq, const M: usize> std::fmt::Debug for Intersection<'_, T, M> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl<T: core::fmt::Debug + PartialEq, const M: usize> core::fmt::Debug for Intersection<'_, T, M> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_list().entries(self.clone()).finish()
     }
 }

@@ -134,25 +134,24 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// avoid a repetitive check for the boundary condition on every `insert()`.
     #[inline]
     pub fn insert(&mut self, k: K, v: V) -> Option<V> {
-        let (_, existing_value) = self.insert_i(k, v);
-        existing_value
+        let (_, existing_pair) = self.insert_i(k, v);
+        existing_pair.map(|(_, v)| v)
     }
 
     #[inline]
-    pub(crate) fn insert_i(&mut self, k: K, v: V) -> (usize, Option<V>) {
+    pub(crate) fn insert_i(&mut self, k: K, v: V) -> (usize, Option<(K, V)>) {
         let mut target = self.len;
         let mut i = 0;
-        let mut existing_value = None;
+        let mut existing_pair = None;
         loop {
             if i == self.len {
-                #[cfg(feature = "std")]
-                debug_assert!(target < N, "No more keys available in the map");
+                core::debug_assert!(target < N, "No more keys available in the map");
                 break;
             }
             let p = self.item_ref(i);
             if p.0 == k {
                 target = i;
-                existing_value = Some(self.item_read(i).1);
+                existing_pair = Some(self.item_read(i));
                 break;
             }
             i += 1;
@@ -162,7 +161,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
             self.len += 1;
         }
 
-        (target, existing_value)
+        (target, existing_pair)
     }
 
     /// Get a reference to a single value.
