@@ -4,21 +4,21 @@
 mod clone;
 mod ctors;
 mod debug;
+mod difference;
 mod display;
 mod drain;
 mod eq;
+mod extend;
 mod from;
+mod intersection;
 mod iterators;
 mod methods;
 #[cfg(feature = "serde")]
 mod serialization;
+mod symmetric_difference;
+mod union;
 
 use crate::Map;
-
-pub mod difference;
-pub mod intersection;
-pub mod symmetric_difference;
-pub mod union;
 
 /// A faster alternative of [`std::collections::HashSet`].
 ///
