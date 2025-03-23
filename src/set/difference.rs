@@ -12,6 +12,8 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     /// # Examples
     ///
     /// ```
+    /// use micromap::Set;
+    /// 
     /// let a = Set::from([1, 2, 3]);
     /// let b = Set::from([4, 2, 3, 4]);
     ///
@@ -113,28 +115,28 @@ mod tests {
 
     use crate::Set;
 
-    // TODO: This is a BUG in the standard library function.
+    // NOTE: This is a BUG in the standard library function.
     // #[test]
     // #[ignore]
     // fn difference_lifetime() {
     //     use std::collections::hash_set::HashSet as Set;
-    // 
+    //
     //     let sentence_1 = String::from("I love the surf and the sand.");
     //     let sentence_1_words: Set<&str> = sentence_1.split(" ").collect();
-    // 
+    //
     //     let first_only = {
     //         let sentence_2 = String::from("I hate the hate and the sand.");
     //         let sentence_2_words: Set<&str> = sentence_2.split(" ").collect();
     //         let first_only: Vec<_> = sentence_1_words.difference(&sentence_2_words).collect();
     //         let second_only: Vec<_> = sentence_2_words.difference(&sentence_1_words).collect();
-    // 
+    //
     //         println!("First  Sentence: {}", sentence_1);
     //         println!("Second Sentence: {}", sentence_2);
     //         println!("{:?}", first_only);
     //         println!("{:?}", second_only);
     //         first_only
     //     };
-    // 
+    //
     //     assert_eq!(
     //         Set::<_>::from_iter(first_only.into_iter().copied()),
     //         Set::<_>::from_iter(["love", "surf"])

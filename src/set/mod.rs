@@ -16,7 +16,7 @@ mod serialization;
 use crate::Map;
 
 pub mod difference;
-// pub mod intersection;
+pub mod intersection;
 // pub mod symmetric_difference;
 // pub mod union;
 
