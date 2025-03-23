@@ -20,7 +20,7 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     ///
     /// ```
     /// use micromap::Set;
-    /// 
+    ///
     /// let a = Set::from([1, 2, 3]);
     /// let b = Set::from([4, 2, 3, 4]);
     ///
@@ -29,8 +29,8 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     ///     println!("{x}");
     /// }
     ///
-    /// let intersection: Set<_, 3> = a.intersection(&b).collect();
-    /// assert_eq!(intersection, [2, 3].iter().collect());
+    /// let intersection: Set<_, 3> = a.intersection(&b).copied().collect();
+    /// assert_eq!(intersection, Set::from([2, 3]));
     /// ```
     #[inline]
     pub fn intersection<'a, const M: usize>(
@@ -130,11 +130,11 @@ mod tests {
         let set_c = Set::from([0, 1, 2, 3, 5, 7, 9, 2, 5, 6, 7, 8]);
 
         let set_result: Set<_, 5> = set_a.intersection(&set_b).copied().collect();
-        assert_eq!(set_result, Set::from_iter([2, 5, 7]));
+        assert_eq!(set_result, Set::from([2, 5, 7]));
         let set_result: Set<_, 7> = set_a.intersection(&set_c).copied().collect();
         assert_eq!(set_result, set_a);
         let set_result: Set<_, 6> = set_b.intersection(&set_c).copied().collect();
-        assert_eq!(set_result, Set::from_iter([2, 5, 6, 7, 8]));
+        assert_eq!(set_result, Set::from([2, 5, 6, 7, 8]));
     }
 
     #[test]
@@ -149,7 +149,7 @@ mod tests {
     fn intersection_with_disjoint_sets() {
         let a = Set::from([1, 2, 3]);
         let b = Set::from([4, 5, 6]);
-        let intersection: Set<_, 3> = a.intersection(&b).collect();
+        let intersection: Set<_, 3> = a.intersection(&b).copied().collect();
         assert!(intersection.is_empty());
     }
 
@@ -157,16 +157,16 @@ mod tests {
     fn intersection_with_subset() {
         let a = Set::from([1, 2, 3, 4]);
         let b = Set::from([2, 3]);
-        let intersection: Set<_, 2> = a.intersection(&b).collect();
-        assert_eq!(intersection, [2, 3].iter().collect());
+        let intersection: Set<_, 2> = a.intersection(&b).copied().collect();
+        assert_eq!(intersection, Set::from([2, 3]));
     }
 
     #[test]
     fn intersection_with_superset() {
         let a = Set::from([2, 3]);
         let b = Set::from([1, 2, 3, 4]);
-        let intersection: Set<_, 2> = a.intersection(&b).collect();
-        assert_eq!(intersection, [2, 3].iter().collect());
+        let intersection: Set<_, 2> = a.intersection(&b).copied().collect();
+        assert_eq!(intersection, Set::from([2, 3]));
     }
 
     #[test]

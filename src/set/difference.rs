@@ -13,7 +13,7 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     ///
     /// ```
     /// use micromap::Set;
-    /// 
+    ///
     /// let a = Set::from([1, 2, 3]);
     /// let b = Set::from([4, 2, 3, 4]);
     ///
@@ -22,13 +22,13 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     ///     println!("{x}"); // Print 1
     /// }
     ///
-    /// let diff: Set<_, 3> = a.difference(&b).collect();
-    /// assert_eq!(diff, [1].iter().collect());
+    /// let diff: Set<_, 3> = a.difference(&b).copied().collect();
+    /// assert_eq!(diff, Set::from([1]));
     ///
     /// // Note that difference is not symmetric,
     /// // and `b - a` means something else:
-    /// let diff: Set<_, 4> = b.difference(&a).collect();
-    /// assert_eq!(diff, [4].iter().collect());
+    /// let diff: Set<_, 4> = b.difference(&a).copied().collect();
+    /// assert_eq!(diff, Set::from([4]));
     /// ```
     #[inline]
     pub fn difference<'a, const M: usize>(&'a self, other: &'a Set<T, M>) -> Difference<'a, T, M> {
@@ -138,13 +138,13 @@ mod tests {
     //     };
     //
     //     assert_eq!(
-    //         Set::<_>::from_iter(first_only.into_iter().copied()),
-    //         Set::<_>::from_iter(["love", "surf"])
+    //         Set::<_>::from(first_only.into_iter().copied()),
+    //         Set::<_>::from(["love", "surf"])
     //     );
     // }
 
     #[test]
-    fn test_difference() {
+    fn difference_disjoint() {
         let set_a: Set<u32, 5> = Set::from([0, 1, 3, 5, 7]);
         let set_b: Set<u32, 4> = Set::from([2, 4, 6, 8]);
 
@@ -153,51 +153,51 @@ mod tests {
     }
 
     #[test]
-    fn test_difference_with_overlap() {
-        let set_a: Set<u32, 4> = Set::from([1, 3, 5, 7]);
-        let set_b: Set<u32, 5> = Set::from([3, 5, 6, 8, 9]);
+    fn difference_with_overlap() {
+        let set_a = Set::from([1, 3, 5, 7]);
+        let set_b = Set::from([3, 5, 6, 8, 9]);
 
         let set_diff = set_a.difference(&set_b).copied().collect::<Set<u32, 4>>();
-        let expected: Set<u32, 4> = Set::from_iter([1, 7]);
+        let expected = Set::from([1, 7]);
         assert_eq!(expected, set_diff);
     }
 
     #[test]
-    fn test_difference_complete_overlap() {
-        let set_a: Set<u32, 4> = Set::from([1, 3, 5, 7]);
-        let set_b: Set<u32, 4> = Set::from([1, 3, 5, 7]);
+    fn difference_complete_overlap() {
+        let set_a = Set::from([1, 3, 5, 7]);
+        let set_b = Set::from([1, 3, 5, 7]);
 
         let set_diff = set_a.difference(&set_b).copied().collect::<Set<u32, 4>>();
-        let expected: Set<u32, 4> = Set::from_iter([]);
+        let expected = Set::from([]);
         assert_eq!(expected, set_diff);
     }
 
     #[test]
-    fn test_difference_empty_set() {
-        let set_a: Set<u32, 4> = Set::from([1, 3, 5, 7]);
-        let set_b: Set<u32, 4> = Set::from_iter([]);
+    fn difference_empty_set() {
+        let set_a = Set::from([1, 3, 5, 7]);
+        let set_b = Set::from([]);
 
         let set_diff = set_a.difference(&set_b).copied().collect::<Set<u32, 4>>();
         assert_eq!(set_a, set_diff);
     }
 
     #[test]
-    fn test_difference_with_empty_first_set() {
-        let set_a: Set<u32, 4> = Set::from_iter([]);
-        let set_b: Set<u32, 4> = Set::from([2, 4, 6, 8]);
+    fn difference_with_empty_first_set() {
+        let set_a = Set::from([]);
+        let set_b = Set::from([2, 4, 6, 8]);
 
         let set_diff = set_a.difference(&set_b).copied().collect::<Set<u32, 4>>();
-        let expected: Set<u32, 4> = Set::from_iter([]);
+        let expected = Set::from([]);
         assert_eq!(expected, set_diff);
     }
 
     #[test]
-    fn test_difference_partial_overlap() {
+    fn difference_partial_overlap() {
         let set_a = Set::from([1, 2, 3, 4, 5, 6]);
         let set_b = Set::from([4, 5, 6, 7, 8, 9]);
 
         let set_diff = set_a.difference(&set_b).copied().collect::<Set<_, 6>>();
-        let expected = Set::from_iter([1, 2, 3]);
+        let expected = Set::from([1, 2, 3]);
         assert_eq!(expected, set_diff);
     }
 }

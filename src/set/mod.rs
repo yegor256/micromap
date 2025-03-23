@@ -136,8 +136,8 @@ mod tests {
     #[test]
     fn test_set_from() {
         let set_a = Set::from(['a', 'b', 'c', 'd']);
-        let set_b = Set::from_iter(vec!['a', 'a', 'd', 'b', 'a', 'd', 'c', 'd', 'c']);
-        let set_c = Set::from_iter(set_a.clone());
+        let set_b: Set<_, 6> = Set::from_iter(['a', 'a', 'd', 'b', 'a', 'd', 'c', 'd', 'c']);
+        let set_c = set_a.clone();
         assert_eq!(set_a, set_b);
         assert_eq!(set_a, set_c);
     }
