@@ -145,7 +145,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         let mut existing_pair = None;
         loop {
             if i == self.len {
-                core::debug_assert!(target < N, "No more keys available in the map");
+                core::debug_assert!(target < N, "No more key-value slot available in the map");
                 break;
             }
             let p = self.item_ref(i);

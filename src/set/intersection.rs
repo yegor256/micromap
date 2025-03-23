@@ -61,6 +61,7 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
 ///
 /// let mut intersection = a.intersection(&b);
 /// ```
+#[must_use = "this returns the intersection as an iterator, without modifying either input set"]
 pub struct Intersection<'a, T: 'a + PartialEq, const M: usize> {
     // iterator of the first set
     iter: SetIter<'a, T>,
@@ -88,10 +89,7 @@ impl<'a, T: PartialEq, const M: usize> Iterator for Intersection<'a, T, M> {
 
     #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
-        let (_, upper) = self.iter.size_hint();
-        let self_upper = upper.expect("Set's iter has the upper bound");
-        let other_upper = self.other.len();
-        (0, Some(usize::min(self_upper, other_upper)))
+        (0, Some(usize::min(self.iter.len(), self.other.len())))
     }
 
     #[inline]
@@ -110,6 +108,8 @@ impl<'a, T: PartialEq, const M: usize> Iterator for Intersection<'a, T, M> {
         })
     }
 }
+
+impl<T: PartialEq, const M: usize> core::iter::FusedIterator for Intersection<'_, T, M> {}
 
 impl<T: core::fmt::Debug + PartialEq, const M: usize> core::fmt::Debug for Intersection<'_, T, M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -169,15 +169,23 @@ mod tests {
     }
 
     #[test]
-    fn test_intersection_size_hint() {
-        let set_a: Set<u32, 5> = Set::from([0, 1, 3, 5, 7]);
-        let set_b: Set<u32, 4> = Set::from([1, 3, 5, 7]);
+    fn intersection_size_hint() {
+        let set_a = Set::from([1, 1, 2, 3]); // cap is 4, but len() is 3
+        let set_b = Set::from([4, 5, 6, 6, 6, 7, 8, 9]); // cap is 8, but len() is 6
+        let set_c = Set::from([]);
+        let set_d = Set::from([3, 4]);
 
-        let intersection = set_a.intersection(&set_b);
-        let (lower, upper) = intersection.size_hint();
+        assert_eq!(set_a.intersection(&set_b).size_hint(), (0, Some(3)));
+        assert_eq!(set_a.intersection(&set_c).size_hint(), (0, Some(0)));
+        assert_eq!(set_a.intersection(&set_d).size_hint(), (0, Some(2)));
 
-        // Since all elements of set_b are in set_a, the upper bound should be the length of set_b
-        assert_eq!(lower, 0);
-        assert_eq!(upper, Some(set_b.len()));
+        assert_eq!(set_b.intersection(&set_a).size_hint(), (0, Some(3)));
+        assert_eq!(set_b.intersection(&set_d).size_hint(), (0, Some(2)));
+
+        assert_eq!(set_c.intersection(&set_b).size_hint(), (0, Some(0)));
+
+        assert_eq!(set_d.intersection(&set_a).size_hint(), (0, Some(2)));
+        assert_eq!(set_d.intersection(&set_b).size_hint(), (0, Some(2)));
+        assert_eq!(set_d.intersection(&set_c).size_hint(), (0, Some(0)));
     }
 }

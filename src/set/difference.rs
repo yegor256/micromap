@@ -55,6 +55,7 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
 ///
 /// let mut difference = a.difference(&b);
 /// ```
+#[must_use = "this returns the difference as an iterator, without modifying either input set"]
 pub struct Difference<'a, T: 'a + PartialEq, const M: usize> {
     // iterator of the first set
     iter: SetIter<'a, T>,
@@ -82,8 +83,13 @@ impl<'a, T: PartialEq, const M: usize> Iterator for Difference<'a, T, M> {
 
     #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
+        let lower = if self.iter.len() > self.other.len() {
+            self.iter.len() - self.other.len()
+        } else {
+            0
+        };
         let (_, upper) = self.iter.size_hint();
-        (0, upper)
+        (lower, upper)
     }
 
     #[inline]
@@ -102,6 +108,8 @@ impl<'a, T: PartialEq, const M: usize> Iterator for Difference<'a, T, M> {
         })
     }
 }
+
+impl<T: PartialEq, const M: usize> core::iter::FusedIterator for Difference<'_, T, M> {}
 
 impl<T: core::fmt::Debug + PartialEq, const M: usize> core::fmt::Debug for Difference<'_, T, M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -198,5 +206,26 @@ mod tests {
         let set_diff = set_a.difference(&set_b).copied().collect::<Set<_, 6>>();
         let expected = Set::from([1, 2, 3]);
         assert_eq!(expected, set_diff);
+    }
+
+    #[test]
+    fn difference_size_hint() {
+        let set_a = Set::from([1, 1, 2, 3]); // cap is 4, but len() is 3
+        let set_b = Set::from([4, 5, 6, 6, 6, 7, 8, 9]); // cap is 8, but len() is 6
+        let set_c = Set::from([]);
+        let set_d = Set::from([3, 4]);
+
+        assert_eq!(set_a.difference(&set_b).size_hint(), (0, Some(3)));
+        assert_eq!(set_a.difference(&set_c).size_hint(), (3, Some(3)));
+        assert_eq!(set_a.difference(&set_d).size_hint(), (1, Some(3)));
+
+        assert_eq!(set_b.difference(&set_a).size_hint(), (3, Some(6)));
+        assert_eq!(set_b.difference(&set_d).size_hint(), (4, Some(6)));
+
+        assert_eq!(set_c.difference(&set_b).size_hint(), (0, Some(0)));
+
+        assert_eq!(set_d.difference(&set_a).size_hint(), (0, Some(2)));
+        assert_eq!(set_d.difference(&set_b).size_hint(), (0, Some(2)));
+        assert_eq!(set_d.difference(&set_c).size_hint(), (2, Some(2)));
     }
 }

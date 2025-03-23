@@ -43,6 +43,11 @@ impl<'a, K, V> Iterator for Iter<'a, K, V> {
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.iter.size_hint()
     }
+
+    #[inline]
+    fn count(self) -> usize {
+        self.iter.len()
+    }
 }
 
 impl<'a, K, V> Iterator for IterMut<'a, K, V> {
@@ -59,6 +64,11 @@ impl<'a, K, V> Iterator for IterMut<'a, K, V> {
     #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.iter.size_hint()
+    }
+
+    #[inline]
+    fn count(self) -> usize {
+        self.iter.len()
     }
 }
 
@@ -78,6 +88,11 @@ impl<K: PartialEq, V, const N: usize> Iterator for IntoIter<K, V, N> {
     #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
         (self.map.len, Some(self.map.len))
+    }
+
+    #[inline]
+    fn count(self) -> usize {
+        self.map.len()
     }
 }
 
