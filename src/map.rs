@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 use crate::{Drain, Entry, Map, OccupiedEntry, VacantEntry};
-use core::borrow::Borrow;
+use core::{borrow::Borrow, mem::replace};
 
 mod internal {
     use crate::Map;
@@ -128,17 +128,35 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     ///
     /// # Panics
     ///
-    /// It may panic if there are too many pairs in the map already. Pay attention,
-    /// it panics only in the "debug" mode. In the "release" mode, you are going to get
-    /// undefined behavior. This is done for the sake of performance, in order to
-    /// avoid a repetitive check for the boundary condition on every `insert()`.
+    /// It may panic if there are too many pairs in the map already.
+    /// In order to comply with the memory safety of the Rust language itself, it will
+    /// perform bounds checking, whether in `debug` mode or `release` mode.
+    ///
+    /// Because the implementation of this `insert()` mainly uses iterators instead of
+    /// loops, it is not much slower in practice. It is even faster when frequently
+    /// inserting and replacing pairs of existing keys which already in set.
     #[inline]
     pub fn insert(&mut self, k: K, v: V) -> Option<V> {
+        let (_, existing_pair) = self.insert_ii(k, v);
+        existing_pair.map(|(_, v)| v)
+    }
+
+    /// Insert a single pair into the map without bound check in release mode.
+    ///
+    /// # Panics
+    ///
+    /// It may panic if there are too many pairs in the map already. Pay attention,
+    /// it panics only in the `debug` mode. In the `release` mode, you are going to get
+    /// **undefined behavior**. This is done for the sake of performance, in order to
+    /// avoid a repetitive check for the boundary condition on every `insert()`.
+    #[inline]
+    pub fn insert_unchecked(&mut self, k: K, v: V) -> Option<V> {
         let (_, existing_pair) = self.insert_i(k, v);
         existing_pair.map(|(_, v)| v)
     }
 
-    #[inline]
+    /// The core insert logic, which is used for `insert_unchecked()`, as it will
+    /// disable the bound check (`assert!`) in `release` mode.
     pub(crate) fn insert_i(&mut self, k: K, v: V) -> (usize, Option<(K, V)>) {
         let mut target = self.len;
         let mut i = 0;
@@ -162,6 +180,27 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         }
 
         (target, existing_pair)
+    }
+
+    /// The core insert logic, which is used for `insert()`. Its name means
+    /// that it uses iterators(the second `i`) instead of loops to implement the underlying
+    /// insertion logic for `insert_i()`.
+    pub(crate) fn insert_ii(&mut self, k: K, v: V) -> (usize, Option<(K, V)>) {
+        if let Some((i, pair)) = self.pairs[..self.len]
+            .iter_mut()
+            .map(|p| unsafe { p.assume_init_mut() })
+            .enumerate()
+            .find(|(_i, p)| p.0 == k)
+        {
+            (i, Some(replace(pair, (k, v))))
+        } else {
+            let i = self.len;
+            // just for panic msg in debug mode, not the main bound check
+            core::debug_assert!(i < N, "No more key-value slot available in the map");
+            self.pairs[i].write((k, v)); // main bound check here but it's ok (not hotspot)
+            self.len += 1;
+            (i, None)
+        }
     }
 
     /// Get a reference to a single value.
