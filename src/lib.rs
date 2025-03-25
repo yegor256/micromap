@@ -27,7 +27,7 @@
 //! to a panic.
 
 #![cfg_attr(all(not(feature = "std"), not(doc), not(test)), no_std)]
-#![doc(html_root_url = "https://docs.rs/micromap/0.0.0")]
+#![doc(html_root_url = "https://docs.rs/micromap/0.0.16")]
 #![deny(warnings)]
 #![warn(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
 #![allow(clippy::multiple_inherent_impl)]
