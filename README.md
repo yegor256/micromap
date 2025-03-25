@@ -6,6 +6,7 @@
 [![Hits-of-Code](https://hitsofcode.com/github/yegor256/micromap)](https://hitsofcode.com/view/github/yegor256/micromap)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/yegor256/micromap/blob/master/LICENSE.txt)
 [![docs.rs](https://img.shields.io/docsrs/micromap)](https://docs.rs/micromap/latest/micromap/)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fyegor256%2Fmicromap.svg?type=shield&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fyegor256%2Fmicromap?ref=badge_shield&issueType=license)
 
 A much faster alternative of
 [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html),
@@ -32,7 +33,7 @@ First, add this to `Cargo.toml`:
 
 ```toml
 [dependencies]
-micromap = "0.0.15"
+micromap = "0.0.16"
 ```
 
 Then, use it like a standard hash map... well, almost:
@@ -69,23 +70,23 @@ while the numbers below 1.0 demonstrate performance loss.
 <!-- benchmark -->
 | | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
 | --- | --: | --: | --: | --: | --: | --: | --: |
-| `flurry::HashMap` | 303.27 | 91.93 | 44.16 | 17.50 | 9.58 | 4.73 | 2.72 |
-| `hashbrown::HashMap` | 21.42 | 11.14 | 6.95 | 2.37 | 1.31 | 0.67 | 0.29 |
-| `heapless::LinearMap` | 1.09 | 1.45 | 1.26 | 0.89 | 0.82 | 0.96 | 1.16 |
-| `indexmap::IndexMap` | 13.31 | 12.11 | 7.74 | 3.16 | 1.76 | 0.88 | 0.48 |
-| `linear_map::LinearMap` | 1.65 | 1.55 | 1.31 | 0.68 | 0.83 | 0.84 | 0.93 |
-| `linked_hash_map::LinkedHashMap` | 26.31 | 21.00 | 12.69 | 5.17 | 2.73 | 1.38 | 0.80 |
-| `litemap::LiteMap` | 1.65 | 2.54 | 6.13 | 2.93 | 1.84 | 0.88 | 0.60 |
+| `flurry::HashMap` | 319.10 | 83.73 | 45.24 | 16.82 | 9.52 | 4.80 | 2.68 |
+| `hashbrown::HashMap` | 20.84 | 11.75 | 6.99 | 2.51 | 1.16 | 0.65 | 0.31 |
+| `heapless::LinearMap` | 1.09 | 1.46 | 1.25 | 0.82 | 0.82 | 0.97 | 1.13 |
+| `indexmap::IndexMap` | 13.28 | 12.24 | 7.70 | 3.02 | 1.68 | 0.90 | 0.48 |
+| `linear_map::LinearMap` | 1.66 | 1.58 | 1.08 | 0.66 | 0.80 | 0.85 | 0.89 |
+| `linked_hash_map::LinkedHashMap` | 27.24 | 21.74 | 12.40 | 4.97 | 2.72 | 1.40 | 0.78 |
+| `litemap::LiteMap` | 1.65 | 2.69 | 6.27 | 2.71 | 1.74 | 0.89 | 0.58 |
 | `micromap::Map` 👍 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 | 1.00 |
-| `nohash_hasher::BuildNoHashHasher` | 20.81 | 11.47 | 7.76 | 2.41 | 1.19 | 0.59 | 0.36 |
-| `rustc_hash::FxHashMap` | 20.82 | 11.34 | 7.08 | 2.24 | 1.04 | 0.57 | 0.32 |
-| `std::collections::BTreeMap` | 19.80 | 9.26 | 5.48 | 3.12 | 1.89 | 1.02 | 0.73 |
-| `std::collections::HashMap` | 20.92 | 14.48 | 8.85 | 3.62 | 1.99 | 0.98 | 0.57 |
-| `tinymap::array_map::ArrayMap` | 1.92 | 4.26 | 5.17 | 3.40 | 3.81 | 4.34 | 4.65 |
+| `nohash_hasher::BuildNoHashHasher` | 20.78 | 11.83 | 7.39 | 2.35 | 1.23 | 0.60 | 0.35 |
+| `rustc_hash::FxHashMap` | 20.82 | 11.96 | 7.08 | 2.21 | 1.05 | 0.58 | 0.31 |
+| `std::collections::BTreeMap` | 19.83 | 10.02 | 5.48 | 3.05 | 1.86 | 1.05 | 0.71 |
+| `std::collections::HashMap` | 20.88 | 14.49 | 8.75 | 3.58 | 1.96 | 1.00 | 0.56 |
+| `tinymap::array_map::ArrayMap` | 1.75 | 4.33 | 5.17 | 3.24 | 3.76 | 4.28 | 4.52 |
 
-The experiment [was performed][action] on 22-03-2025.
+The experiment [was performed][action] on 25-03-2025.
 There were 1000000 repetition cycles.
-The entire benchmark took 254s.
+The entire benchmark took 250s.
 Uname: 'Linux'.
 
 <!-- benchmark -->
