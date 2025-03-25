@@ -83,7 +83,7 @@ impl<K: PartialEq, V, const N: usize> Iterator for IntoIter<K, V, N> {
     fn next(&mut self) -> Option<Self::Item> {
         if self.map.len > 0 {
             self.map.len -= 1;
-            Some(self.map.item_read(self.map.len))
+            Some(unsafe { self.map.item_read(self.map.len) })
         } else {
             None
         }

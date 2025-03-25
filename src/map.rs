@@ -10,37 +10,37 @@ mod internal {
     impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         /// Internal function to get access via reference to the element in the internal array.
         #[inline]
-        pub(crate) const fn item_ref(&self, i: usize) -> &(K, V) {
-            unsafe { self.pairs[i].assume_init_ref() }
+        pub(crate) unsafe fn item_ref(&self, i: usize) -> &(K, V) {
+            self.pairs.get_unchecked(i).assume_init_ref()
         }
 
         /// Internal function to get mutable access via reference to the element in the internal array.
         #[inline]
-        pub(crate) fn item_mut(&mut self, i: usize) -> &mut V {
-            &mut unsafe { self.pairs[i].assume_init_mut() }.1
+        pub(crate) unsafe fn item_mut(&mut self, i: usize) -> &mut V {
+            &mut self.pairs.get_unchecked_mut(i).assume_init_mut().1
         }
 
         /// Internal function to get access to the element in the internal array.
         #[inline]
-        pub(crate) fn item_read(&mut self, i: usize) -> (K, V) {
-            unsafe { self.pairs[i].assume_init_read() }
+        pub(crate) unsafe fn item_read(&mut self, i: usize) -> (K, V) {
+            self.pairs.get_unchecked(i).assume_init_read()
         }
 
         /// Internal function to get access to the element in the internal array.
         #[inline]
-        pub(crate) fn item_drop(&mut self, i: usize) {
-            unsafe { self.pairs[i].assume_init_drop() };
+        pub(crate) unsafe fn item_drop(&mut self, i: usize) {
+            self.pairs.get_unchecked_mut(i).assume_init_drop();
         }
 
         /// Internal function to get access to the element in the internal array.
         #[inline]
-        pub(crate) fn item_write(&mut self, i: usize, val: (K, V)) {
-            self.pairs[i].write(val);
+        pub(crate) unsafe fn item_write(&mut self, i: usize, val: (K, V)) {
+            self.pairs.get_unchecked_mut(i).write(val);
         }
 
         /// Remove an index (by swapping the last one here and reducing the length)
         #[inline]
-        pub(crate) fn remove_index_drop(&mut self, i: usize) {
+        pub(crate) unsafe fn remove_index_drop(&mut self, i: usize) {
             self.item_drop(i);
 
             self.len -= 1;
@@ -52,7 +52,7 @@ mod internal {
 
         /// Remove an index (by swapping the last one here and reducing the length)
         #[inline]
-        pub(crate) fn remove_index_read(&mut self, i: usize) -> (K, V) {
+        pub(crate) unsafe fn remove_index_read(&mut self, i: usize) -> (K, V) {
             let result = self.item_read(i);
 
             self.len -= 1;
@@ -116,9 +116,9 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         K: Borrow<Q>,
     {
         for i in 0..self.len {
-            let p = self.item_ref(i);
+            let p = unsafe { self.item_ref(i) };
             if p.0.borrow() == k {
-                return Some(self.remove_index_read(i).1);
+                return Some(unsafe { self.remove_index_read(i).1 });
             }
         }
         None
@@ -149,14 +149,20 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// it panics only in the `debug` mode. In the `release` mode, you are going to get
     /// **undefined behavior**. This is done for the sake of performance, in order to
     /// avoid a repetitive check for the boundary condition on every `insert()`.
+    ///
+    /// # Safety
+    ///
+    /// Calling this method to add a new key-value pair when the [`Map`] is already
+    /// full is undefined behavior instead of panic. So you need to make sure that
+    /// the map is not full before calling.
     #[inline]
-    pub fn insert_unchecked(&mut self, k: K, v: V) -> Option<V> {
+    pub unsafe fn insert_unchecked(&mut self, k: K, v: V) -> Option<V> {
         let (_, existing_pair) = self.insert_i(k, v);
         existing_pair.map(|(_, v)| v)
     }
 
     /// The core insert logic, which is used for `insert_unchecked()`, as it will
-    /// disable the bound check (`assert!`) in `release` mode.
+    /// disable the bound check (`debug_assert!`) in `release` mode.
     pub(crate) fn insert_i(&mut self, k: K, v: V) -> (usize, Option<(K, V)>) {
         let mut target = self.len;
         let mut i = 0;
@@ -166,15 +172,15 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
                 core::debug_assert!(target < N, "No more key-value slot available in the map");
                 break;
             }
-            let p = self.item_ref(i);
+            let p = unsafe { self.item_ref(i) };
             if p.0 == k {
                 target = i;
-                existing_pair = Some(self.item_read(i));
+                existing_pair = Some(unsafe { self.item_read(i) });
                 break;
             }
             i += 1;
         }
-        self.item_write(target, (k, v));
+        unsafe { self.item_write(target, (k, v)) };
         if target == self.len {
             self.len += 1;
         }
@@ -211,7 +217,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         K: Borrow<Q>,
     {
         for i in 0..self.len {
-            let p = self.item_ref(i);
+            let p = unsafe { self.item_ref(i) };
             if p.0.borrow() == k {
                 return Some(&p.1);
             }
@@ -231,9 +237,9 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         K: Borrow<Q>,
     {
         for i in 0..self.len {
-            let p = self.item_ref(i);
+            let p = unsafe { self.item_ref(i) };
             if p.0.borrow() == k {
-                return Some(self.item_mut(i));
+                return Some(unsafe { self.item_mut(i) });
             }
         }
         None
@@ -243,7 +249,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     #[inline]
     pub fn clear(&mut self) {
         for i in 0..self.len {
-            self.item_drop(i);
+            unsafe { self.item_drop(i) };
         }
         self.len = 0;
     }
@@ -253,12 +259,12 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     pub fn retain<F: Fn(&K, &V) -> bool>(&mut self, f: F) {
         let mut i = 0;
         while i < self.len {
-            let p = self.item_ref(i);
+            let p = unsafe { self.item_ref(i) };
             if f(&p.0, &p.1) {
                 // do not remove -> next index
                 i += 1;
             } else {
-                self.remove_index_drop(i);
+                unsafe { self.remove_index_drop(i) };
                 // recheck the same index
             }
         }
@@ -271,7 +277,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         K: Borrow<Q>,
     {
         for i in 0..self.len {
-            let p = self.item_ref(i);
+            let p = unsafe { self.item_ref(i) };
             if p.0.borrow() == k {
                 return Some((&p.0, &p.1));
             }
@@ -287,9 +293,9 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         K: Borrow<Q>,
     {
         for i in 0..self.len {
-            let p = self.item_ref(i);
+            let p = unsafe { self.item_ref(i) };
             if p.0.borrow() == k {
-                return Some(self.remove_index_read(i));
+                return Some(unsafe { self.remove_index_read(i) });
             }
         }
         None
@@ -297,7 +303,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
 
     pub fn entry(&mut self, k: K) -> Entry<'_, K, V, N> {
         for i in 0..self.len {
-            let p = self.item_ref(i);
+            let p = unsafe { self.item_ref(i) };
             if p.0 == k {
                 return Entry::Occupied(OccupiedEntry {
                     index: i,
