@@ -209,7 +209,6 @@ mod tests {
 
     // NOTE: This is a BUG in the standard library function.
     #[test]
-    #[ignore]
     fn difference_lifetime() {
         // use std::collections::hash_set::HashSet as Set;
 

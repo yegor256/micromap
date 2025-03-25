@@ -14,7 +14,7 @@ impl<T: PartialEq + Serialize, const N: usize> Serialize for Set<T, N> {
         S: Serializer,
     {
         let mut seq = serializer.serialize_seq(Some(self.len()))?;
-        for k in self.iter() {
+        for k in self {
             seq.serialize_element(k)?;
         }
         seq.end()
@@ -55,22 +55,30 @@ impl<'de, T: PartialEq + Deserialize<'de>, const N: usize> Deserialize<'de> for 
 mod tests {
 
     use crate::Set;
-    use bincode::{deserialize, serialize};
+    use bincode::serde::{decode_from_slice, encode_into_slice};
 
     #[test]
     fn serialize_and_deserialize() {
+        let config = bincode::config::legacy();
         let mut before: Set<u8, 8> = Set::new();
         before.insert(1);
-        let bytes: Vec<u8> = serialize(&before).unwrap();
-        let after: Set<u8, 8> = deserialize(&bytes).unwrap();
+        let mut bytes: [u8; 1024] = [0; 1024];
+        let len = encode_into_slice(&before, &mut bytes, config).unwrap();
+        let bytes = &bytes[..len];
+        let (after, read_len): (Set<u8, 8>, usize) = decode_from_slice(&bytes, config).unwrap();
         assert_eq!(1, after.into_iter().next().unwrap());
+        assert_eq!(bytes.len(), read_len);
     }
 
     #[test]
     fn empty_set_serde() {
+        let config = bincode::config::legacy();
         let before: Set<u8, 8> = Set::new();
-        let bytes: Vec<u8> = serialize(&before).unwrap();
-        let after: Set<u8, 8> = deserialize(&bytes).unwrap();
+        let mut bytes: [u8; 1024] = [0; 1024];
+        let len = encode_into_slice(&before, &mut bytes, config).unwrap();
+        let bytes = &bytes[..len];
+        let (after, read_len): (Set<u8, 8>, usize) = decode_from_slice(&bytes, config).unwrap();
         assert!(after.is_empty());
+        assert_eq!(bytes.len(), read_len);
     }
 }
