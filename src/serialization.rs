@@ -28,7 +28,7 @@ impl<'de, K: PartialEq + Deserialize<'de>, V: Deserialize<'de>, const N: usize> 
 {
     type Value = Map<K, V, N>;
 
-    fn expecting(&self, formatter: &mut Formatter) -> core::fmt::Result {
+    fn expecting(&self, formatter: &mut Formatter<'_>) -> core::fmt::Result {
         formatter.write_str("a Map")
     }
 

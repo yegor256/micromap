@@ -56,7 +56,7 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
 /// let mut difference = a.difference(&b);
 /// ```
 #[must_use = "this returns the difference as an iterator, without modifying either input set"]
-pub struct Difference<'a, T: 'a + PartialEq, const M: usize> {
+pub struct Difference<'a, T: PartialEq, const M: usize> {
     // iterator of the first set
     iter: SetIter<'a, T>,
     // the second set
@@ -78,7 +78,7 @@ impl<'a, T: PartialEq, const M: usize> Iterator for Difference<'a, T, M> {
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        self.iter.by_ref().find(|&item| !self.other.contains(item))
+        self.iter.find(|&item| !self.other.contains(item))
     }
 
     #[inline]
@@ -117,38 +117,123 @@ impl<T: core::fmt::Debug + PartialEq, const M: usize> core::fmt::Debug for Diffe
     }
 }
 
+mod difference_ref {
+    use super::{Set, SetIter};
+
+    impl<'a, T: PartialEq + ?Sized, const N: usize> Set<&'a T, N> {
+        #[inline]
+        pub fn difference_ref<'b, 'set1, 'set2, const M: usize>(
+            &'set1 self,
+            other: &'set2 Set<&'b T, M>,
+        ) -> DifferenceRef<'a, 'b, 'set2, T, M>
+        where
+            'set1: 'a,
+            'set2: 'b,
+        {
+            DifferenceRef {
+                iter: self.iter(),
+                other,
+            }
+        }
+    }
+
+    #[must_use = "this returns the difference as an iterator, without modifying either input set"]
+    pub struct DifferenceRef<'a, 'b, 'set, T: PartialEq + ?Sized, const M: usize> {
+        // iterator of the first set
+        iter: SetIter<'a, &'a T>,
+        // the second set
+        other: &'set Set<&'b T, M>,
+    }
+
+    impl<T: PartialEq, const M: usize> Clone for DifferenceRef<'_, '_, '_, T, M> {
+        #[inline]
+        fn clone(&self) -> Self {
+            DifferenceRef {
+                iter: self.iter.clone(),
+                ..*self
+            }
+        }
+    }
+
+    impl<'a, T: PartialEq + ?Sized, const M: usize> Iterator for DifferenceRef<'a, '_, '_, T, M> {
+        type Item = &'a T;
+
+        #[inline]
+        fn next(&mut self) -> Option<Self::Item> {
+            self.iter.find(|&item| !self.other.contains(item)).copied()
+        }
+
+        #[inline]
+        fn size_hint(&self) -> (usize, Option<usize>) {
+            let lower = if self.iter.len() > self.other.len() {
+                self.iter.len() - self.other.len()
+            } else {
+                0
+            };
+            let (_, upper) = self.iter.size_hint();
+            (lower, upper)
+        }
+
+        #[inline]
+        fn fold<B, F>(self, init: B, mut f: F) -> B
+        where
+            Self: Sized,
+            F: FnMut(B, Self::Item) -> B,
+        {
+            // Maybe using iterator is better than the default Iterator::fold() which uses while loop.
+            self.iter.fold(init, |acc, elt| {
+                if self.other.contains(elt) {
+                    acc
+                } else {
+                    f(acc, elt)
+                }
+            })
+        }
+    }
+
+    impl<T: PartialEq, const M: usize> core::iter::FusedIterator for DifferenceRef<'_, '_, '_, T, M> {}
+
+    impl<T: core::fmt::Debug + PartialEq, const M: usize> core::fmt::Debug
+        for DifferenceRef<'_, '_, '_, T, M>
+    {
+        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+            f.debug_list().entries(self.clone()).finish()
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
 
     use crate::Set;
 
     // NOTE: This is a BUG in the standard library function.
-    // #[test]
-    // #[ignore]
-    // fn difference_lifetime() {
-    //     use std::collections::hash_set::HashSet as Set;
-    //
-    //     let sentence_1 = String::from("I love the surf and the sand.");
-    //     let sentence_1_words: Set<&str> = sentence_1.split(" ").collect();
-    //
-    //     let first_only = {
-    //         let sentence_2 = String::from("I hate the hate and the sand.");
-    //         let sentence_2_words: Set<&str> = sentence_2.split(" ").collect();
-    //         let first_only: Vec<_> = sentence_1_words.difference(&sentence_2_words).collect();
-    //         let second_only: Vec<_> = sentence_2_words.difference(&sentence_1_words).collect();
-    //
-    //         println!("First  Sentence: {}", sentence_1);
-    //         println!("Second Sentence: {}", sentence_2);
-    //         println!("{:?}", first_only);
-    //         println!("{:?}", second_only);
-    //         first_only
-    //     };
-    //
-    //     assert_eq!(
-    //         Set::<_>::from(first_only.into_iter().copied()),
-    //         Set::<_>::from(["love", "surf"])
-    //     );
-    // }
+    #[test]
+    #[ignore]
+    fn difference_lifetime() {
+        // use std::collections::hash_set::HashSet as Set;
+
+        let sentence_1 = String::from("I love the surf and the sand.");
+        let sentence_1_words: Set<&str, 10> = sentence_1.split(" ").collect();
+
+        let first_only = {
+            let sentence_2 = String::from("I hate the hate and the sand.");
+            let sentence_2_words: Set<&str, 10> = sentence_2.split(" ").collect();
+            let first_only: Vec<_> = sentence_1_words.difference_ref(&sentence_2_words).collect();
+            let second_only: Vec<_> = sentence_2_words.difference_ref(&sentence_1_words).collect();
+
+            println!("First  Sentence: {}", sentence_1);
+            println!("Second Sentence: {}", sentence_2);
+            println!("{:?}", first_only);
+            println!("{:?}", second_only);
+            first_only
+        };
+
+        assert_eq!(
+            Set::<_, 10>::from_iter(first_only.iter().copied()),
+            Set::<_, 2>::from(["love", "surf"])
+        );
+    }
 
     #[test]
     fn difference_disjoint() {

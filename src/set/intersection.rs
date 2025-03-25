@@ -62,7 +62,7 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
 /// let mut intersection = a.intersection(&b);
 /// ```
 #[must_use = "this returns the intersection as an iterator, without modifying either input set"]
-pub struct Intersection<'a, T: 'a + PartialEq, const M: usize> {
+pub struct Intersection<'a, T: PartialEq, const M: usize> {
     // iterator of the first set
     iter: SetIter<'a, T>,
     // the second set

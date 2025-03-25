@@ -53,7 +53,7 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
 /// let mut sym_diff = a.symmetric_difference(&b);
 /// ```
 #[must_use = "this returns the difference as an iterator, without modifying either input set"]
-pub struct SymmetricDifference<'a, T: 'a + PartialEq, const N: usize, const M: usize> {
+pub struct SymmetricDifference<'a, T: PartialEq, const N: usize, const M: usize> {
     iter: core::iter::Chain<Difference<'a, T, M>, Difference<'a, T, N>>,
 }
 
