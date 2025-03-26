@@ -21,11 +21,9 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     #[must_use]
     #[allow(clippy::uninit_assumed_init)]
     pub const fn new() -> Self {
-        unsafe {
-            Self {
-                len: 0,
-                pairs: MaybeUninit::<[MaybeUninit<(K, V)>; N]>::uninit().assume_init(),
-            }
+        Self {
+            len: 0,
+            pairs: [const { MaybeUninit::uninit() }; N],
         }
     }
 }
@@ -33,7 +31,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
 impl<K: PartialEq, V, const N: usize> Drop for Map<K, V, N> {
     fn drop(&mut self) {
         for i in 0..self.len {
-            self.item_drop(i);
+            unsafe { self.item_drop(i) };
         }
     }
 }

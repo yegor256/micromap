@@ -26,7 +26,7 @@ struct Vi<T, const N: usize>(PhantomData<T>);
 impl<'de, T: PartialEq + Deserialize<'de>, const N: usize> Visitor<'de> for Vi<T, N> {
     type Value = Set<T, N>;
 
-    fn expecting(&self, formatter: &mut Formatter) -> core::fmt::Result {
+    fn expecting(&self, formatter: &mut Formatter<'_>) -> core::fmt::Result {
         formatter.write_str("a Set")
     }
 

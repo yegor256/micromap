@@ -8,7 +8,7 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     /// Make an iterator over all pairs.
     #[inline]
     #[must_use]
-    pub fn iter(&self) -> SetIter<T> {
+    pub fn iter(&self) -> SetIter<'_, T> {
         SetIter {
             iter: self.map.keys(),
         }

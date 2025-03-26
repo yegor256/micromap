@@ -63,26 +63,26 @@ impl<'a, K: PartialEq, V: Default, const N: usize> Entry<'a, K, V, N> {
 impl<'a, K: PartialEq, V, const N: usize> OccupiedEntry<'a, K, V, N> {
     #[must_use]
     pub fn key(&self) -> &K {
-        &self.table.item_ref(self.index).0
+        unsafe { &self.table.item_ref(self.index).0 }
     }
 
     #[must_use]
     pub fn remove_entry(self) -> (K, V) {
-        self.table.remove_index_read(self.index)
+        unsafe { self.table.remove_index_read(self.index) }
     }
 
     #[must_use]
     pub fn get(&self) -> &V {
-        &self.table.item_ref(self.index).1
+        unsafe { &self.table.item_ref(self.index).1 }
     }
 
     pub fn get_mut(&mut self) -> &mut V {
-        self.table.item_mut(self.index)
+        unsafe { self.table.item_mut(self.index) }
     }
 
     #[must_use]
     pub fn into_mut(self) -> &'a mut V {
-        self.table.item_mut(self.index)
+        unsafe { self.table.item_mut(self.index) }
     }
 
     pub fn insert(&mut self, value: V) -> V {
@@ -91,7 +91,7 @@ impl<'a, K: PartialEq, V, const N: usize> OccupiedEntry<'a, K, V, N> {
 
     #[must_use]
     pub fn remove(self) -> V {
-        self.table.remove_index_read(self.index).1
+        unsafe { self.table.remove_index_read(self.index).1 }
     }
 }
 
@@ -106,7 +106,7 @@ impl<'a, K: PartialEq, V, const N: usize> VacantEntry<'a, K, V, N> {
 
     pub fn insert(self, value: V) -> &'a mut V {
         let (index, _) = self.table.insert_i(self.key, value);
-        self.table.item_mut(index)
+        unsafe { self.table.item_mut(index) }
     }
 }
 

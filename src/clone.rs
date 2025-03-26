@@ -7,7 +7,7 @@ impl<K: Clone + PartialEq, V: Clone, const N: usize> Clone for Map<K, V, N> {
     fn clone(&self) -> Self {
         let mut m: Self = Self::new();
         for i in 0..self.len {
-            m.item_write(i, self.item_ref(i).clone());
+            unsafe { m.item_write(i, self.item_ref(i).clone()) };
         }
         m.len = self.len;
         m

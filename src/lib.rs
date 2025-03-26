@@ -30,6 +30,7 @@
 #![doc(html_root_url = "https://docs.rs/micromap/0.0.0")]
 #![deny(warnings)]
 #![warn(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
+#![warn(rust_2018_idioms)]
 #![allow(clippy::multiple_inherent_impl)]
 #![allow(clippy::multiple_crate_versions)]
 
@@ -138,7 +139,7 @@ pub struct IntoKeys<K: PartialEq, V, const N: usize> {
 /// This `enum` is constructed from the [`entry`] method on [`Map`].
 ///
 /// [`entry`]: Map::entry
-pub enum Entry<'a, K: 'a + PartialEq, V: 'a, const N: usize> {
+pub enum Entry<'a, K: PartialEq, V, const N: usize> {
     /// An occupied entry.
     Occupied(OccupiedEntry<'a, K, V, N>),
 
@@ -148,14 +149,14 @@ pub enum Entry<'a, K: 'a + PartialEq, V: 'a, const N: usize> {
 
 /// A view into an occupied entry in a `Map`.
 /// It is part of the [`Entry`] enum.
-pub struct OccupiedEntry<'a, K: 'a + PartialEq, V: 'a, const N: usize> {
+pub struct OccupiedEntry<'a, K: PartialEq, V, const N: usize> {
     index: usize,
     table: &'a mut Map<K, V, N>,
 }
 
 /// A view into a vacant entry in a `Map`.
 /// It is part of the [`Entry`] enum.
-pub struct VacantEntry<'a, K: 'a + PartialEq, V: 'a, const N: usize> {
+pub struct VacantEntry<'a, K: PartialEq, V, const N: usize> {
     key: K,
     table: &'a mut Map<K, V, N>,
 }
@@ -164,6 +165,6 @@ pub struct VacantEntry<'a, K: 'a + PartialEq, V: 'a, const N: usize> {
 ///
 /// This struct is created by the drain method on `Map`. See its documentation for more.
 #[deny(clippy::needless_lifetimes)]
-pub struct Drain<'a, K: 'a, V: 'a> {
+pub struct Drain<'a, K, V> {
     iter: core::slice::IterMut<'a, MaybeUninit<(K, V)>>,
 }

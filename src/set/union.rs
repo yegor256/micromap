@@ -51,7 +51,7 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
 /// let mut union = a.union(&b);
 /// ```
 #[must_use = "this returns the union as an iterator, without modifying either input set"]
-pub struct Union<'a, T: 'a + PartialEq, const M: usize> {
+pub struct Union<'a, T: PartialEq, const M: usize> {
     iter: core::iter::Chain<SetIter<'a, T>, Difference<'a, T, M>>,
 }
 
