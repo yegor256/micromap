@@ -69,7 +69,6 @@ mod tests {
         let mut bytes: [u8; 1024] = [0; 1024];
         let len = encode_into_slice(&before, &mut bytes, config).unwrap();
         let bytes = &bytes[..len];
-        println!("bytes: {:?}", bytes);
         let (after, read_len): (Map<u8, u8, 8>, usize) = decode_from_slice(&bytes, config).unwrap();
         assert_eq!(42, after.into_iter().next().unwrap().1);
         assert_eq!(bytes.len(), read_len);
