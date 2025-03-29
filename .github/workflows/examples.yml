@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
+# SPDX-FileCopyrightText: Copyright (c) 2025 owtotwo
+# SPDX-License-Identifier: MIT
+---
+# yamllint disable rule:line-length
+name: examples
+'on':
+  push:
+  pull_request:
+jobs:
+  run-examples:
+    timeout-minutes: 15
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - id: list-examples
+        # For now we only identify single .rs file examples, and will not consider the examples
+        # listed in cargo.toml or complex examples in the form of Cargo workspace folders.
+        run: |
+          {
+            echo "examples<<EOF"
+            find examples -name '*.rs' -print0 | xargs -0 -I {} basename {} .rs
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+      - run: |
+          echo "${{ env.examples }}" | while IFS= read -r example; do
+            cargo run --example "$example"
+          done
