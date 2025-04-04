@@ -141,6 +141,21 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         existing_pair.map(|(_, v)| v)
     }
 
+    /// Attempt to insert a pair into the map. (no panic)
+    ///
+    /// - If the key existed, we update the pair, return `Some(old_value)`
+    /// - If the key does not exist and the map has empty slot, we insert into that slot
+    ///   and return `Some(None)`.
+    /// - If the key does not exist and the map is full already, return `None`.
+    #[inline]
+    pub fn checked_insert(&mut self, k: K, v: V) -> Option<Option<V>> {
+        if self.len < N {
+            Some(self.insert_ii(k, v).1.map(|(_, v)| v))
+        } else {
+            self.insert_ii_for_full(k, v).map(|(_, (_, v))| Some(v))
+        }
+    }
+
     /// Insert a single pair into the map without bound check in release mode.
     ///
     /// # Panics
@@ -206,6 +221,22 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
             self.pairs[i].write((k, v)); // main bound check here but it's ok (not hotspot)
             self.len += 1;
             (i, None)
+        }
+    }
+
+    /// When the map is full, we need to check the key-value pair if existed already or not.
+    /// If no place to insert the new key-value pair, we return `None`.
+    pub(crate) fn insert_ii_for_full(&mut self, k: K, v: V) -> Option<(usize, (K, V))> {
+        if let Some((i, pair)) = self.pairs[..self.len]
+            .iter_mut()
+            .map(|p| unsafe { p.assume_init_mut() })
+            .enumerate()
+            .find(|(_, p)| p.0 == k)
+        {
+            let existing_pair = replace(pair, (k, v));
+            Some((i, existing_pair))
+        } else {
+            None
         }
     }
 
@@ -548,5 +579,58 @@ mod tests {
         assert_eq!(m.insert(2, 3), Some(2));
         assert_eq!(1, m.len());
         assert_eq!(3, m[&2]);
+    }
+
+    #[test]
+    fn checked_insert_updates_existing_key() {
+        let mut m: Map<String, i32, 10> = Map::new();
+        assert_eq!(m.checked_insert("key".to_string(), 42), Some(None));
+        assert_eq!(m.checked_insert("key".to_string(), 100), Some(Some(42)));
+        assert_eq!(m.get("key"), Some(&100));
+    }
+
+    #[test]
+    fn checked_insert_inserts_new_key_when_space_available() {
+        let mut m: Map<String, i32, 2> = Map::new();
+        assert_eq!(m.checked_insert("key1".to_string(), 42), Some(None));
+        assert_eq!(m.checked_insert("key2".to_string(), 100), Some(None));
+        assert_eq!(m.get("key1"), Some(&42));
+        assert_eq!(m.get("key2"), Some(&100));
+    }
+
+    #[test]
+    fn checked_insert_fails_when_map_is_full() {
+        let mut m: Map<String, i32, 1> = Map::new();
+        assert_eq!(m.checked_insert("key1".to_string(), 42), Some(None));
+        assert_eq!(m.checked_insert("key2".to_string(), 100), None);
+        assert_eq!(m.get("key1"), Some(&42));
+        assert_eq!(m.get("key2"), None);
+        assert_eq!(m.checked_insert("key1".to_string(), 43), Some(Some(42)));
+        assert_eq!(m.get("key1"), Some(&43));
+    }
+
+    #[test]
+    fn checked_insert_handles_empty_map() {
+        let mut m: Map<String, i32, 0> = Map::new();
+        assert_eq!(m.checked_insert("key".to_string(), 42), None);
+        assert!(m.is_empty());
+    }
+
+    #[test]
+    fn checked_insert_replaces_value_for_existing_key() {
+        let mut m: Map<i32, i32, 3> = Map::new();
+        assert_eq!(m.checked_insert(1, 10), Some(None));
+        assert_eq!(m.checked_insert(1, 20), Some(Some(10)));
+        assert_eq!(m.get(&1), Some(&20));
+    }
+
+    #[test]
+    fn checked_insert_does_not_affect_other_keys() {
+        let mut m: Map<i32, i32, 3> = Map::new();
+        assert_eq!(m.checked_insert(1, 10), Some(None));
+        assert_eq!(m.checked_insert(2, 20), Some(None));
+        assert_eq!(m.checked_insert(1, 30), Some(Some(10)));
+        assert_eq!(m.get(&1), Some(&30));
+        assert_eq!(m.get(&2), Some(&20));
     }
 }

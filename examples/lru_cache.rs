@@ -128,7 +128,8 @@ mod map_in_lru {
     }
 
     impl<K: PartialEq, V, const N: usize> WithCapacity for MicroMap<K, V, N> {
-        fn with_capacity(_capacity: usize) -> Self {
+        fn with_capacity(capacity: usize) -> Self {
+            assert_eq!(capacity, N);
             MicroMap::<K, V, N>::new()
         }
     }
