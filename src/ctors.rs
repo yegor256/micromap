@@ -4,7 +4,7 @@
 use crate::Map;
 use core::mem::MaybeUninit;
 
-impl<K: PartialEq, V, const N: usize> Default for Map<K, V, N> {
+impl<K, V, const N: usize> Default for Map<K, V, N> {
     /// Make a default empty [`Map`].
     #[inline]
     fn default() -> Self {
@@ -12,7 +12,7 @@ impl<K: PartialEq, V, const N: usize> Default for Map<K, V, N> {
     }
 }
 
-impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
+impl<K, V, const N: usize> Map<K, V, N> {
     /// Make it.
     ///
     /// The size of the map is defined by the generic argument. For example,
@@ -28,7 +28,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     }
 }
 
-impl<K: PartialEq, V, const N: usize> Drop for Map<K, V, N> {
+impl<K, V, const N: usize> Drop for Map<K, V, N> {
     fn drop(&mut self) {
         for i in 0..self.len {
             unsafe { self.item_drop(i) };

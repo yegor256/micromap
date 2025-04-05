@@ -8,7 +8,7 @@ use serde::de::{MapAccess, Visitor};
 use serde::ser::SerializeMap;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-impl<K: PartialEq + Serialize, V: Serialize, const N: usize> Serialize for Map<K, V, N> {
+impl<K: Serialize, V: Serialize, const N: usize> Serialize for Map<K, V, N> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,

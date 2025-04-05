@@ -4,7 +4,7 @@
 use crate::Set;
 use core::fmt::{self, Display, Formatter, Write};
 
-impl<T: PartialEq + Display, const N: usize> Display for Set<T, N> {
+impl<T: Display, const N: usize> Display for Set<T, N> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let mut first = true;
         f.write_char('{')?;

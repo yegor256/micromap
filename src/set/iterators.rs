@@ -4,7 +4,7 @@
 use crate::set::{Set, SetIntoIter, SetIter};
 use core::iter::FusedIterator;
 
-impl<T: PartialEq, const N: usize> Set<T, N> {
+impl<T, const N: usize> Set<T, N> {
     /// Make an iterator over all pairs.
     #[inline]
     #[must_use]
@@ -38,7 +38,7 @@ impl<'a, T> Iterator for SetIter<'a, T> {
     }
 }
 
-impl<T: PartialEq, const N: usize> Iterator for SetIntoIter<T, N> {
+impl<T, const N: usize> Iterator for SetIntoIter<T, N> {
     type Item = T;
 
     #[inline]
@@ -52,7 +52,7 @@ impl<T: PartialEq, const N: usize> Iterator for SetIntoIter<T, N> {
     }
 }
 
-impl<'a, T: PartialEq, const N: usize> IntoIterator for &'a Set<T, N> {
+impl<'a, T, const N: usize> IntoIterator for &'a Set<T, N> {
     type Item = &'a T;
     type IntoIter = SetIter<'a, T>;
 
@@ -62,7 +62,7 @@ impl<'a, T: PartialEq, const N: usize> IntoIterator for &'a Set<T, N> {
     }
 }
 
-impl<T: PartialEq, const N: usize> IntoIterator for Set<T, N> {
+impl<T, const N: usize> IntoIterator for Set<T, N> {
     type Item = T;
     type IntoIter = SetIntoIter<T, N>;
 
@@ -80,7 +80,7 @@ impl<T> ExactSizeIterator for SetIter<'_, T> {
     }
 }
 
-impl<T: PartialEq, const N: usize> ExactSizeIterator for SetIntoIter<T, N> {
+impl<T, const N: usize> ExactSizeIterator for SetIntoIter<T, N> {
     fn len(&self) -> usize {
         self.iter.len()
     }
@@ -88,4 +88,4 @@ impl<T: PartialEq, const N: usize> ExactSizeIterator for SetIntoIter<T, N> {
 
 impl<T> FusedIterator for SetIter<'_, T> {}
 
-impl<T: PartialEq, const N: usize> FusedIterator for SetIntoIter<T, N> {}
+impl<T, const N: usize> FusedIterator for SetIntoIter<T, N> {}

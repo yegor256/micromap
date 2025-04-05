@@ -12,7 +12,7 @@ impl<K, V> Drop for Drain<'_, K, V> {
     }
 }
 
-impl<K: PartialEq, V> Iterator for Drain<'_, K, V> {
+impl<K, V> Iterator for Drain<'_, K, V> {
     type Item = (K, V);
 
     #[inline]
@@ -26,14 +26,14 @@ impl<K: PartialEq, V> Iterator for Drain<'_, K, V> {
     }
 }
 
-impl<K: PartialEq, V> ExactSizeIterator for Drain<'_, K, V> {
+impl<K, V> ExactSizeIterator for Drain<'_, K, V> {
     #[inline]
     fn len(&self) -> usize {
         self.iter.len()
     }
 }
 
-impl<K: PartialEq, V> FusedIterator for Drain<'_, K, V> {}
+impl<K, V> FusedIterator for Drain<'_, K, V> {}
 
 #[cfg(test)]
 mod tests {

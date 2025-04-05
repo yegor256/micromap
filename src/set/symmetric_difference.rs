@@ -53,11 +53,11 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
 /// let mut sym_diff = a.symmetric_difference(&b);
 /// ```
 #[must_use = "this returns the difference as an iterator, without modifying either input set"]
-pub struct SymmetricDifference<'a, T: PartialEq, const N: usize, const M: usize> {
-    iter: core::iter::Chain<Difference<'a, T, M>, Difference<'a, T, N>>,
+pub struct SymmetricDifference<'a, T, const N: usize, const M: usize> {
+    iter: core::iter::Chain<Difference<'a, 'a, T, M>, Difference<'a, 'a, T, N>>,
 }
 
-impl<T: PartialEq, const N: usize, const M: usize> Clone for SymmetricDifference<'_, T, N, M> {
+impl<T, const N: usize, const M: usize> Clone for SymmetricDifference<'_, T, N, M> {
     #[inline]
     fn clone(&self) -> Self {
         SymmetricDifference {
@@ -91,7 +91,7 @@ impl<'a, T: PartialEq, const N: usize, const M: usize> Iterator
     }
 }
 
-impl<T: core::fmt::Debug + PartialEq, const N: usize, const M: usize> core::fmt::Debug
+impl<T: PartialEq + core::fmt::Debug, const N: usize, const M: usize> core::fmt::Debug
     for SymmetricDifference<'_, T, N, M>
 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {

@@ -2,71 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 use crate::{Drain, Entry, Map, OccupiedEntry, VacantEntry};
-use core::{borrow::Borrow, mem::replace};
+use core::borrow::Borrow;
 
-mod internal {
-    use crate::Map;
-
-    impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
-        /// Internal function to get access via reference to the element in the internal array.
-        #[inline]
-        pub(crate) unsafe fn item_ref(&self, i: usize) -> &(K, V) {
-            self.pairs.get_unchecked(i).assume_init_ref()
-        }
-
-        /// Internal function to get mutable access via reference to the element in the internal array.
-        #[inline]
-        pub(crate) unsafe fn item_mut(&mut self, i: usize) -> &mut V {
-            &mut self.pairs.get_unchecked_mut(i).assume_init_mut().1
-        }
-
-        /// Internal function to get access to the element in the internal array.
-        #[inline]
-        pub(crate) unsafe fn item_read(&mut self, i: usize) -> (K, V) {
-            self.pairs.get_unchecked(i).assume_init_read()
-        }
-
-        /// Internal function to get access to the element in the internal array.
-        #[inline]
-        pub(crate) unsafe fn item_drop(&mut self, i: usize) {
-            self.pairs.get_unchecked_mut(i).assume_init_drop();
-        }
-
-        /// Internal function to get access to the element in the internal array.
-        #[inline]
-        pub(crate) unsafe fn item_write(&mut self, i: usize, val: (K, V)) {
-            self.pairs.get_unchecked_mut(i).write(val);
-        }
-
-        /// Remove an index (by swapping the last one here and reducing the length)
-        #[inline]
-        pub(crate) unsafe fn remove_index_drop(&mut self, i: usize) {
-            self.item_drop(i);
-
-            self.len -= 1;
-            if i != self.len {
-                let value = self.item_read(self.len);
-                self.item_write(i, value);
-            }
-        }
-
-        /// Remove an index (by swapping the last one here and reducing the length)
-        #[inline]
-        pub(crate) unsafe fn remove_index_read(&mut self, i: usize) -> (K, V) {
-            let result = self.item_read(i);
-
-            self.len -= 1;
-            if i != self.len {
-                let value = self.item_read(self.len);
-                self.item_write(i, value);
-            }
-
-            result
-        }
-    }
-}
-
-impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
+impl<K, V, const N: usize> Map<K, V, N> {
     /// Get its total capacity.
     #[inline]
     #[must_use]
@@ -99,6 +37,33 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         drain
     }
 
+    /// Remove all pairs from it, but keep the space intact for future use.
+    #[inline]
+    pub fn clear(&mut self) {
+        for i in 0..self.len {
+            unsafe { self.item_drop(i) };
+        }
+        self.len = 0;
+    }
+
+    /// Retains only the elements specified by the predicate.
+    #[inline]
+    pub fn retain<F: Fn(&K, &V) -> bool>(&mut self, f: F) {
+        let mut i = 0;
+        while i < self.len {
+            let p = unsafe { self.item_ref(i) };
+            if f(&p.0, &p.1) {
+                // do not remove -> next index
+                i += 1;
+            } else {
+                unsafe { self.remove_index_drop(i) };
+                // recheck the same index
+            }
+        }
+    }
+}
+
+impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// Does the map contain this key?
     #[inline]
     #[must_use]
@@ -176,70 +141,6 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         existing_pair.map(|(_, v)| v)
     }
 
-    /// The core insert logic, which is used for `insert_unchecked()`, as it will
-    /// disable the bound check (`debug_assert!`) in `release` mode.
-    pub(crate) fn insert_i(&mut self, k: K, v: V) -> (usize, Option<(K, V)>) {
-        let mut target = self.len;
-        let mut i = 0;
-        let mut existing_pair = None;
-        loop {
-            if i == self.len {
-                core::debug_assert!(target < N, "No more key-value slot available in the map");
-                break;
-            }
-            let p = unsafe { self.item_ref(i) };
-            if p.0 == k {
-                target = i;
-                existing_pair = Some(unsafe { self.item_read(i) });
-                break;
-            }
-            i += 1;
-        }
-        unsafe { self.item_write(target, (k, v)) };
-        if target == self.len {
-            self.len += 1;
-        }
-
-        (target, existing_pair)
-    }
-
-    /// The core insert logic, which is used for `insert()`. Its name means
-    /// that it uses iterators(the second `i`) instead of loops to implement the underlying
-    /// insertion logic for `insert_i()`.
-    pub(crate) fn insert_ii(&mut self, k: K, v: V) -> (usize, Option<(K, V)>) {
-        if let Some((i, pair)) = self.pairs[..self.len]
-            .iter_mut()
-            .map(|p| unsafe { p.assume_init_mut() })
-            .enumerate()
-            .find(|(_i, p)| p.0 == k)
-        {
-            (i, Some(replace(pair, (k, v))))
-        } else {
-            let i = self.len;
-            // just for panic msg in debug mode, not the main bound check
-            core::debug_assert!(i < N, "No more key-value slot available in the map");
-            self.pairs[i].write((k, v)); // main bound check here but it's ok (not hotspot)
-            self.len += 1;
-            (i, None)
-        }
-    }
-
-    /// When the map is full, we need to check the key-value pair if existed already or not.
-    /// If no place to insert the new key-value pair, we return `None`.
-    pub(crate) fn insert_ii_for_full(&mut self, k: K, v: V) -> Option<(usize, (K, V))> {
-        if let Some((i, pair)) = self.pairs[..self.len]
-            .iter_mut()
-            .map(|p| unsafe { p.assume_init_mut() })
-            .enumerate()
-            .find(|(_, p)| p.0 == k)
-        {
-            let existing_pair = replace(pair, (k, v));
-            Some((i, existing_pair))
-        } else {
-            None
-        }
-    }
-
     /// Get a reference to a single value.
     #[inline]
     #[must_use]
@@ -274,31 +175,6 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
             }
         }
         None
-    }
-
-    /// Remove all pairs from it, but keep the space intact for future use.
-    #[inline]
-    pub fn clear(&mut self) {
-        for i in 0..self.len {
-            unsafe { self.item_drop(i) };
-        }
-        self.len = 0;
-    }
-
-    /// Retains only the elements specified by the predicate.
-    #[inline]
-    pub fn retain<F: Fn(&K, &V) -> bool>(&mut self, f: F) {
-        let mut i = 0;
-        while i < self.len {
-            let p = unsafe { self.item_ref(i) };
-            if f(&p.0, &p.1) {
-                // do not remove -> next index
-                i += 1;
-            } else {
-                unsafe { self.remove_index_drop(i) };
-                // recheck the same index
-            }
-        }
     }
 
     /// Returns the key-value pair corresponding to the supplied key.
@@ -346,6 +222,134 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
             key: k,
             table: self,
         })
+    }
+}
+
+mod internal {
+    use crate::Map;
+
+    impl<K, V, const N: usize> Map<K, V, N> {
+        /// Internal function to get access via reference to the element in the internal array.
+        #[inline]
+        pub(crate) unsafe fn item_ref(&self, i: usize) -> &(K, V) {
+            self.pairs.get_unchecked(i).assume_init_ref()
+        }
+
+        /// Internal function to get mutable access via reference to the element in the internal array.
+        #[inline]
+        pub(crate) unsafe fn item_mut(&mut self, i: usize) -> &mut V {
+            &mut self.pairs.get_unchecked_mut(i).assume_init_mut().1
+        }
+
+        /// Internal function to get access to the element in the internal array.
+        #[inline]
+        pub(crate) unsafe fn item_read(&mut self, i: usize) -> (K, V) {
+            self.pairs.get_unchecked(i).assume_init_read()
+        }
+
+        /// Internal function to get access to the element in the internal array.
+        #[inline]
+        pub(crate) unsafe fn item_drop(&mut self, i: usize) {
+            self.pairs.get_unchecked_mut(i).assume_init_drop();
+        }
+
+        /// Internal function to get access to the element in the internal array.
+        #[inline]
+        pub(crate) unsafe fn item_write(&mut self, i: usize, val: (K, V)) {
+            self.pairs.get_unchecked_mut(i).write(val);
+        }
+
+        /// Remove an index (by swapping the last one here and reducing the length)
+        #[inline]
+        pub(crate) unsafe fn remove_index_drop(&mut self, i: usize) {
+            self.item_drop(i);
+
+            self.len -= 1;
+            if i != self.len {
+                let value = self.item_read(self.len);
+                self.item_write(i, value);
+            }
+        }
+
+        /// Remove an index (by swapping the last one here and reducing the length)
+        #[inline]
+        pub(crate) unsafe fn remove_index_read(&mut self, i: usize) -> (K, V) {
+            let result = self.item_read(i);
+
+            self.len -= 1;
+            if i != self.len {
+                let value = self.item_read(self.len);
+                self.item_write(i, value);
+            }
+
+            result
+        }
+    }
+
+    impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
+        /// The core insert logic, which is used for `insert_unchecked()`, as it will
+        /// disable the bound check (`debug_assert!`) in `release` mode.
+        pub(crate) fn insert_i(&mut self, k: K, v: V) -> (usize, Option<(K, V)>) {
+            let mut target = self.len;
+            let mut i = 0;
+            let mut existing_pair = None;
+            loop {
+                if i == self.len {
+                    core::debug_assert!(target < N, "No more key-value slot available in the map");
+                    break;
+                }
+                let p = unsafe { self.item_ref(i) };
+                if p.0 == k {
+                    target = i;
+                    existing_pair = Some(unsafe { self.item_read(i) });
+                    break;
+                }
+                i += 1;
+            }
+            unsafe { self.item_write(target, (k, v)) };
+            if target == self.len {
+                self.len += 1;
+            }
+
+            (target, existing_pair)
+        }
+
+        /// The core insert logic, which is used for `insert()`. Its name means
+        /// that it uses iterators(the second `i`) instead of loops to implement the underlying
+        /// insertion logic for `insert_i()`.
+        pub(crate) fn insert_ii(&mut self, k: K, v: V) -> (usize, Option<(K, V)>) {
+            if let Some((i, pair)) = self.pairs[..self.len]
+                .iter_mut()
+                .map(|p| unsafe { p.assume_init_mut() })
+                .enumerate()
+                .find(|(_i, p)| p.0 == k)
+            {
+                (i, Some(core::mem::replace(pair, (k, v))))
+            } else {
+                let i = self.len;
+                // just for panic msg in debug mode, not the main bound check
+                core::debug_assert!(i < N, "No more key-value slot available in the map");
+                self.pairs[i].write((k, v)); // main bound check here but it's ok (not hotspot)
+                self.len += 1;
+                (i, None)
+            }
+        }
+
+        /// When the map is full, we need to check the key-value pair if existed already or not.
+        /// If no place to insert the new key-value pair, we return `None`.
+        pub(crate) fn insert_ii_for_full(&mut self, k: K, v: V) -> Option<(usize, (K, V))> {
+            if let Some((i, pair)) = self.pairs[..self.len]
+                .iter_mut()
+                .map(|p| unsafe { p.assume_init_mut() })
+                .enumerate()
+                .find(|(_, p)| p.0 == k)
+            {
+                let existing_pair = core::mem::replace(pair, (k, v));
+                Some((i, existing_pair))
+            } else {
+                None
+            }
+        }
     }
 }
 

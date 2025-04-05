@@ -4,7 +4,7 @@
 use crate::{IntoIter, Iter, IterMut, Map};
 use core::iter::FusedIterator;
 
-impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
+impl<K, V, const N: usize> Map<K, V, N> {
     /// Make an iterator over all pairs.
     #[inline]
     #[must_use]
@@ -76,7 +76,7 @@ impl<'a, K, V> Iterator for IterMut<'a, K, V> {
     }
 }
 
-impl<K: PartialEq, V, const N: usize> Iterator for IntoIter<K, V, N> {
+impl<K, V, const N: usize> Iterator for IntoIter<K, V, N> {
     type Item = (K, V);
 
     #[inline]
@@ -100,7 +100,7 @@ impl<K: PartialEq, V, const N: usize> Iterator for IntoIter<K, V, N> {
     }
 }
 
-impl<'a, K: PartialEq, V, const N: usize> IntoIterator for &'a Map<K, V, N> {
+impl<'a, K, V, const N: usize> IntoIterator for &'a Map<K, V, N> {
     type Item = (&'a K, &'a V);
     type IntoIter = Iter<'a, K, V>;
 
@@ -110,7 +110,7 @@ impl<'a, K: PartialEq, V, const N: usize> IntoIterator for &'a Map<K, V, N> {
     }
 }
 
-impl<'a, K: PartialEq, V, const N: usize> IntoIterator for &'a mut Map<K, V, N> {
+impl<'a, K, V, const N: usize> IntoIterator for &'a mut Map<K, V, N> {
     type Item = (&'a K, &'a mut V);
     type IntoIter = IterMut<'a, K, V>;
 
@@ -120,7 +120,7 @@ impl<'a, K: PartialEq, V, const N: usize> IntoIterator for &'a mut Map<K, V, N> 
     }
 }
 
-impl<K: PartialEq, V, const N: usize> IntoIterator for Map<K, V, N> {
+impl<K, V, const N: usize> IntoIterator for Map<K, V, N> {
     type Item = (K, V);
     type IntoIter = IntoIter<K, V, N>;
 
@@ -142,7 +142,7 @@ impl<K, V> ExactSizeIterator for IterMut<'_, K, V> {
     }
 }
 
-impl<K: PartialEq, V, const N: usize> ExactSizeIterator for IntoIter<K, V, N> {
+impl<K, V, const N: usize> ExactSizeIterator for IntoIter<K, V, N> {
     fn len(&self) -> usize {
         self.map.len
     }
@@ -152,7 +152,7 @@ impl<K, V> FusedIterator for Iter<'_, K, V> {}
 
 impl<K, V> FusedIterator for IterMut<'_, K, V> {}
 
-impl<K: PartialEq, V, const N: usize> FusedIterator for IntoIter<K, V, N> {}
+impl<K, V, const N: usize> FusedIterator for IntoIter<K, V, N> {}
 
 #[cfg(test)]
 mod tests {

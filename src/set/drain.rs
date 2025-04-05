@@ -4,7 +4,7 @@
 use crate::SetDrain;
 use core::iter::FusedIterator;
 
-impl<K: PartialEq> Iterator for SetDrain<'_, K> {
+impl<K> Iterator for SetDrain<'_, K> {
     type Item = K;
 
     #[inline]
@@ -18,11 +18,11 @@ impl<K: PartialEq> Iterator for SetDrain<'_, K> {
     }
 }
 
-impl<K: PartialEq> ExactSizeIterator for SetDrain<'_, K> {
+impl<K> ExactSizeIterator for SetDrain<'_, K> {
     #[inline]
     fn len(&self) -> usize {
         self.iter.len()
     }
 }
 
-impl<K: PartialEq> FusedIterator for SetDrain<'_, K> {}
+impl<K> FusedIterator for SetDrain<'_, K> {}

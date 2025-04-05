@@ -31,7 +31,10 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     /// assert_eq!(diff, Set::from([4]));
     /// ```
     #[inline]
-    pub fn difference<'a, const M: usize>(&'a self, other: &'a Set<T, M>) -> Difference<'a, T, M> {
+    pub fn difference<'a, 'b, const M: usize>(
+        &'a self,
+        other: &'b Set<T, M>,
+    ) -> Difference<'a, 'b, T, M> {
         Difference {
             iter: self.iter(),
             other,
@@ -56,14 +59,14 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
 /// let mut difference = a.difference(&b);
 /// ```
 #[must_use = "this returns the difference as an iterator, without modifying either input set"]
-pub struct Difference<'a, T: PartialEq, const M: usize> {
+pub struct Difference<'a, 'b, T, const M: usize> {
     // iterator of the first set
     iter: SetIter<'a, T>,
     // the second set
-    other: &'a Set<T, M>,
+    other: &'b Set<T, M>,
 }
 
-impl<T: PartialEq, const M: usize> Clone for Difference<'_, T, M> {
+impl<T, const M: usize> Clone for Difference<'_, '_, T, M> {
     #[inline]
     fn clone(&self) -> Self {
         Difference {
@@ -73,7 +76,7 @@ impl<T: PartialEq, const M: usize> Clone for Difference<'_, T, M> {
     }
 }
 
-impl<'a, T: PartialEq, const M: usize> Iterator for Difference<'a, T, M> {
+impl<'a, T: PartialEq, const M: usize> Iterator for Difference<'a, '_, T, M> {
     type Item = &'a T;
 
     #[inline]
@@ -109,9 +112,11 @@ impl<'a, T: PartialEq, const M: usize> Iterator for Difference<'a, T, M> {
     }
 }
 
-impl<T: PartialEq, const M: usize> core::iter::FusedIterator for Difference<'_, T, M> {}
+impl<T: PartialEq, const M: usize> core::iter::FusedIterator for Difference<'_, '_, T, M> {}
 
-impl<T: core::fmt::Debug + PartialEq, const M: usize> core::fmt::Debug for Difference<'_, T, M> {
+impl<T: core::fmt::Debug + PartialEq, const M: usize> core::fmt::Debug
+    for Difference<'_, '_, T, M>
+{
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_list().entries(self.clone()).finish()
     }
@@ -138,14 +143,14 @@ mod difference_ref {
     }
 
     #[must_use = "this returns the difference as an iterator, without modifying either input set"]
-    pub struct DifferenceRef<'a, 'b, 'set, T: PartialEq + ?Sized, const M: usize> {
+    pub struct DifferenceRef<'a, 'b, 'set, T: ?Sized, const M: usize> {
         // iterator of the first set
         iter: SetIter<'a, &'a T>,
         // the second set
         other: &'set Set<&'b T, M>,
     }
 
-    impl<T: PartialEq, const M: usize> Clone for DifferenceRef<'_, '_, '_, T, M> {
+    impl<T, const M: usize> Clone for DifferenceRef<'_, '_, '_, T, M> {
         #[inline]
         fn clone(&self) -> Self {
             DifferenceRef {

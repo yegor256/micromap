@@ -46,7 +46,7 @@ use crate::Map;
 /// but its behaviour is undefined. In the "release" mode all boundary checks
 /// are disabled, for the sake of higher performance.
 #[repr(transparent)]
-pub struct Set<T: PartialEq, const N: usize> {
+pub struct Set<T, const N: usize> {
     map: Map<T, (), N>,
 }
 
@@ -60,13 +60,13 @@ pub struct SetIter<'a, T> {
 /// Into-iterator over the [`Set`].
 #[repr(transparent)]
 #[allow(clippy::module_name_repetitions)]
-pub struct SetIntoIter<T: PartialEq, const N: usize> {
+pub struct SetIntoIter<T, const N: usize> {
     iter: crate::IntoKeys<T, (), N>,
 }
 
 #[repr(transparent)]
 #[allow(clippy::module_name_repetitions)]
-pub struct SetDrain<'a, T: PartialEq> {
+pub struct SetDrain<'a, T> {
     iter: crate::Drain<'a, T, ()>,
 }
 

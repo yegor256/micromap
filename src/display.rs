@@ -4,7 +4,7 @@
 use crate::Map;
 use core::fmt::{self, Display, Formatter, Write};
 
-impl<K: PartialEq + Display, V: Display, const N: usize> Display for Map<K, V, N> {
+impl<K: Display, V: Display, const N: usize> Display for Map<K, V, N> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let mut first = true;
         f.write_char('{')?;
