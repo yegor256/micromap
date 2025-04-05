@@ -316,6 +316,194 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         None
     }
 
+    /// Attempts to get mutable references to `J` values in the map at once.
+    /// Or you want to batch search keys (and get mutable references to them) in
+    /// one iteration for map.
+    ///
+    /// Returns an array of length `J` with the results of each query.
+    /// For soundness, at most one mutable reference will be returned to any value.
+    /// None will be used if the key is missing.
+    ///
+    /// # Panics
+    ///
+    /// Panics if any keys are overlapping.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use micromap::Map;
+    ///
+    /// let mut libraries: Map<String, u32, 5> = Map::new();
+    /// libraries.insert("Bodleian Library".to_string(), 1602);
+    /// libraries.insert("Athenæum".to_string(), 1807);
+    /// libraries.insert("Herzogin-Anna-Amalia-Bibliothek".to_string(), 1691);
+    /// libraries.insert("Library of Congress".to_string(), 1800);
+    ///
+    /// // Get Athenæum and Bodleian Library
+    /// let [Some(a), Some(b)] = libraries.get_disjoint_mut([
+    ///     "Athenæum",
+    ///     "Bodleian Library",
+    /// ]) else { panic!() };
+    ///
+    /// // Assert values of Athenæum and Library of Congress
+    /// let got = libraries.get_disjoint_mut([
+    ///     "Athenæum",
+    ///     "Library of Congress",
+    /// ]);
+    /// assert_eq!(
+    ///     got,
+    ///     [
+    ///         Some(&mut 1807),
+    ///         Some(&mut 1800),
+    ///     ],
+    /// );
+    ///
+    /// // Missing keys result in None
+    /// let got = libraries.get_disjoint_mut([
+    ///     "Athenæum",
+    ///     "New York Public Library",
+    /// ]);
+    /// assert_eq!(
+    ///     got,
+    ///     [
+    ///         Some(&mut 1807),
+    ///         None
+    ///     ]
+    /// );
+    /// ```
+    ///
+    /// ```should_panic
+    /// use std::collections::HashMap;
+    ///
+    /// let mut libraries = HashMap::new();
+    /// libraries.insert("Athenæum".to_string(), 1807);
+    ///
+    /// // Duplicate keys panic!
+    /// let got = libraries.get_disjoint_mut([
+    ///     "Athenæum",
+    ///     "Athenæum",
+    /// ]);
+    /// ```
+    #[inline]
+    pub fn get_disjoint_mut<Q, const J: usize>(&mut self, ks: [&Q; J]) -> [Option<&mut V>; J]
+    where
+        K: Borrow<Q>,
+        Q: Eq + ?Sized,
+    {
+        if ks.len() == 0 {
+            return [const { None }; J];
+        }
+
+        // check for overlapping keys (O(n^2), but n is small)
+        for (i, k) in ks[..ks.len() - 1].iter().enumerate() {
+            for k_behind in ks[i + 1..].iter() {
+                assert!(k != k_behind, "Overlapping keys");
+            }
+        }
+
+        unsafe { self.get_disjoint_unchecked_mut(ks) }
+    }
+
+    /// Attempts to get mutable references to `J` values in the map at once, without validating that
+    /// the values are unique. Or you want to batch search keys (and get mutable references to them)
+    /// in one iteration for map.
+    ///
+    /// Returns an array of length `J` with the results of each query. `None` will be used if
+    /// the key is missing.
+    ///
+    /// For a safe alternative see [`Map::get_disjoint_mut`].
+    ///
+    /// # Safety
+    ///
+    /// Calling this method with overlapping keys is *[undefined behavior]* even if the resulting
+    /// references are not used.
+    ///
+    /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use micromap::Map;
+    ///
+    /// let mut libraries: Map<String, u32, 5> = Map::new();
+    /// libraries.insert("Bodleian Library".to_string(), 1602);
+    /// libraries.insert("Athenæum".to_string(), 1807);
+    /// libraries.insert("Herzogin-Anna-Amalia-Bibliothek".to_string(), 1691);
+    /// libraries.insert("Library of Congress".to_string(), 1800);
+    ///
+    /// // SAFETY: The keys do not overlap.
+    /// let [Some(a), Some(b)] = (unsafe { libraries.get_disjoint_unchecked_mut([
+    ///     "Athenæum",
+    ///     "Bodleian Library",
+    /// ]) }) else { panic!() };
+    ///
+    /// // SAFETY: The keys do not overlap.
+    /// let got = unsafe { libraries.get_disjoint_unchecked_mut([
+    ///     "Athenæum",
+    ///     "Library of Congress",
+    /// ]) };
+    /// assert_eq!(
+    ///     got,
+    ///     [
+    ///         Some(&mut 1807),
+    ///         Some(&mut 1800),
+    ///     ],
+    /// );
+    ///
+    /// // SAFETY: The keys do not overlap.
+    /// let got = unsafe { libraries.get_disjoint_unchecked_mut([
+    ///     "Athenæum",
+    ///     "New York Public Library",
+    /// ]) };
+    /// // Missing keys result in None
+    /// assert_eq!(got, [Some(&mut 1807), None]);
+    /// ```
+    #[inline]
+    pub unsafe fn get_disjoint_unchecked_mut<Q, const J: usize>(
+        &mut self,
+        ks: [&Q; J],
+    ) -> [Option<&mut V>; J]
+    where
+        K: Borrow<Q>,
+        Q: Eq + ?Sized,
+    {
+        let mut ret: [Option<&mut V>; J] = [const { None }; J];
+
+        if ks.len() == 0 {
+            return ret;
+        } else if ks.len() == 1 {
+            ret[0] = self.get_mut(ks[0]);
+            return ret;
+        }
+
+        // find the keys' index in one iteration of the map, store the result
+        // into the stack.
+        let mut stack = [const { None }; J];
+        let mut stack_top = 0;
+        for pair_i in 0..self.len {
+            let p = unsafe { self.item_ref(pair_i) };
+            if let Some(ks_i) = ks.iter().position(|&k| k.borrow() == p.0.borrow()) {
+                stack[stack_top] = Some((pair_i, ks_i));
+                stack_top += 1;
+                continue;
+            }
+        }
+
+        stack[..stack_top].sort_unstable_by_key(|x| x.map(|(pair_i, _)| pair_i));
+
+        // start splitting the found pairs from the back to the front
+        let mut rest_head = &mut self.pairs[..self.len];
+        for found in stack[..stack_top].iter().rev() {
+            if let Some((pair_i, ks_i)) = found {
+                let (head, tail) = rest_head.split_at_mut(*pair_i);
+                rest_head = head;
+                let p = unsafe { tail[0].assume_init_mut() };
+                ret[*ks_i] = Some(&mut p.1);
+            }
+        }
+        ret
+    }
+
     /// Removes a key from the map, returning the stored key and value if the
     /// key was previously in the map.
     #[inline]
@@ -632,5 +820,84 @@ mod tests {
         assert_eq!(m.checked_insert(1, 30), Some(Some(10)));
         assert_eq!(m.get(&1), Some(&30));
         assert_eq!(m.get(&2), Some(&20));
+    }
+
+    #[test]
+    fn get_disjoint_mut_non_overlapping_keys() {
+        let mut map: Map<&str, i32, 5> = Map::new();
+        map.insert("key1", 10);
+        map.insert("key2", 20);
+        map.insert("key3", 30);
+        map.insert("key4", 40);
+
+        let [v3, v1, v2] = map.get_disjoint_mut(["key3", "key1", "key2"]);
+        assert_eq!(v1, Some(&mut 10));
+        assert_eq!(v2, Some(&mut 20));
+        assert_eq!(v3, Some(&mut 30));
+
+        if let Some(v1) = v1 {
+            *v1 = 100;
+        }
+        if let Some(v2) = v2 {
+            *v2 = 200;
+        }
+        if let Some(v3) = v3 {
+            *v3 = 300;
+        }
+
+        assert_eq!(map.get("key1"), Some(&100));
+        assert_eq!(map.get("key2"), Some(&200));
+        assert_eq!(map.get("key3"), Some(&300));
+        assert_eq!(map.get("key4"), Some(&40));
+    }
+
+    #[test]
+    #[should_panic(expected = "Overlapping keys")]
+    fn get_disjoint_mut_overlapping_keys() {
+        let mut map: Map<&str, i32, 5> = Map::new();
+        map.insert("key1", 10);
+        map.insert("key2", 20);
+
+        // This should panic because the keys overlap.
+        let _ = map.get_disjoint_mut(["key1", "key1"]);
+    }
+
+    #[test]
+    fn get_disjoint_mut_missing_keys() {
+        let mut map: Map<&str, i32, 5> = Map::new();
+        map.insert("key2", 20);
+
+        let [v1, v2] = map.get_disjoint_mut(["key1", "key2"]);
+        assert_eq!(v1, None);
+        assert_eq!(v2, Some(&mut 20));
+    }
+
+    #[test]
+    fn get_disjoint_mut_empty_keys() {
+        let mut map: Map<&str, i32, 5> = Map::new();
+        let result: [Option<&mut i32>; 0] = map.get_disjoint_mut::<&str, 0>([]);
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn get_disjoint_mut_keys_more_than_capacity() {
+        let mut map: Map<&str, i32, 3> = Map::new();
+        assert!(map.is_empty());
+        let [v1] = map.get_disjoint_mut(["key1"]);
+        assert_eq!(v1, None);
+        map.insert("key1", 10);
+        let [v1] = map.get_disjoint_mut(["key1"]);
+        assert_eq!(v1, Some(&mut 10));
+        map.insert("key2", 20);
+        map.insert("key3", 30);
+        assert!(!map.is_empty());
+        let result = map.get_disjoint_mut(["key1", "key2", "key3"]);
+        result.iter().all(|x| x.is_some());
+        let [v0, v1, v2, v3, v4] = map.get_disjoint_mut(["key0", "key1", "key2", "key3", "key4"]);
+        assert_eq!(v0, None);
+        assert_eq!(v1, Some(&mut 10));
+        assert_eq!(v2, Some(&mut 20));
+        assert_eq!(v3, Some(&mut 30));
+        assert_eq!(v4, None);
     }
 }
