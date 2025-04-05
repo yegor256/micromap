@@ -4,7 +4,7 @@
 use crate::Map;
 use core::fmt::{self, Debug, Formatter};
 
-impl<K: PartialEq + Debug, V: Debug, const N: usize> Debug for Map<K, V, N> {
+impl<K: Debug, V: Debug, const N: usize> Debug for Map<K, V, N> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         f.debug_map().entries(self.iter()).finish()
     }

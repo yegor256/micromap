@@ -4,7 +4,7 @@
 use crate::{IntoValues, Map, Values, ValuesMut};
 use core::iter::FusedIterator;
 
-impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
+impl<K, V, const N: usize> Map<K, V, N> {
     /// An iterator visiting all values in arbitrary order.
     #[inline]
     pub fn values(&self) -> Values<'_, K, V> {
@@ -56,7 +56,7 @@ impl<'a, K, V> Iterator for ValuesMut<'a, K, V> {
     }
 }
 
-impl<K: PartialEq, V, const N: usize> Iterator for IntoValues<K, V, N> {
+impl<K, V, const N: usize> Iterator for IntoValues<K, V, N> {
     type Item = V;
 
     #[inline]
@@ -82,7 +82,7 @@ impl<K, V> ExactSizeIterator for ValuesMut<'_, K, V> {
     }
 }
 
-impl<K: PartialEq, V, const N: usize> ExactSizeIterator for IntoValues<K, V, N> {
+impl<K, V, const N: usize> ExactSizeIterator for IntoValues<K, V, N> {
     fn len(&self) -> usize {
         self.iter.len()
     }

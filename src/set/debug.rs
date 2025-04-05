@@ -4,7 +4,7 @@
 use crate::Set;
 use core::fmt::{self, Debug, Formatter};
 
-impl<T: PartialEq + Debug, const N: usize> Debug for Set<T, N> {
+impl<T: Debug, const N: usize> Debug for Set<T, N> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         f.debug_set().entries(self.iter()).finish()
     }

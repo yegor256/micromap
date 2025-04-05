@@ -8,7 +8,7 @@ use serde::de::{SeqAccess, Visitor};
 use serde::ser::SerializeSeq;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-impl<T: PartialEq + Serialize, const N: usize> Serialize for Set<T, N> {
+impl<T: Serialize, const N: usize> Serialize for Set<T, N> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,

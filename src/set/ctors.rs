@@ -3,7 +3,7 @@
 
 use crate::{Map, Set};
 
-impl<T: PartialEq, const N: usize> Default for Set<T, N> {
+impl<T, const N: usize> Default for Set<T, N> {
     /// Make a default empty [`Set`].
     #[inline]
     fn default() -> Self {
@@ -11,7 +11,7 @@ impl<T: PartialEq, const N: usize> Default for Set<T, N> {
     }
 }
 
-impl<T: PartialEq, const N: usize> Set<T, N> {
+impl<T, const N: usize> Set<T, N> {
     /// Make it.
     ///
     /// The size of the set is defined by the generic argument. For example,

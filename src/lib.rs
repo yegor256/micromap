@@ -31,7 +31,6 @@
 #![deny(warnings)]
 #![warn(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
 #![warn(rust_2018_idioms)]
-#![allow(clippy::multiple_inherent_impl)]
 #![allow(clippy::multiple_crate_versions)]
 
 mod clone;
@@ -79,7 +78,7 @@ use core::mem::MaybeUninit;
 /// into it, it simply panics. Moreover, in the "release" mode it doesn't panic,
 /// but its behaviour is undefined. In the "release" mode all boundary checks
 /// are disabled, for the sake of higher performance.
-pub struct Map<K: PartialEq, V, const N: usize> {
+pub struct Map<K, V, const N: usize> {
     /// The next available pair in the array.
     len: usize,
     /// The fixed-size array of key-value pairs.
@@ -100,7 +99,7 @@ pub struct IterMut<'a, K, V> {
 
 /// Into-iterator over the [`Map`].
 #[repr(transparent)]
-pub struct IntoIter<K: PartialEq, V, const N: usize> {
+pub struct IntoIter<K, V, const N: usize> {
     map: Map<K, V, N>,
 }
 
@@ -118,7 +117,7 @@ pub struct ValuesMut<'a, K, V> {
 
 /// Consuming iterator over the values of the [`Map`].
 #[repr(transparent)]
-pub struct IntoValues<K: PartialEq, V, const N: usize> {
+pub struct IntoValues<K, V, const N: usize> {
     iter: IntoIter<K, V, N>,
 }
 
@@ -130,7 +129,7 @@ pub struct Keys<'a, K, V> {
 
 /// Consuming iterator over the keys of the [`Map`].
 #[repr(transparent)]
-pub struct IntoKeys<K: PartialEq, V, const N: usize> {
+pub struct IntoKeys<K, V, const N: usize> {
     iter: IntoIter<K, V, N>,
 }
 
@@ -139,7 +138,7 @@ pub struct IntoKeys<K: PartialEq, V, const N: usize> {
 /// This `enum` is constructed from the [`entry`] method on [`Map`].
 ///
 /// [`entry`]: Map::entry
-pub enum Entry<'a, K: PartialEq, V, const N: usize> {
+pub enum Entry<'a, K, V, const N: usize> {
     /// An occupied entry.
     Occupied(OccupiedEntry<'a, K, V, N>),
 
@@ -149,14 +148,14 @@ pub enum Entry<'a, K: PartialEq, V, const N: usize> {
 
 /// A view into an occupied entry in a `Map`.
 /// It is part of the [`Entry`] enum.
-pub struct OccupiedEntry<'a, K: PartialEq, V, const N: usize> {
+pub struct OccupiedEntry<'a, K, V, const N: usize> {
     index: usize,
     table: &'a mut Map<K, V, N>,
 }
 
 /// A view into a vacant entry in a `Map`.
 /// It is part of the [`Entry`] enum.
-pub struct VacantEntry<'a, K: PartialEq, V, const N: usize> {
+pub struct VacantEntry<'a, K, V, const N: usize> {
     key: K,
     table: &'a mut Map<K, V, N>,
 }

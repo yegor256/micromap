@@ -3,7 +3,7 @@
 
 use crate::Set;
 
-impl<T: Clone + PartialEq, const N: usize> Clone for Set<T, N> {
+impl<T: Clone, const N: usize> Clone for Set<T, N> {
     fn clone(&self) -> Self {
         Self {
             map: self.map.clone(),

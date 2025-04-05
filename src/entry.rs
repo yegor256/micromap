@@ -4,6 +4,29 @@
 use crate::{Entry, OccupiedEntry, VacantEntry};
 use core::mem;
 
+impl<K, V, const N: usize> Entry<'_, K, V, N> {
+    pub fn key(&self) -> &K {
+        match self {
+            Entry::Occupied(entry) => entry.key(),
+            Entry::Vacant(entry) => entry.key(),
+        }
+    }
+
+    #[must_use]
+    pub fn and_modify<F>(self, f: F) -> Self
+    where
+        F: FnOnce(&mut V),
+    {
+        match self {
+            Entry::Occupied(mut entry) => {
+                f(entry.get_mut());
+                Entry::Occupied(entry)
+            }
+            Entry::Vacant(entry) => Entry::Vacant(entry),
+        }
+    }
+}
+
 impl<'a, K: PartialEq, V, const N: usize> Entry<'a, K, V, N> {
     pub fn or_insert(self, default: V) -> &'a mut V {
         match self {
@@ -28,27 +51,6 @@ impl<'a, K: PartialEq, V, const N: usize> Entry<'a, K, V, N> {
             }
         }
     }
-
-    pub fn key(&self) -> &K {
-        match self {
-            Entry::Occupied(entry) => entry.key(),
-            Entry::Vacant(entry) => entry.key(),
-        }
-    }
-
-    #[must_use]
-    pub fn and_modify<F>(self, f: F) -> Self
-    where
-        F: FnOnce(&mut V),
-    {
-        match self {
-            Entry::Occupied(mut entry) => {
-                f(entry.get_mut());
-                Entry::Occupied(entry)
-            }
-            Entry::Vacant(entry) => Entry::Vacant(entry),
-        }
-    }
 }
 
 impl<'a, K: PartialEq, V: Default, const N: usize> Entry<'a, K, V, N> {
@@ -60,15 +62,15 @@ impl<'a, K: PartialEq, V: Default, const N: usize> Entry<'a, K, V, N> {
     }
 }
 
-impl<'a, K: PartialEq, V, const N: usize> OccupiedEntry<'a, K, V, N> {
+impl<'a, K, V, const N: usize> OccupiedEntry<'a, K, V, N> {
     #[must_use]
     pub fn key(&self) -> &K {
         unsafe { &self.table.item_ref(self.index).0 }
     }
 
     #[must_use]
-    pub fn remove_entry(self) -> (K, V) {
-        unsafe { self.table.remove_index_read(self.index) }
+    pub fn into_mut(self) -> &'a mut V {
+        unsafe { self.table.item_mut(self.index) }
     }
 
     #[must_use]
@@ -80,13 +82,13 @@ impl<'a, K: PartialEq, V, const N: usize> OccupiedEntry<'a, K, V, N> {
         unsafe { self.table.item_mut(self.index) }
     }
 
-    #[must_use]
-    pub fn into_mut(self) -> &'a mut V {
-        unsafe { self.table.item_mut(self.index) }
-    }
-
     pub fn insert(&mut self, value: V) -> V {
         mem::replace(self.get_mut(), value)
+    }
+
+    #[must_use]
+    pub fn remove_entry(self) -> (K, V) {
+        unsafe { self.table.remove_index_read(self.index) }
     }
 
     #[must_use]
@@ -95,7 +97,7 @@ impl<'a, K: PartialEq, V, const N: usize> OccupiedEntry<'a, K, V, N> {
     }
 }
 
-impl<'a, K: PartialEq, V, const N: usize> VacantEntry<'a, K, V, N> {
+impl<K, V, const N: usize> VacantEntry<'_, K, V, N> {
     pub const fn key(&self) -> &K {
         &self.key
     }
@@ -103,7 +105,9 @@ impl<'a, K: PartialEq, V, const N: usize> VacantEntry<'a, K, V, N> {
     pub fn into_key(self) -> K {
         self.key
     }
+}
 
+impl<'a, K: PartialEq, V, const N: usize> VacantEntry<'a, K, V, N> {
     pub fn insert(self, value: V) -> &'a mut V {
         let (index, _) = self.table.insert_i(self.key, value);
         unsafe { self.table.item_mut(index) }

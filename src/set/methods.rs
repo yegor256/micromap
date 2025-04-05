@@ -4,7 +4,7 @@
 use crate::{Set, SetDrain};
 use core::borrow::Borrow;
 
-impl<T: PartialEq, const N: usize> Set<T, N> {
+impl<T, const N: usize> Set<T, N> {
     /// Get its total capacity.
     #[inline]
     #[must_use]
@@ -35,6 +35,20 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
         }
     }
 
+    /// Remove all pairs from it, but keep the space intact for future use.
+    #[inline]
+    pub fn clear(&mut self) {
+        self.map.clear();
+    }
+
+    /// Retains only the elements specified by the predicate.
+    #[inline]
+    pub fn retain<F: Fn(&T) -> bool>(&mut self, f: F) {
+        self.map.retain(|k, ()| f(k));
+    }
+}
+
+impl<T: PartialEq, const N: usize> Set<T, N> {
     /// Returns true if the set contains a value.
     #[inline]
     #[must_use]
@@ -80,18 +94,6 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
         T: Borrow<Q>,
     {
         self.map.get_key_value(k).map(|p| p.0)
-    }
-
-    /// Remove all pairs from it, but keep the space intact for future use.
-    #[inline]
-    pub fn clear(&mut self) {
-        self.map.clear();
-    }
-
-    /// Retains only the elements specified by the predicate.
-    #[inline]
-    pub fn retain<F: Fn(&T) -> bool>(&mut self, f: F) {
-        self.map.retain(|k, ()| f(k));
     }
 
     /// Removes a key from the set, returning the stored key and value if the
