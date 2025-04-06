@@ -393,14 +393,12 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         if ks.is_empty() {
             return [const { None }; J];
         }
-
         // check for overlapping keys (O(n^2), but n is small)
         for (i, k) in ks[..ks.len() - 1].iter().enumerate() {
             for k_behind in &ks[i + 1..] {
                 assert!(k != k_behind, "Overlapping keys");
             }
         }
-
         unsafe { self.get_disjoint_unchecked_mut(ks) }
     }
 
@@ -468,14 +466,12 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         Q: Eq + ?Sized,
     {
         let mut ret: [Option<&mut V>; J] = [const { None }; J];
-
         if ks.is_empty() {
             return ret;
         } else if ks.len() == 1 {
             ret[0] = self.get_mut(ks[0]);
             return ret;
         }
-
         // find the keys' index in one iteration of the map, store the result
         // into the stack.
         let mut stack = [const { None }; J];
@@ -487,9 +483,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
                 stack_top += 1;
             }
         }
-
         stack[..stack_top].sort_unstable_by_key(|x| x.map(|(pair_i, _)| pair_i));
-
         // start splitting the found pairs from the back to the front
         let mut rest_head = &mut self.pairs[..self.len];
         for (pair_i, ks_i) in stack[..stack_top].iter().rev().flatten() {
