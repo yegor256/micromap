@@ -820,12 +820,10 @@ mod tests {
         map.insert("key2", 20);
         map.insert("key3", 30);
         map.insert("key4", 40);
-
         let [v3, v1, v2] = map.get_disjoint_mut(["key3", "key1", "key2"]);
         assert_eq!(v1, Some(&mut 10));
         assert_eq!(v2, Some(&mut 20));
         assert_eq!(v3, Some(&mut 30));
-
         if let Some(v1) = v1 {
             *v1 = 100;
         }
@@ -835,7 +833,6 @@ mod tests {
         if let Some(v3) = v3 {
             *v3 = 300;
         }
-
         assert_eq!(map.get("key1"), Some(&100));
         assert_eq!(map.get("key2"), Some(&200));
         assert_eq!(map.get("key3"), Some(&300));
@@ -848,7 +845,6 @@ mod tests {
         let mut map: Map<&str, i32, 5> = Map::new();
         map.insert("key1", 10);
         map.insert("key2", 20);
-
         // This should panic because the keys overlap.
         let _ = map.get_disjoint_mut(["key1", "key1"]);
     }
@@ -857,7 +853,6 @@ mod tests {
     fn get_disjoint_mut_missing_keys() {
         let mut map: Map<&str, i32, 5> = Map::new();
         map.insert("key2", 20);
-
         let [v1, v2] = map.get_disjoint_mut(["key1", "key2"]);
         assert_eq!(v1, None);
         assert_eq!(v2, Some(&mut 20));
