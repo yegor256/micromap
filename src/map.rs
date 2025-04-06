@@ -390,13 +390,13 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         K: Borrow<Q>,
         Q: Eq + ?Sized,
     {
-        if ks.len() == 0 {
+        if ks.is_empty() {
             return [const { None }; J];
         }
 
         // check for overlapping keys (O(n^2), but n is small)
         for (i, k) in ks[..ks.len() - 1].iter().enumerate() {
-            for k_behind in ks[i + 1..].iter() {
+            for k_behind in &ks[i + 1..] {
                 assert!(k != k_behind, "Overlapping keys");
             }
         }
@@ -469,7 +469,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     {
         let mut ret: [Option<&mut V>; J] = [const { None }; J];
 
-        if ks.len() == 0 {
+        if ks.is_empty() {
             return ret;
         } else if ks.len() == 1 {
             ret[0] = self.get_mut(ks[0]);
@@ -485,7 +485,6 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
             if let Some(ks_i) = ks.iter().position(|&k| k.borrow() == p.0.borrow()) {
                 stack[stack_top] = Some((pair_i, ks_i));
                 stack_top += 1;
-                continue;
             }
         }
 
@@ -493,13 +492,11 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
 
         // start splitting the found pairs from the back to the front
         let mut rest_head = &mut self.pairs[..self.len];
-        for found in stack[..stack_top].iter().rev() {
-            if let Some((pair_i, ks_i)) = found {
-                let (head, tail) = rest_head.split_at_mut(*pair_i);
-                rest_head = head;
-                let p = unsafe { tail[0].assume_init_mut() };
-                ret[*ks_i] = Some(&mut p.1);
-            }
+        for (pair_i, ks_i) in stack[..stack_top].iter().rev().flatten() {
+            let (head, tail) = rest_head.split_at_mut(*pair_i);
+            rest_head = head;
+            let p = unsafe { tail[0].assume_init_mut() };
+            ret[*ks_i] = Some(&mut p.1);
         }
         ret
     }
