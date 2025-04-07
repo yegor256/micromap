@@ -249,9 +249,9 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// ```
     ///
     /// ```should_panic
-    /// use std::collections::HashMap;
+    /// use micromap::Map;
     ///
-    /// let mut libraries = HashMap::new();
+    /// let mut libraries: Map<String, u32, 3> = Map::new();
     /// libraries.insert("Athenæum".to_string(), 1807);
     ///
     /// // Duplicate keys panic!
