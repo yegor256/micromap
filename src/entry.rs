@@ -70,7 +70,7 @@ impl<'a, K, V, const N: usize> OccupiedEntry<'a, K, V, N> {
 
     #[must_use]
     pub fn into_mut(self) -> &'a mut V {
-        unsafe { self.table.item_mut(self.index) }
+        unsafe { self.table.value_mut(self.index) }
     }
 
     #[must_use]
@@ -79,7 +79,7 @@ impl<'a, K, V, const N: usize> OccupiedEntry<'a, K, V, N> {
     }
 
     pub fn get_mut(&mut self) -> &mut V {
-        unsafe { self.table.item_mut(self.index) }
+        unsafe { self.table.value_mut(self.index) }
     }
 
     pub fn insert(&mut self, value: V) -> V {
@@ -110,7 +110,7 @@ impl<K, V, const N: usize> VacantEntry<'_, K, V, N> {
 impl<'a, K: PartialEq, V, const N: usize> VacantEntry<'a, K, V, N> {
     pub fn insert(self, value: V) -> &'a mut V {
         let (index, _) = self.table.insert_i(self.key, value);
-        unsafe { self.table.item_mut(index) }
+        unsafe { self.table.value_mut(index) }
     }
 }
 

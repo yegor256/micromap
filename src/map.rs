@@ -48,11 +48,11 @@ impl<K, V, const N: usize> Map<K, V, N> {
 
     /// Retains only the elements specified by the predicate.
     #[inline]
-    pub fn retain<F: Fn(&K, &V) -> bool>(&mut self, f: F) {
+    pub fn retain<F: FnMut(&K, &mut V) -> bool>(&mut self, mut f: F) {
         let mut i = 0;
         while i < self.len {
-            let p = unsafe { self.item_ref(i) };
-            if f(&p.0, &p.1) {
+            let p = unsafe { self.item_mut(i) };
+            if f(&p.0, &mut p.1) {
                 // do not remove -> next index
                 i += 1;
             } else {
@@ -171,7 +171,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         for i in 0..self.len {
             let p = unsafe { self.item_ref(i) };
             if p.0.borrow() == k {
-                return Some(unsafe { self.item_mut(i) });
+                return Some(unsafe { self.value_mut(i) });
             }
         }
         None
@@ -408,6 +408,12 @@ mod internal {
     use crate::Map;
 
     impl<K, V, const N: usize> Map<K, V, N> {
+        /// Internal function to get mutable access via reference to the value in the internal array.
+        #[inline]
+        pub(crate) unsafe fn value_mut(&mut self, i: usize) -> &mut V {
+            &mut self.pairs.get_unchecked_mut(i).assume_init_mut().1
+        }
+
         /// Internal function to get access via reference to the element in the internal array.
         #[inline]
         pub(crate) unsafe fn item_ref(&self, i: usize) -> &(K, V) {
@@ -416,8 +422,8 @@ mod internal {
 
         /// Internal function to get mutable access via reference to the element in the internal array.
         #[inline]
-        pub(crate) unsafe fn item_mut(&mut self, i: usize) -> &mut V {
-            &mut self.pairs.get_unchecked_mut(i).assume_init_mut().1
+        pub(crate) unsafe fn item_mut(&mut self, i: usize) -> &mut (K, V) {
+            self.pairs.get_unchecked_mut(i).assume_init_mut()
         }
 
         /// Internal function to get access to the element in the internal array.
@@ -675,7 +681,7 @@ mod tests {
         assert_eq!(m.len(), 8);
         m.retain(|&k, _| k < 6);
         assert_eq!(m.len(), 6);
-        m.retain(|_, &v| v > 30);
+        m.retain(|_, &mut v| v > 30);
         assert_eq!(m.len(), 2);
     }
 

@@ -43,7 +43,7 @@ impl<T, const N: usize> Set<T, N> {
 
     /// Retains only the elements specified by the predicate.
     #[inline]
-    pub fn retain<F: Fn(&T) -> bool>(&mut self, f: F) {
+    pub fn retain<F: FnMut(&T) -> bool>(&mut self, mut f: F) {
         self.map.retain(|k, ()| f(k));
     }
 }
