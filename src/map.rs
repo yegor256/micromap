@@ -686,6 +686,27 @@ mod tests {
     }
 
     #[test]
+    fn retain_with_mutable_value() {
+        let mut map: Map<&str, i32, 5> = Map::new();
+        map.insert("key1", 10);
+        map.insert("key2", 20);
+        map.insert("key3", 30);
+        // Retain only keys where the value is greater than 15, and double the retained values.
+        map.retain(|_, value| {
+            if *value > 15 {
+                *value *= 2;
+                true
+            } else {
+                false
+            }
+        });
+        assert_eq!(map.len(), 2);
+        assert_eq!(map.get("key1"), None);
+        assert_eq!(map.get("key2"), Some(&40));
+        assert_eq!(map.get("key3"), Some(&60));
+    }
+
+    #[test]
     fn insert_many_and_remove() {
         let mut m: Map<usize, u64, 4> = Map::new();
         for _ in 0..2 {
