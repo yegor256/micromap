@@ -15,6 +15,15 @@ pub fn insert_benchmark(c: &mut Criterion) {
         });
     });
 
+    c.bench_function("insert_same_ignore_return", |b| {
+        let mut m: Map<u64, u64, 64> = Map::new();
+        b.iter(|| {
+            for i in 0..1000 {
+                let _ = m.insert(8, i);
+            }
+        });
+    });
+
     c.bench_function("insert_different", |b| {
         const CAP: usize = 64;
         let mut m: Map<usize, u64, CAP> = Map::new();
@@ -25,13 +34,36 @@ pub fn insert_benchmark(c: &mut Criterion) {
         });
     });
 
+    c.bench_function("insert_different_ignore_return", |b| {
+        const CAP: usize = 64;
+        let mut m: Map<usize, u64, CAP> = Map::new();
+        b.iter(|| {
+            for i in 0..CAP {
+                let _ = m.insert(i, 256);
+            }
+        });
+    });
+
     c.bench_function("insert_and_remove", |b| {
+        const CAP: usize = 64;
+        let mut m: Map<usize, u64, CAP> = Map::new();
+        b.iter(|| {
+            for i in 0..CAP {
+                let _ = m.insert(i, 256);
+                let _ = m.remove(&i);
+                black_box(m.len());
+            }
+        });
+    });
+
+    c.bench_function("insert_and_remove_ignore_return", |b| {
         const CAP: usize = 64;
         let mut m: Map<usize, u64, CAP> = Map::new();
         b.iter(|| {
             for i in 0..CAP {
                 black_box(m.insert(i, 256));
                 black_box(m.remove(&i));
+                black_box(m.len());
             }
         });
     });
