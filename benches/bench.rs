@@ -2,6 +2,28 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 owtotwo
 // SPDX-License-Identifier: MIT
 
+/// Benchmark Usage:
+///
+/// `cargo bench --bench bench` will run all benchmarks in this file.
+/// ("--bench bench" for this file named "bench.rs", without this, the
+/// command `cargo bench` will run all benchmarks in the project.)
+///
+/// If you want to run a single benchmark, you can use the command
+/// `cargo bench -- insert_same`.
+///
+/// To filter benchmarks, use `cargo bench -- <filter>`, where <filter> is
+/// a regular expression matching the benchmark ID.
+///
+/// For example, running `cargo bench -- length` would only run benchmarks
+/// whose ID contains the string "length", such as "straight_length" and
+/// "fragmented_length".
+///
+/// You can use `cargo bench -- length --list` to see what benchmarks will
+/// be run.
+///
+/// While `cargo bench -- insert_.+` would match start with "insert_", such
+/// as "insert_same", "insert_same_ignore_return", "insert_and_remove" and
+/// so on.
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use micromap::Map;
 
@@ -63,7 +85,6 @@ pub fn insert_benchmark(c: &mut Criterion) {
             for i in 0..CAP {
                 black_box(m.insert(i, 256));
                 black_box(m.remove(&i));
-                black_box(m.len());
             }
         });
     });
@@ -166,6 +187,6 @@ criterion_group!(
     benches,
     insert_benchmark,
     length_benchmark,
-    // insert_exist_kv_in_diff_slot
+    // insert_exist_kv_in_diff_slot // ignored for now
 );
 criterion_main!(benches);
