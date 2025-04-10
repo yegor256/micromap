@@ -113,7 +113,7 @@ run `cargo fmt` and `cargo clippy`.
 Also, before you start making changes, run benchmarks:
 
 ```bash
-rustup run nightly cargo bench
+cargo bench --bench bench
 ```
 
 Then, after the changes you make, run it again. Compare the results.
