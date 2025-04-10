@@ -6,6 +6,7 @@
 
 use std::collections::HashMap;
 use std::env;
+use std::hint::black_box;
 use std::time::{Duration, Instant};
 
 const CAPACITY: usize = 1;
@@ -18,7 +19,7 @@ macro_rules! eval {
             let _ = $map.insert(0, 42);
             for i in 1..$capacity - 1 {
                 let _ = $map.insert(i as u32, i as i64);
-                let v = std::hint::black_box(*$map.get(&(i as u32)).unwrap());
+                let v = black_box(*$map.get(&(i as u32)).unwrap());
                 assert_eq!(v, i as i64);
             }
             for i in 1..$capacity - 1 {
@@ -29,9 +30,9 @@ macro_rules! eval {
             if $map.iter().find(|(_k, v)| **v == 0).is_some() {
                 $map.clear();
             }
-            sum += std::hint::black_box($map.iter().find(|(_k, v)| **v == 42).unwrap().1);
+            sum += black_box($map.iter().find(|(_k, v)| **v == 42).unwrap().1);
         }
-        std::hint::black_box(sum)
+        black_box(sum)
     }};
 }
 

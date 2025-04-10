@@ -28,8 +28,13 @@ linear-map = "1.2.0"
 indexmap = "2.2.6"
 litemap = "0.7.0"
 flurry = "0.5.2"
+criterion = "0.5.1"
 
 [features]
 default = []
 std = []
 serde = ["dep:serde", "dep:bincode"]
+
+[[bench]]
+name = "bench"
+harness = false
