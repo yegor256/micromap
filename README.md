@@ -104,7 +104,8 @@ For the maps of just a few keys, the gain was enormous.
 
 ## How to Contribute
 
-First, install [Rust](https://www.rust-lang.org/tools/install), update to the last version by `rustup update stable`, and then:
+First, install [Rust](https://www.rust-lang.org/tools/install), update to the
+last version by `rustup update stable`, and then:
 
 ```bash
 cargo test -vv
