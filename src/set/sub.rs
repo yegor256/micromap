@@ -25,7 +25,7 @@ where
     /// let set = &a - &b;
     /// let expected = Set::from([0, 2]);
     ///
-    /// assert_eq!(result, expected);
+    /// assert_eq!(set, expected);
     /// ```
     fn sub(self, rhs: &Set<T, M>) -> Set<T, N> {
         self.difference(rhs).cloned().collect()
