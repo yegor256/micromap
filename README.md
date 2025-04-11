@@ -2,10 +2,11 @@
 
 [![cargo](https://github.com/yegor256/micromap/actions/workflows/cargo.yml/badge.svg)](https://github.com/yegor256/micromap/actions/workflows/cargo.yml)
 [![crates.io](https://img.shields.io/crates/v/micromap.svg)](https://crates.io/crates/micromap)
+[![docs.rs](https://img.shields.io/docsrs/micromap)](https://docs.rs/micromap/latest/micromap/)
+[![MSRV](https://img.shields.io/badge/MSRV-1.79-ffc832)](https://blog.rust-lang.org/2024/06/13/Rust-1.79.0.html)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/yegor256/micromap/blob/master/LICENSE.txt)
 [![codecov](https://codecov.io/gh/yegor256/micromap/branch/master/graph/badge.svg)](https://codecov.io/gh/yegor256/micromap)
 [![Hits-of-Code](https://hitsofcode.com/github/yegor256/micromap)](https://hitsofcode.com/view/github/yegor256/micromap)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/yegor256/micromap/blob/master/LICENSE.txt)
-[![docs.rs](https://img.shields.io/docsrs/micromap)](https://docs.rs/micromap/latest/micromap/)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fyegor256%2Fmicromap.svg?type=shield&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fyegor256%2Fmicromap?ref=badge_shield&issueType=license)
 
 A much faster alternative of
@@ -95,9 +96,16 @@ As you see, the highest performance gain was achieved for the maps that
 were smaller than ten keys.
 For the maps of just a few keys, the gain was enormous.
 
+## MSRV (Minimum Supported Rust Version)
+
+**`Rust 1.79`**
+
+(Enabling some features will affect MSRV, the documentation will note it.)
+
 ## How to Contribute
 
-First, install [Rust](https://www.rust-lang.org/tools/install) and then:
+First, install [Rust](https://www.rust-lang.org/tools/install), update to the
+last version by `rustup update stable`, and then:
 
 ```bash
 cargo test -vv
