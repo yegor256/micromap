@@ -5,6 +5,7 @@
 name = "micromap"
 version = "0.0.0"
 edition = "2021"
+rust-version = "1.79"
 repository = "https://github.com/yegor256/micromap"
 description = "The fastest alternative to HashMap, for maps smaller than 20 keys"
 readme = "README.md"
