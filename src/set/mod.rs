@@ -15,6 +15,7 @@ mod iterators;
 mod methods;
 #[cfg(feature = "serde")]
 mod serialization;
+mod sub;
 mod symmetric_difference;
 mod union;
 
