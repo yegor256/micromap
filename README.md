@@ -126,9 +126,17 @@ cargo bench --bench bench
 
 If you modified the comment docs, run this to check:
 
-```bash
-cargo doc --all-features --no-deps --open
-```
+- Linux:
+
+    ```bash
+    RUSTDOCFLAGS="--cfg docsrs" cargo +nightly doc --all-features --no-deps
+    ```
+
+- Windows(PowerShell):
+
+    ```PowerShell
+    $env:RUSTDOCFLAGS="--cfg docsrs"; cargo +nightly doc --all-features --no-deps --open; Remove-Item Env:\RUSTDOCFLAGS
+    ```
 
 Then, after the changes you make, run it again. Compare the results.
 If your changes
