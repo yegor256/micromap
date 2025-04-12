@@ -37,7 +37,9 @@ impl<K, V, const N: usize> Map<K, V, N> {
         drain
     }
 
-    /// Remove all pairs from it, but keep the space intact for future use.
+    /// Clears the map, removing all key-value pairs (drop them). But keeps the
+    /// memory that was occupied when creating the [Map], that is, will not
+    /// release any memory usage.
     #[inline]
     pub fn clear(&mut self) {
         for i in 0..self.len {
