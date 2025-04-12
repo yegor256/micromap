@@ -33,7 +33,7 @@
 #![warn(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
 #![warn(rust_2018_idioms)]
 // #![warn(missing_docs)]
-#![cfg_attr(docsrs, warn(rustdoc::missing_doc_code_examples))]
+#![cfg_attr(docsrs, feature(rustdoc_missing_doc_code_examples))]
 #![warn(rustdoc::missing_crate_level_docs)]
 #![doc(test(attr(warn(unused))))]
 
