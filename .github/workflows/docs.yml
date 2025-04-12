@@ -18,7 +18,7 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
-      - run: cargo test --doc --all-features -- --nocapture
-      - run: cargo doc --all-features --no-deps
+      - run: cargo +nightly test --doc --all-features -- --nocapture
+      - run: cargo +nightly doc --all-features --no-deps
         env:
           RUSTDOCFLAGS: '--cfg docsrs'
