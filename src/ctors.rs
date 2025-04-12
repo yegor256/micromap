@@ -5,7 +5,7 @@ use crate::Map;
 use core::mem::MaybeUninit;
 
 impl<K, V, const N: usize> Default for Map<K, V, N> {
-    /// Make a default empty [`Map`].
+    /// Creates a empty [Map] like [`Map::new`].
     #[inline]
     fn default() -> Self {
         Self::new()
@@ -13,13 +13,22 @@ impl<K, V, const N: usize> Default for Map<K, V, N> {
 }
 
 impl<K, V, const N: usize> Map<K, V, N> {
-    /// Make it.
+    /// Creates an empty (len) Linear Map with capacity `N`.
     ///
-    /// The size of the map is defined by the generic argument. For example,
-    /// this is how you make a map of four key-values pairs:
+    /// The linear map is initially created with a capacity of `N`, so it
+    /// will immediately occupy memory on the stack (no allocation on heap).
+    ///
+    /// After creation, capacity will not change, which is the max len of
+    /// the map.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use micromap::Map;
+    /// let mut map: Map<&str, i32, 20> = Map::new();
+    /// ```
     #[inline]
     #[must_use]
-    #[allow(clippy::uninit_assumed_init)]
     pub const fn new() -> Self {
         Self {
             len: 0,
