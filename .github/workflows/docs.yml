@@ -1,8 +1,9 @@
 # SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
+# SPDX-FileCopyrightText: Copyright (c) 2025 owtotwo
 # SPDX-License-Identifier: MIT
 ---
 # yamllint disable rule:line-length
-name: cargo
+name: docs
 'on':
   push:
   pull_request:
@@ -17,15 +18,10 @@ jobs:
       CARGO_TERM_COLOR: always
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 17
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
-      - run: cargo test --all-features -vv -- --nocapture
-      - run: cargo test --release --all-features -vv -- --nocapture
-      - run: cargo fmt --check
-      - run: cargo doc --no-deps
-      - run: cargo clippy -- --no-deps
+          toolchain: nightly
+      - run: cargo test --doc --all-features -- --nocapture
+      - run: cargo doc --all-features --no-deps
+        env:
+          RUSTDOCFLAGS: '--cfg docsrs'
