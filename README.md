@@ -126,13 +126,13 @@ cargo bench --bench bench
 
 If you modified the comment docs, run this to check:
 
-- Linux:
+* Linux:
 
     ```bash
     RUSTDOCFLAGS="--cfg docsrs" cargo +nightly doc --all-features --no-deps
     ```
 
-- Windows(PowerShell):
+* Windows(PowerShell):
 
     ```PowerShell
     $env:RUSTDOCFLAGS="--cfg docsrs"; cargo +nightly doc --all-features --no-deps --open; Remove-Item Env:\RUSTDOCFLAGS
