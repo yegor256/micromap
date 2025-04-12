@@ -13,12 +13,11 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       CARGO_TERM_COLOR: always
+      RUSTDOCFLAGS: '--cfg docsrs'
     steps:
       - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
       - run: cargo +nightly test --doc --all-features -- --nocapture
-      - run: cargo +nightly doc --all-features --no-deps
-        env:
-          RUSTDOCFLAGS: '--cfg docsrs'
+      - run: cargo +nightly doc --all-features --no-deps      
