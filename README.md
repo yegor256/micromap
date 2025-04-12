@@ -124,6 +124,12 @@ Also, before you start making changes, run benchmarks:
 cargo bench --bench bench
 ```
 
+If you modified the comment docs, run this to check:
+
+```bash
+cargo doc --all-features --no-deps --open
+```
+
 Then, after the changes you make, run it again. Compare the results.
 If your changes
 degrade performance, think twice before submitting a pull request.
