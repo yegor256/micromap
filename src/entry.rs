@@ -109,7 +109,7 @@ impl<K, V, const N: usize> VacantEntry<'_, K, V, N> {
 
 impl<'a, K: PartialEq, V, const N: usize> VacantEntry<'a, K, V, N> {
     pub fn insert(self, value: V) -> &'a mut V {
-        let (index, _) = self.table.insert_i(self.key, value);
+        let (index, _) = self.table.insert_ii(self.key, value, false);
         unsafe { self.table.value_mut(index) }
     }
 }

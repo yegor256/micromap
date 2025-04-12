@@ -5,21 +5,22 @@ use crate::{Drain, Entry, Map, OccupiedEntry, VacantEntry};
 use core::borrow::Borrow;
 
 impl<K, V, const N: usize> Map<K, V, N> {
-    /// Get its total capacity.
+    /// Returns the number of key-value pairs the [Map] can hold,
+    /// which always equal to `N`.
     #[inline]
     #[must_use]
     pub const fn capacity(&self) -> usize {
         N
     }
 
-    /// Is it empty?
+    /// Returns true if the map contains no key-value pair.
     #[inline]
     #[must_use]
     pub const fn is_empty(&self) -> bool {
-        self.len() == 0
+        self.len == 0
     }
 
-    /// Return the total number of pairs inside.
+    /// Returns the number of key-value pairs in the map.
     #[inline]
     #[must_use]
     pub const fn len(&self) -> usize {
@@ -66,7 +67,11 @@ impl<K, V, const N: usize> Map<K, V, N> {
 }
 
 impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
-    /// Does the map contain this key?
+    /// Returns true if the map contains a value for the specified key.
+    ///
+    /// The key may be any borrowed form of the map’s key type, but
+    /// [`PartialEq`] on the borrowed form must match those for the key
+    /// type.
     #[inline]
     #[must_use]
     pub fn contains_key<Q: PartialEq + ?Sized>(&self, k: &Q) -> bool
@@ -91,20 +96,49 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         None
     }
 
-    /// Insert a single pair into the map.
+    /// Insert a single key-value pair into the map.
+    ///
+    /// If the map did not have this key present, [None] is returned.
+    ///
+    /// If the map did have this key present, the value is updated, and the old
+    /// value is returned. The key is not updated, though; this matters for
+    /// types that can be `==` without being identical. See the [module-level
+    /// documentation] for more.
+    ///
+    /// If you want to update the key as well, use and check the documentation of
+    /// [`insert_key_value()`][Self::insert_key_value].
+    ///
+    /// [module-level documentation]: std::collections#insert-and-complex-keys
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use micromap::Map;
+    ///
+    /// let mut map: Map<_, _, 3> = Map::new();
+    /// assert_eq!(map.insert(37, "a"), None);
+    /// assert_eq!(map.is_empty(), false);
+    ///
+    /// map.insert(37, "b");
+    /// assert_eq!(map.insert(37, "c"), Some("b"));
+    /// assert_eq!(map[&37], "c");
+    /// ```
     ///
     /// # Panics
     ///
-    /// It may panic if there are too many pairs in the map already.
-    /// In order to comply with the memory safety of the Rust language itself, it will
-    /// perform bounds checking, whether in `debug` mode or `release` mode.
+    /// It may panic if there are too many pairs in the map already. If you
+    /// want to avoid this, use [`checked_insert()`][Self::checked_insert] instead.
     ///
-    /// Because the implementation of this `insert()` mainly uses iterators instead of
-    /// loops, it is not much slower in practice. It is even faster when frequently
-    /// inserting and replacing pairs of existing keys which already in set.
+    /// In order to comply with the memory safety of the Rust language itself, it
+    /// will perform bounds checking, whether in `debug` mode or `release` mode.
+    ///
+    /// About performance, because the implementation of this [`insert()`][Self::insert]
+    /// mainly uses iterators instead of loops, it is not much slower in practice.
+    /// It is even faster when frequently inserting and replacing pairs of
+    /// existing keys which already in set.
     #[inline]
     pub fn insert(&mut self, k: K, v: V) -> Option<V> {
-        let (_, existing_pair) = self.insert_ii(k, v);
+        let (_, existing_pair) = self.insert_ii(k, v, false);
         existing_pair.map(|(_, v)| v)
     }
 
@@ -117,10 +151,54 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     #[inline]
     pub fn checked_insert(&mut self, k: K, v: V) -> Option<Option<V>> {
         if self.len < N {
-            Some(self.insert_ii(k, v).1.map(|(_, v)| v))
+            Some(self.insert_ii(k, v, false).1.map(|(_, v)| v))
         } else {
-            self.insert_ii_for_full(k, v).map(|(_, (_, v))| Some(v))
+            self.insert_ii_for_full(k, v, false)
+                .map(|(_, (_, v))| Some(v))
         }
+    }
+
+    /// Insert a single key-value pair into the map, updating the key as well.
+    ///
+    /// If the map did not have this key present, [None] is returned.
+    ///
+    /// If the map did have this key present, the key-value pair is updated, and
+    /// the old key-value pair is returned. Note that unlike
+    /// [`insert()`][Self::insert], this method updates both key and value.
+    /// This matters for types that can be `==` without being identical.
+    /// See the [module-level documentation] for more.
+    ///
+    /// [module-level documentation]: std::collections#insert-and-complex-keys
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use micromap::Map;
+    ///
+    /// #[derive(Debug)]
+    /// struct Foo(u8, f32);
+    /// impl PartialEq for Foo {
+    ///    fn eq(&self, other: &Self) -> bool {
+    ///       self.0 == other.0
+    ///     }
+    /// }
+    /// impl Eq for Foo {}
+    ///
+    /// let mut map: Map<Foo, char, 3> = Map::new();
+    /// assert_eq!(map.insert_key_value(Foo(b'a', 0.123), 'a'), None);
+    /// assert_eq!(map.len(), 1);
+    ///
+    /// assert_eq!(map.insert_key_value(Foo(b'b', 0.456), 'b'), None);
+    /// assert_eq!(map.len(), 2);
+    /// assert_eq!(map.insert_key_value(Foo(b'b', 0.789), 'B'), Some((Foo(b'b', 0.456), 'b')));
+    /// assert_eq!(map[&Foo(b'b', 3.1416)], 'B');
+    ///
+    /// assert_eq!(map.get_key_value(&Foo(b'b', 0.123)).unwrap().0.1, 0.789);
+    /// ```
+    #[inline]
+    pub fn insert_key_value(&mut self, k: K, v: V) -> Option<(K, V)> {
+        let (_, existing_pair) = self.insert_ii(k, v, true);
+        existing_pair
     }
 
     /// Insert a single pair into the map without bound check in release mode.
@@ -139,7 +217,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// the map is not full before calling.
     #[inline]
     pub unsafe fn insert_unchecked(&mut self, k: K, v: V) -> Option<V> {
-        let (_, existing_pair) = self.insert_i(k, v);
+        let (_, existing_pair) = self.insert_i(k, v, false);
         existing_pair.map(|(_, v)| v)
     }
 
@@ -476,7 +554,7 @@ mod internal {
     impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         /// The core insert logic, which is used for `insert_unchecked()`, as it will
         /// disable the bound check (`debug_assert!`) in `release` mode.
-        pub(crate) fn insert_i(&mut self, k: K, v: V) -> (usize, Option<(K, V)>) {
+        pub(crate) fn insert_i(&mut self, k: K, v: V, update_key: bool) -> (usize, Option<(K, V)>) {
             let mut target = self.len;
             let mut i = 0;
             let mut existing_pair = None;
@@ -493,25 +571,39 @@ mod internal {
                 }
                 i += 1;
             }
-            unsafe { self.item_write(target, (k, v)) };
             if target == self.len {
                 self.len += 1;
             }
-
+            if !update_key {
+                if let Some((old_k, old_v)) = existing_pair {
+                    unsafe { self.item_write(target, (old_k, v)) };
+                    return (target, Some((k, old_v)));
+                }
+            }
+            unsafe { self.item_write(target, (k, v)) };
             (target, existing_pair)
         }
 
         /// The core insert logic, which is used for `insert()`. Its name means
         /// that it uses iterators(the second `i`) instead of loops to implement the underlying
         /// insertion logic for `insert_i()`.
-        pub(crate) fn insert_ii(&mut self, k: K, v: V) -> (usize, Option<(K, V)>) {
+        pub(crate) fn insert_ii(
+            &mut self,
+            k: K,
+            v: V,
+            update_key: bool,
+        ) -> (usize, Option<(K, V)>) {
             if let Some((i, pair)) = self.pairs[..self.len]
                 .iter_mut()
                 .map(|p| unsafe { p.assume_init_mut() })
                 .enumerate()
                 .find(|(_i, p)| p.0 == k)
             {
-                (i, Some(core::mem::replace(pair, (k, v))))
+                if update_key {
+                    (i, Some(core::mem::replace(pair, (k, v))))
+                } else {
+                    (i, Some((k, core::mem::replace(&mut pair.1, v))))
+                }
             } else {
                 let i = self.len;
                 // just for panic msg in debug mode, not the main bound check
@@ -524,14 +616,23 @@ mod internal {
 
         /// When the map is full, we need to check the key-value pair if existed already or not.
         /// If no place to insert the new key-value pair, we return `None`.
-        pub(crate) fn insert_ii_for_full(&mut self, k: K, v: V) -> Option<(usize, (K, V))> {
+        pub(crate) fn insert_ii_for_full(
+            &mut self,
+            k: K,
+            v: V,
+            update_key: bool,
+        ) -> Option<(usize, (K, V))> {
             if let Some((i, pair)) = self.pairs[..self.len]
                 .iter_mut()
                 .map(|p| unsafe { p.assume_init_mut() })
                 .enumerate()
                 .find(|(_, p)| p.0 == k)
             {
-                let existing_pair = core::mem::replace(pair, (k, v));
+                let existing_pair = if update_key {
+                    core::mem::replace(pair, (k, v))
+                } else {
+                    (k, core::mem::replace(&mut pair.1, v))
+                };
                 Some((i, existing_pair))
             } else {
                 None
@@ -918,5 +1019,78 @@ mod tests {
         assert_eq!(v2, Some(&mut 20));
         assert_eq!(v3, Some(&mut 30));
         assert_eq!(v4, None);
+    }
+
+    mod book_example {
+        use super::*;
+
+        #[derive(Debug, Clone)]
+        struct Book {
+            isbn: u64,
+            title: String,
+        }
+
+        impl PartialEq for Book {
+            fn eq(&self, other: &Self) -> bool {
+                self.isbn == other.isbn
+            }
+        }
+
+        impl Eq for Book {}
+
+        #[test]
+        fn insert_will_not_update_the_key() {
+            // library <book, inventory> map
+            let mut library: Map<Book, u32, 5> = Map::new();
+            // The book has old and new publish versions, but they are the same book.
+            let csapp_old = Book {
+                isbn: 9780134092669,
+                title: "CSAPP 3rd".to_string(),
+            };
+            let csapp_new = Book {
+                isbn: 9780134092669,
+                title: "Computer Systems: A Programmer's Perspective (3rd Edition)".to_string(),
+            };
+            assert_ne!(csapp_old.title, csapp_new.title);
+            assert_eq!(csapp_old, csapp_new);
+            // Insert the old version of the book.
+            assert_eq!(library.insert(csapp_old.clone(), 10), None);
+            assert_eq!(library.get_key_value(&csapp_old), Some((&csapp_old, &10)));
+            assert_eq!(library.len(), 1);
+            // After some new editions of books have arrived.
+            assert_eq!(library.insert(csapp_new.clone(), 20), Some(10));
+            // the key is still `csapp_old` instead of `csapp_new`.
+            assert_eq!(library.get_key_value(&csapp_new), Some((&csapp_old, &20)));
+            assert_eq!(library.len(), 1);
+        }
+
+        #[test]
+        fn insert_key_value_will_update_the_key() {
+            // library <book, inventory> map
+            let mut library: Map<Book, u32, 5> = Map::new();
+            // The book has old and new publish versions, but they are the same book.
+            let csapp_old = Book {
+                isbn: 9780134092669,
+                title: "CSAPP 3rd".to_string(),
+            };
+            let csapp_new = Book {
+                isbn: 9780134092669,
+                title: "Computer Systems: A Programmer's Perspective (3rd Edition)".to_string(),
+            };
+            assert_ne!(csapp_old.title, csapp_new.title);
+            assert_eq!(csapp_old, csapp_new);
+            // Insert the old version of the book.
+            assert_eq!(library.insert_key_value(csapp_old.clone(), 10), None);
+            assert_eq!(library.get_key_value(&csapp_old), Some((&csapp_old, &10)));
+            assert_eq!(library.len(), 1);
+            // After some new editions of books have arrived.
+            assert_eq!(
+                library.insert_key_value(csapp_new.clone(), 20),
+                Some((csapp_old.clone(), 10))
+            );
+            // the key will be updated to `csapp_new`, the old key will be included in return pair.
+            assert_eq!(library.get_key_value(&csapp_old), Some((&csapp_new, &20)));
+            assert_eq!(library.len(), 1);
+        }
     }
 }

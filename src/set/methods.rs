@@ -201,7 +201,7 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     /// ```
     #[inline]
     pub fn replace(&mut self, value: T) -> Option<T> {
-        let (_, existing_pair) = self.map.insert_i(value, ());
+        let (_, existing_pair) = self.map.insert_ii(value, (), true);
         existing_pair.map(|(k, ())| k)
     }
 }
