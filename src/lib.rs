@@ -35,6 +35,7 @@
 // #![warn(missing_docs)]
 #![cfg_attr(docsrs, feature(rustdoc_missing_doc_code_examples))]
 #![warn(rustdoc::missing_crate_level_docs)]
+// #![doc(test(attr(deny(unused))))]
 #![doc(test(attr(warn(unused))))]
 
 mod clone;

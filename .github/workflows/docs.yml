@@ -19,5 +19,5 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
-      - run: cargo +nightly test --doc --all-features -- --nocapture
+      - run: cargo +nightly test --doc --all-features -- --show-output
       - run: cargo +nightly doc --all-features --no-deps      
