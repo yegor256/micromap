@@ -20,4 +20,4 @@ jobs:
         with:
           toolchain: nightly
       - run: cargo +nightly test --doc --all-features -- --show-output
-      - run: cargo +nightly doc --all-features --no-deps      
+      - run: cargo +nightly doc --all-features --no-deps
