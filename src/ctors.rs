@@ -35,6 +35,29 @@ impl<K, V, const N: usize> Map<K, V, N> {
             pairs: [const { MaybeUninit::uninit() }; N],
         }
     }
+    /// Creates an empty [Map] with fixed capacity.
+    ///
+    /// The map will be able to hold at most `capacity` elements. And
+    /// the argument `capacity` should be always equal to the generic
+    /// constant `N`.
+    ///
+    /// # Panics
+    ///
+    /// If `capacity` is not equal to `N`, the function will panic.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use micromap::Map;
+    /// let mut map: Map<&str, i32, 10> = Map::with_capacity(10);
+    /// ```
+    #[deprecated(note = "Please use `new()` instead.")]
+    #[inline]
+    #[must_use]
+    pub fn with_capacity(capacity: usize) -> Self {
+        assert!(capacity == N, "capacity must be equal to N");
+        Self::new()
+    }
 }
 
 impl<K, V, const N: usize> Drop for Map<K, V, N> {
