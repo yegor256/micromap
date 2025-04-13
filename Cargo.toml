@@ -36,6 +36,12 @@ default = []
 std = []
 serde = ["dep:serde", "dep:bincode"]
 
+# Ref: https://users.rust-lang.org/t/how-to-document-optional-features-in-api-docs/64577/3
+[package.metadata.docs.rs]
+all-features = true
+rust-toolchain = "nightly"
+rustdoc-args = ["--cfg", "docsrs"]
+
 [[bench]]
 name = "bench"
 harness = false

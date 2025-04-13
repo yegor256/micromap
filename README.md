@@ -124,6 +124,20 @@ Also, before you start making changes, run benchmarks:
 cargo bench --bench bench
 ```
 
+If you modified the comment docs, run this to check:
+
+* Linux:
+
+    ```bash
+    RUSTDOCFLAGS="--cfg docsrs" cargo +nightly doc --all-features --no-deps
+    ```
+
+* Windows(PowerShell):
+
+    ```PowerShell
+    $env:RUSTDOCFLAGS="--cfg docsrs"; cargo +nightly doc --all-features --no-deps --open; Remove-Item Env:\RUSTDOCFLAGS
+    ```
+
 Then, after the changes you make, run it again. Compare the results.
 If your changes
 degrade performance, think twice before submitting a pull request.

@@ -14,6 +14,7 @@ mod intersection;
 mod iterators;
 mod methods;
 #[cfg(feature = "serde")]
+#[cfg_attr(docsrs, doc(cfg(feature = "serde")))]
 mod serialization;
 mod sub;
 mod symmetric_difference;

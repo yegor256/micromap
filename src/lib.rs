@@ -26,12 +26,16 @@
 //! will have exactly ten elements. An attempt to add an 11th element will lead
 //! to a panic.
 
+#![cfg_attr(docsrs, feature(doc_cfg))]
 #![cfg_attr(all(not(feature = "std"), not(doc), not(test)), no_std)]
 #![doc(html_root_url = "https://docs.rs/micromap/0.0.0")]
 #![deny(warnings)]
 #![warn(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
 #![warn(rust_2018_idioms)]
-#![allow(clippy::multiple_crate_versions)]
+// #![warn(missing_docs)]
+#![cfg_attr(docsrs, feature(rustdoc_missing_doc_code_examples))]
+#![warn(rustdoc::missing_crate_level_docs)]
+#![doc(test(attr(warn(unused))))]
 
 mod clone;
 mod ctors;
@@ -46,6 +50,7 @@ mod iterators;
 mod keys;
 mod map;
 #[cfg(feature = "serde")]
+#[cfg_attr(docsrs, doc(cfg(feature = "serde")))]
 mod serialization;
 mod set;
 mod values;

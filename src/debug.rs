@@ -2,10 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 use crate::Map;
-use core::fmt::{self, Debug, Formatter};
+use core::fmt;
 
-impl<K: Debug, V: Debug, const N: usize> Debug for Map<K, V, N> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+impl<K, V, const N: usize> fmt::Debug for Map<K, V, N>
+where
+    K: fmt::Debug,
+    V: fmt::Debug,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_map().entries(self.iter()).finish()
     }
 }
