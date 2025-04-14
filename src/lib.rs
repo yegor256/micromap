@@ -28,7 +28,7 @@
 
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![cfg_attr(all(not(feature = "std"), not(doc), not(test)), no_std)]
-#![doc(html_root_url = "https://docs.rs/micromap/0.0.0")]
+#![doc(html_root_url = "https://docs.rs/micromap/0.0.19")]
 #![deny(warnings)]
 #![warn(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
 #![warn(rust_2018_idioms)]
