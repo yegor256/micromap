@@ -1,12 +1,15 @@
 // SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
-use crate::{Drain, Entry, Map, OccupiedEntry, VacantEntry};
+use crate::{Entry, Map, OccupiedEntry, VacantEntry};
 use core::borrow::Borrow;
 
 impl<K, V, const N: usize> Map<K, V, N> {
     /// Returns the number of key-value pairs the [Map] can hold,
     /// which always equal to `N`.
+    ///
+    /// Note that the number of the inserted pairs (with difference keys)
+    /// should not exceed this value.
     #[inline]
     #[must_use]
     pub const fn capacity(&self) -> usize {
@@ -14,6 +17,17 @@ impl<K, V, const N: usize> Map<K, V, N> {
     }
 
     /// Returns true if the map contains no key-value pair.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use micromap::Map;
+    ///
+    /// let mut a = Map::<_, _, 3>::new();
+    /// assert!(a.is_empty());
+    /// a.insert(1, "a");
+    /// assert!(!a.is_empty());
+    /// ```
     #[inline]
     #[must_use]
     pub const fn is_empty(&self) -> bool {
@@ -21,21 +35,21 @@ impl<K, V, const N: usize> Map<K, V, N> {
     }
 
     /// Returns the number of key-value pairs in the map.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use micromap::Map;
+    ///
+    /// let mut a = Map::<_, _, 3>::new();
+    /// assert_eq!(a.len(), 0);
+    /// a.insert(1, "a");
+    /// assert_eq!(a.len(), 1);
+    /// ```
     #[inline]
     #[must_use]
     pub const fn len(&self) -> usize {
         self.len
-    }
-
-    /// Clears the map, returning all key-value pairs as an iterator. Keeps the allocated memory for reuse.
-    ///
-    /// If the returned iterator is dropped before being fully consumed, it drops the remaining key-value pairs. The returned iterator keeps a mutable borrow on the map to optimize its implementation.
-    pub fn drain(&mut self) -> Drain<'_, K, V> {
-        let drain = Drain {
-            iter: self.pairs[0..self.len].iter_mut(),
-        };
-        self.len = 0;
-        drain
     }
 
     /// Clears the map, removing all key-value pairs (drop them). But keeps the

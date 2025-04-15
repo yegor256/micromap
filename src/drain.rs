@@ -1,8 +1,67 @@
 // SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
-use crate::Drain;
-use core::iter::FusedIterator;
+use super::Map;
+use core::{iter::FusedIterator, mem::MaybeUninit};
+
+impl<K, V, const N: usize> Map<K, V, N> {
+    /// Clears the map, returning all key-value pairs as an iterator. For reuse, the
+    /// memory of capacity `N` will be keeped.
+    ///
+    /// If the returned iterator is dropped before being fully consumed, it drops the
+    /// remaining key-value pairs. The returned iterator keeps a mutable borrow on
+    /// the map to optimize its implementation.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use micromap::Map;
+    ///
+    /// let mut a = Map::<_, _, 3>::new();
+    /// a.insert(1, "a");
+    /// a.insert(2, "b");
+    ///
+    /// for (k, v) in a.drain().take(1) {
+    ///     assert!(k == 1 || k == 2);
+    ///     assert!(v == "a" || v == "b");
+    /// }
+    ///
+    /// assert!(a.is_empty());
+    /// ```
+    pub fn drain(&mut self) -> Drain<'_, K, V> {
+        let drain = Drain {
+            iter: self.pairs[0..self.len].iter_mut(),
+        };
+        self.len = 0;
+        drain
+    }
+}
+
+/// A draining iterator over the entries of a `Map`.
+///
+/// This `struct` is created by the [`drain`][`Map::drain`] method on [`Map`].
+/// See its documentation for more.
+///
+/// # Example
+///
+/// ```
+/// use micromap::Map;
+///
+/// let mut map = Map::from([
+///     ("a", 1),
+///     ("b", 2),
+/// ]);
+/// assert_eq!(map.len(), 2);
+///
+/// let iter = map.drain();
+/// assert_eq!(iter.len(), 2);
+/// // assert_eq!(map.len(), 0); // Drain keeps a mutable borrow on the map
+/// drop(iter);
+/// assert_eq!(map.len(), 0); // Now we can use the map's borrow
+/// ```
+pub struct Drain<'a, K, V> {
+    iter: core::slice::IterMut<'a, MaybeUninit<(K, V)>>,
+}
 
 impl<K, V> Drop for Drain<'_, K, V> {
     fn drop(&mut self) {
