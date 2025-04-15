@@ -1,27 +1,23 @@
 # SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
+# SPDX-FileCopyrightText: Copyright (c) 2025 owtotwo
 # SPDX-License-Identifier: MIT
 ---
 # yamllint disable rule:line-length
-name: cargo
+name: docs
 'on':
   push:
   pull_request:
-concurrency:
-  group: ${{ github.ref }}
-  cancel-in-progress: true
 jobs:
   build:
     timeout-minutes: 15
     runs-on: ubuntu-24.04
     env:
       CARGO_TERM_COLOR: always
+      RUSTDOCFLAGS: '--cfg docsrs'
     steps:
       - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
-      - run: cargo test --all-features -- --show-output
-      - run: cargo test --release --all-features -- --show-output
-      - run: cargo fmt --check
-      - run: cargo doc --no-deps
-      - run: cargo clippy -- --no-deps
+          toolchain: nightly
+      - run: cargo +nightly test --doc --all-features -- --show-output
+      - run: cargo +nightly doc --all-features --no-deps
