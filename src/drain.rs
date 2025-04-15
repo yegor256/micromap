@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
+use super::iterators::slice_iter;
 use super::Map;
 use core::{fmt, iter::FusedIterator, mem::MaybeUninit};
 
@@ -67,12 +68,7 @@ where
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_list()
-            .entries(
-                self.iter
-                    .as_slice()
-                    .iter()
-                    .map(|may| unsafe { may.assume_init_ref() }),
-            )
+            .entries(slice_iter(self.iter.as_slice()))
             .finish()
     }
 }

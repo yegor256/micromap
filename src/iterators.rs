@@ -94,7 +94,26 @@ pub struct Iter<'a, K, V> {
     iter: core::slice::Iter<'a, MaybeUninit<(K, V)>>,
 }
 
-/// Mutable Iterator over the [`Map`].
+/// A mutable iterator over the entries of a `Map`.
+///
+/// This `struct` is created by the [`iter_mut`][`Map::iter_mut`] method
+/// on [`Map`]. See its documentation for more.
+///
+/// # Example
+///
+/// ```
+/// use micromap::Map;
+///
+/// let mut map = Map::from([("a", 1), ("b", 2)]);
+/// let mut iter = map.iter_mut();
+///
+/// iter.next().map(|(_, v)| *v *= 2); // ("a", 2)
+/// iter.next().map(|(_, v)| *v += 1); // ("b", 3)
+///
+/// assert_eq!(iter.len(), 0);
+/// assert_eq!(iter.next(), None);
+/// assert_eq!(map, Map::from([("a", 2), ("b", 3)]));
+/// ```
 #[repr(transparent)]
 pub struct IterMut<'a, K, V> {
     iter: core::slice::IterMut<'a, MaybeUninit<(K, V)>>,
@@ -104,6 +123,15 @@ pub struct IterMut<'a, K, V> {
 #[repr(transparent)]
 pub struct IntoIter<K, V, const N: usize> {
     map: Map<K, V, N>,
+}
+
+/// Utility function for implementing Debug trait for iterators.
+#[inline(always)]
+pub(crate) fn slice_iter<K, V>(slice: &[MaybeUninit<(K, V)>]) -> impl Iterator<Item = (&K, &V)> {
+    slice.iter().map(|may| unsafe {
+        let (k, v) = may.assume_init_ref();
+        (k, v)
+    })
 }
 
 impl<K, V> Clone for Iter<'_, K, V> {
@@ -117,7 +145,17 @@ impl<K, V> Clone for Iter<'_, K, V> {
 
 impl<K: fmt::Debug, V: fmt::Debug> fmt::Debug for Iter<'_, K, V> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_list().entries(self.clone()).finish()
+        f.debug_list()
+            .entries(slice_iter(self.iter.as_slice()))
+            .finish()
+    }
+}
+
+impl<K: fmt::Debug, V: fmt::Debug> fmt::Debug for IterMut<'_, K, V> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_list()
+            .entries(slice_iter(self.iter.as_slice()))
+            .finish()
     }
 }
 
@@ -125,6 +163,15 @@ impl<K, V> Default for Iter<'_, K, V> {
     #[inline]
     fn default() -> Self {
         Iter { iter: [].iter() }
+    }
+}
+
+impl<K, V> Default for IterMut<'_, K, V> {
+    #[inline]
+    fn default() -> Self {
+        IterMut {
+            iter: [].iter_mut(),
+        }
     }
 }
 
@@ -306,6 +353,17 @@ mod tests {
             sum += v;
         }
         assert_eq!(6, sum);
+    }
+
+    #[test]
+    fn debug_trait_for_iter() {
+        let map = Map::from([('x', 120), ('y', 121), ('z', 122)]);
+        let it = map.iter();
+        // use Debug trait by `format!` macro
+        let debug_output = format!("{:?}", it);
+        assert!(debug_output.contains("('x', 120)"));
+        assert!(debug_output.contains("('y', 121)"));
+        assert!(debug_output.contains("('z', 122)"));
     }
 
     #[test]
