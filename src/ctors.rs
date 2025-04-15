@@ -5,7 +5,7 @@ use crate::Map;
 use core::mem::MaybeUninit;
 
 impl<K, V, const N: usize> Default for Map<K, V, N> {
-    /// Creates a empty [Map] like [`Map::new`].
+    /// Creates a empty [Map] like [`new()`][`Map::new`].
     #[inline]
     fn default() -> Self {
         Self::new()
@@ -15,17 +15,20 @@ impl<K, V, const N: usize> Default for Map<K, V, N> {
 impl<K, V, const N: usize> Map<K, V, N> {
     /// Creates an empty (len) Linear Map with capacity `N`.
     ///
-    /// The linear map is initially created with a capacity of `N`, so it
-    /// will immediately occupy memory on the stack (no allocation on heap).
+    /// The linear map is initially created with a place that has a capacity
+    /// of `N` key-value pairs (and one usize), so it will immediately occupy
+    /// these memory on the stack (no allocation on heap).
     ///
-    /// After creation, capacity will not change, which is the max len of
-    /// the map.
+    /// After creation, capacity will not change any more, which is the max
+    /// len of the map.
     ///
     /// # Examples
     ///
     /// ```
     /// use micromap::Map;
-    /// let mut map: Map<&str, i32, 20> = Map::new();
+    /// let map: Map<&str, i32, 20> = Map::new();
+    /// assert_eq!(map.capacity(), 20);
+    /// assert_eq!(map.len(), 0);
     /// ```
     #[inline]
     #[must_use]
@@ -35,6 +38,7 @@ impl<K, V, const N: usize> Map<K, V, N> {
             pairs: [const { MaybeUninit::uninit() }; N],
         }
     }
+
     /// Creates an empty [Map] with fixed capacity.
     ///
     /// The map will be able to hold at most `capacity` elements. And
@@ -47,9 +51,13 @@ impl<K, V, const N: usize> Map<K, V, N> {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```should_panic
+    /// # #![allow(deprecated)]
     /// use micromap::Map;
-    /// let mut map: Map<&str, i32, 10> = Map::with_capacity(10);
+    /// let map: Map<&str, i32, 10> = Map::with_capacity(10); // correct
+    /// assert_eq!(map.capacity(), 10);
+    /// let map: Map<&str, i32, 10> = Map::with_capacity(20); // panic here
+    /// assert_eq!(map.capacity(), 10); // unreachable line
     /// ```
     #[deprecated(note = "Please use `new()` instead.")]
     #[inline]
