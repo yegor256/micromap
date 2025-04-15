@@ -1,11 +1,33 @@
 // SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
-use crate::{IntoIter, Iter, IterMut, Map};
-use core::iter::FusedIterator;
+use super::Map;
+
+use core::{fmt, iter::FusedIterator, mem::MaybeUninit};
 
 impl<K, V, const N: usize> Map<K, V, N> {
-    /// Make an iterator over all pairs.
+    /// An iterator visiting all key-value pairs in _non-deterministic order_.
+    /// The iterator element type is `(&'a K, &'a V)`.
+    ///
+    /// If no mutable borrow modifications are made to the map before the next
+    /// iteration, the order of iteration will not change.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use micromap::Map;
+    ///
+    /// let map = Map::from([("a", 1), ("b", 2), ("c", 3)]);
+    ///
+    /// for (key, val) in map.iter() {
+    ///     println!("key: {key} val: {val}");
+    /// }
+    /// ```
+    ///
+    /// # Performance
+    ///
+    /// In the current implementation, iterating over map takes `O(len)` time.
+    /// The average complexity is `O(len/2)`.
     #[inline]
     #[must_use]
     pub fn iter(&self) -> Iter<'_, K, V> {
@@ -14,7 +36,31 @@ impl<K, V, const N: usize> Map<K, V, N> {
         }
     }
 
-    /// An iterator with mutable references to the values but
+    /// An iterator visiting all key-value pairs in _arbitrary order_, with
+    /// mutable references to the values. The iterator element type
+    /// is `(&'a K, &'a mut V)`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use micromap::Map;
+    ///
+    /// let mut map = Map::from([("a", 1), ("b", 2), ("c", 3)]);
+    ///
+    /// // Update all values
+    /// for (_, val) in map.iter_mut() {
+    ///     *val *= 2;
+    /// }
+    ///
+    /// for (key, val) in &map {
+    ///     println!("key: {key} val: {val}"); // vals are now 2, 4, 6
+    /// }
+    /// ```
+    ///
+    /// # Performance
+    ///
+    /// In the current implementation, iterating over map takes `O(len)` time.
+    /// The average complexity is `O(len/2)`.
     #[inline]
     pub fn iter_mut(&mut self) -> IterMut<'_, K, V> {
         IterMut {
@@ -23,12 +69,62 @@ impl<K, V, const N: usize> Map<K, V, N> {
     }
 }
 
+/// An iterator over the entries of a `HashMap`.
+///
+/// This `struct` is created by the [`iter`][`Map::iter`] method on [`Map`].
+/// See its documentation for more.
+///
+/// # Example
+///
+/// ```
+/// use micromap::Map;
+///
+/// let map = Map::from([("a", 1), ("b", 2)]);
+/// let mut iter = map.iter();
+///
+/// assert_eq!(iter.len(), 2);
+/// assert_eq!(iter.next(), Some((&"a", &1)));
+/// assert_eq!(iter.len(), 1);
+/// assert_eq!(iter.next(), Some((&"b", &2)));
+/// assert_eq!(iter.len(), 0);
+/// assert_eq!(iter.next(), None);
+/// ```
+#[repr(transparent)]
+pub struct Iter<'a, K, V> {
+    iter: core::slice::Iter<'a, MaybeUninit<(K, V)>>,
+}
+
+/// Mutable Iterator over the [`Map`].
+#[repr(transparent)]
+pub struct IterMut<'a, K, V> {
+    iter: core::slice::IterMut<'a, MaybeUninit<(K, V)>>,
+}
+
+/// Into-iterator over the [`Map`].
+#[repr(transparent)]
+pub struct IntoIter<K, V, const N: usize> {
+    map: Map<K, V, N>,
+}
+
 impl<K, V> Clone for Iter<'_, K, V> {
     #[inline]
     fn clone(&self) -> Self {
         Self {
             iter: self.iter.clone(),
         }
+    }
+}
+
+impl<K: fmt::Debug, V: fmt::Debug> fmt::Debug for Iter<'_, K, V> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_list().entries(self.clone()).finish()
+    }
+}
+
+impl<K, V> Default for Iter<'_, K, V> {
+    #[inline]
+    fn default() -> Self {
+        Iter { iter: [].iter() }
     }
 }
 
@@ -249,6 +345,17 @@ mod tests {
         m.remove("two");
         assert_eq!(m.iter_mut().count(), 2);
         assert_eq!(m.iter_mut().last().unwrap().1, &5);
+    }
+
+    #[test]
+    fn iter_mut_key_is_not_mut() {
+        let mut m: Map<u8, i32, 10> = Map::new();
+        m.insert(1, 10);
+        m.insert(2, 20);
+        for (k, v) in m.iter_mut() {
+            // *k += 1; // this will not compile, because `k` is &u8
+            *v += *k as i32; // v is &mut i32
+        }
     }
 
     #[test]

@@ -59,7 +59,9 @@ mod set;
 mod values;
 
 pub use crate::set::{Set, SetDrain, SetIntoIter, SetIter};
+
 pub use drain::Drain;
+pub use iterators::{IntoIter, Iter, IterMut};
 
 use core::mem::MaybeUninit;
 
@@ -93,24 +95,6 @@ pub struct Map<K, V, const N: usize> {
     len: usize,
     /// The fixed-size array of key-value pairs.
     pairs: [MaybeUninit<(K, V)>; N],
-}
-
-/// Iterator over the [`Map`].
-#[repr(transparent)]
-pub struct Iter<'a, K, V> {
-    iter: core::slice::Iter<'a, MaybeUninit<(K, V)>>,
-}
-
-/// Mutable Iterator over the [`Map`].
-#[repr(transparent)]
-pub struct IterMut<'a, K, V> {
-    iter: core::slice::IterMut<'a, MaybeUninit<(K, V)>>,
-}
-
-/// Into-iterator over the [`Map`].
-#[repr(transparent)]
-pub struct IntoIter<K, V, const N: usize> {
-    map: Map<K, V, N>,
 }
 
 /// An iterator over the values of the [`Map`].
