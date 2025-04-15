@@ -126,8 +126,8 @@ pub struct IntoIter<K, V, const N: usize> {
 }
 
 /// Utility function for implementing Debug trait for iterators.
-#[inline(always)]
-pub(crate) fn slice_iter<K, V>(slice: &[MaybeUninit<(K, V)>]) -> impl Iterator<Item = (&K, &V)> {
+#[inline]
+pub fn slice_iter<K, V>(slice: &[MaybeUninit<(K, V)>]) -> impl Iterator<Item = (&K, &V)> {
     slice.iter().map(|may| unsafe {
         let (k, v) = may.assume_init_ref();
         (k, v)
