@@ -19,8 +19,8 @@ impl<K, V, const N: usize> Map<K, V, N> {
     ///
     /// let map = Map::from([("a", 1), ("b", 2), ("c", 3)]);
     ///
-    /// for (key, val) in map.iter() {
-    ///     println!("key: {key} val: {val}");
+    /// for (k, v) in &map { // Implicit call as `map.iter()`
+    ///     println!("key: {k} val: {v}");
     /// }
     /// ```
     ///
@@ -48,12 +48,12 @@ impl<K, V, const N: usize> Map<K, V, N> {
     /// let mut map = Map::from([("a", 1), ("b", 2), ("c", 3)]);
     ///
     /// // Update all values
-    /// for (_, val) in map.iter_mut() {
+    /// for (_, val) in &mut map { // Implicit call as `map.iter_mut()`
     ///     *val *= 2;
     /// }
     ///
-    /// for (key, val) in &map {
-    ///     println!("key: {key} val: {val}"); // vals are now 2, 4, 6
+    /// for (k, v) in &map { // Implicit call as `map.iter()`
+    ///     println!("key: {k} val: {v}"); // vals are now 2, 4, 6
     /// }
     /// ```
     ///
@@ -119,13 +119,32 @@ pub struct IterMut<'a, K, V> {
     iter: core::slice::IterMut<'a, MaybeUninit<(K, V)>>,
 }
 
-/// Into-iterator over the [`Map`].
+/// An owning iterator over the entries of a `Map`.
+///
+/// This `struct` is created by the [`into_iter`][`IntoIterator::into_iter`]
+/// method on [`Map`] (provided by the [`IntoIterator`] trait). See its
+/// documentation for more.
+///
+/// # Example
+///
+/// ```
+/// use micromap::Map;
+///
+/// let map = Map::from([("a", 1)]);
+/// let _iter = map.into_iter(); // consumed map
+///
+/// let mut map = Map::from([('b', 2), ('c', 3)]);
+/// for (k, v) in map { // Implicit call as `map.into_iter()`
+///     println!("key: {k} val: {v}");
+/// }
+/// // assert_eq!(map.len(), 2); // `into_iter()` takes ownership, so can not do this
+/// ```
 #[repr(transparent)]
 pub struct IntoIter<K, V, const N: usize> {
     map: Map<K, V, N>,
 }
 
-/// Utility function for implementing Debug trait for iterators.
+/// Utility function for implementing Debug trait for iterators (whose inner is a slice).
 #[inline]
 pub fn slice_iter<K, V>(slice: &[MaybeUninit<(K, V)>]) -> impl Iterator<Item = (&K, &V)> {
     slice.iter().map(|may| unsafe {
@@ -159,18 +178,33 @@ impl<K: fmt::Debug, V: fmt::Debug> fmt::Debug for IterMut<'_, K, V> {
     }
 }
 
+impl<K: fmt::Debug, V: fmt::Debug, const N: usize> fmt::Debug for IntoIter<K, V, N> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_list().entries(self.map.iter()).finish()
+    }
+}
+
 impl<K, V> Default for Iter<'_, K, V> {
     #[inline]
     fn default() -> Self {
-        Iter { iter: [].iter() }
+        Self { iter: [].iter() }
     }
 }
 
 impl<K, V> Default for IterMut<'_, K, V> {
     #[inline]
     fn default() -> Self {
-        IterMut {
+        Self {
             iter: [].iter_mut(),
+        }
+    }
+}
+
+impl<K, V, const N: usize> Default for IntoIter<K, V, N> {
+    #[inline]
+    fn default() -> Self {
+        Self {
+            map: Map::default(),
         }
     }
 }
@@ -367,6 +401,28 @@ mod tests {
     }
 
     #[test]
+    fn debug_trait_for_iter_mut() {
+        let mut map = Map::from([('x', 120), ('y', 121), ('z', 122)]);
+        let it = map.iter_mut();
+        // use Debug trait by `format!` macro
+        let debug_output = format!("{:?}", it);
+        assert!(debug_output.contains("('x', 120)"));
+        assert!(debug_output.contains("('y', 121)"));
+        assert!(debug_output.contains("('z', 122)"));
+    }
+
+    #[test]
+    fn debug_trait_for_into_iter() {
+        let map = Map::from([('x', 120), ('y', 121), ('z', 122)]);
+        let it = map.into_iter();
+        // use Debug trait by `format!` macro
+        let debug_output = format!("{:?}", it);
+        assert!(debug_output.contains("('x', 120)"));
+        assert!(debug_output.contains("('y', 121)"));
+        assert!(debug_output.contains("('z', 122)"));
+    }
+
+    #[test]
     fn into_iterate_with_blanks() {
         let mut m: Map<String, i32, 10> = Map::new();
         m.insert("one".to_string(), 1);
@@ -460,5 +516,12 @@ mod tests {
         assert!(it_into.next().is_none());
         assert!(it_into.next().is_none());
         assert_eq!(it_into.len(), 0);
+    }
+
+    #[test]
+    fn iter_series_default() {
+        let _i = Iter::<String, u32>::default();
+        let _i = IterMut::<String, u32>::default();
+        let _i = IntoIter::<String, u32, 3>::default();
     }
 }
