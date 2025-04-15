@@ -59,6 +59,8 @@ mod set;
 mod values;
 
 pub use crate::set::{Set, SetDrain, SetIntoIter, SetIter};
+pub use drain::Drain;
+
 use core::mem::MaybeUninit;
 
 /// A faster alternative of [`std::collections::HashMap`].
@@ -167,5 +169,3 @@ pub struct VacantEntry<'a, K, V, const N: usize> {
     key: K,
     table: &'a mut Map<K, V, N>,
 }
-
-pub use drain::Drain;

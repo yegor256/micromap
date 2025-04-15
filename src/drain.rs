@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 use super::Map;
-use core::{iter::FusedIterator, mem::MaybeUninit};
+use core::{fmt, iter::FusedIterator, mem::MaybeUninit};
 
 impl<K, V, const N: usize> Map<K, V, N> {
     /// Clears the map, returning all key-value pairs as an iterator. For reuse, the
@@ -47,10 +47,7 @@ impl<K, V, const N: usize> Map<K, V, N> {
 /// ```
 /// use micromap::Map;
 ///
-/// let mut map = Map::from([
-///     ("a", 1),
-///     ("b", 2),
-/// ]);
+/// let mut map = Map::from([("a", 1), ("b", 2)]);
 /// assert_eq!(map.len(), 2);
 ///
 /// let iter = map.drain();
@@ -61,6 +58,23 @@ impl<K, V, const N: usize> Map<K, V, N> {
 /// ```
 pub struct Drain<'a, K, V> {
     iter: core::slice::IterMut<'a, MaybeUninit<(K, V)>>,
+}
+
+impl<K, V> fmt::Debug for Drain<'_, K, V>
+where
+    K: fmt::Debug,
+    V: fmt::Debug,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_list()
+            .entries(
+                self.iter
+                    .as_slice()
+                    .iter()
+                    .map(|may| unsafe { may.assume_init_ref() }),
+            )
+            .finish()
+    }
 }
 
 impl<K, V> Drop for Drain<'_, K, V> {
@@ -75,7 +89,7 @@ impl<K, V> Iterator for Drain<'_, K, V> {
     type Item = (K, V);
 
     #[inline]
-    fn next(&mut self) -> Option<Self::Item> {
+    fn next(&mut self) -> Option<(K, V)> {
         self.iter.next().map(|p| unsafe { p.assume_init_read() })
     }
 
@@ -126,5 +140,16 @@ mod tests {
         assert_eq!(drain.next(), Some(('a', 97)));
         // Three elements left for Drop
         drop(drain);
+    }
+
+    #[test]
+    fn debug_trait_for_drain() {
+        let mut map = Map::from([('x', 120), ('y', 121), ('z', 122)]);
+        let drain = map.drain();
+        // use Debug trait by `format!` macro
+        let debug_output = format!("{:?}", drain);
+        assert!(debug_output.contains("('x', 120)"));
+        assert!(debug_output.contains("('y', 121)"));
+        assert!(debug_output.contains("('z', 122)"));
     }
 }
