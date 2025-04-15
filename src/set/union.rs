@@ -11,18 +11,14 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     /// i.e., the values that are in `self` or `other`.
     ///
     /// # Examples
-    ///
     /// ```
     /// use micromap::Set;
-    ///
     /// let a = Set::from([1, 2, 3]);
     /// let b = Set::from([4, 2, 3, 4]);
-    ///
     /// // Can be seen as `a ∪ b`.
     /// for x in a.union(&b) {
     ///     println!("{x}"); // Print 1, 2, 3, 4
     /// }
-    ///
     /// let union: Set<_, 7> = a.union(&b).copied().collect();
     /// assert_eq!(union, Set::from([1, 2, 3, 4]));
     /// ```
@@ -41,13 +37,10 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
 /// [`union`]: Set::union
 ///
 /// # Examples
-///
 /// ```
 /// use micromap::Set;
-///
 /// let a = Set::from([1, 2, 3]);
 /// let b = Set::from([4, 2, 3, 4]);
-///
 /// let mut union = a.union(&b);
 /// ```
 #[must_use = "this returns the union as an iterator, without modifying either input set"]
@@ -102,7 +95,6 @@ impl<T: PartialEq, const M: usize> core::iter::FusedIterator for Union<'_, T, M>
 
 #[cfg(test)]
 mod tests {
-
     use crate::Set;
 
     #[test]
@@ -110,7 +102,6 @@ mod tests {
         let set_a = Set::from([0, 1, 2, 3, 5, 7, 9]);
         let set_b = Set::from([2, 5, 6, 7, 8, 10]);
         let set_c = Set::from([0, 1, 2, 3, 5, 7, 9, 2, 5, 6, 7, 8]);
-
         let set_result: Set<_, 13> = set_a.union(&set_b).copied().collect();
         assert_eq!(set_result, Set::from([0, 1, 2, 3, 5, 6, 7, 8, 9, 10]));
         let set_result: Set<_, 19> = set_a.union(&set_c).copied().collect();
@@ -157,16 +148,12 @@ mod tests {
         let set_b = Set::from([4, 5, 6, 6, 6, 7, 8, 9]); // cap is 8, but len() is 6
         let set_c = Set::from([]);
         let set_d = Set::from([3, 4]);
-
         assert_eq!(set_a.union(&set_b).size_hint(), (6, Some(9)));
         assert_eq!(set_a.union(&set_c).size_hint(), (3, Some(3)));
         assert_eq!(set_a.union(&set_d).size_hint(), (3, Some(5)));
-
         assert_eq!(set_b.union(&set_a).size_hint(), (6, Some(9)));
         assert_eq!(set_b.union(&set_d).size_hint(), (6, Some(8)));
-
         assert_eq!(set_c.union(&set_b).size_hint(), (6, Some(6)));
-
         assert_eq!(set_d.union(&set_a).size_hint(), (3, Some(5)));
         assert_eq!(set_d.union(&set_b).size_hint(), (6, Some(8)));
         assert_eq!(set_d.union(&set_c).size_hint(), (2, Some(2)));

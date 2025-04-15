@@ -164,7 +164,6 @@ pub fn benchmark_and_print() {
         if d == ours {
             continue;
         }
-
         if d.cmp(ours).is_gt() {
             total_gain += differential;
         } else {

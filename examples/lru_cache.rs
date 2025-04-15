@@ -137,9 +137,7 @@ mod map_in_lru {
 
 fn main() {
     use lru_cache::LRUCache;
-
     const MAX: usize = 2; // LRU Cache Capacity
-
     {
         // micromap::Map
         let mut cache: LRUCache<_, _, MAX> = LRUCache::new(); //use MicroMap by default
@@ -153,7 +151,6 @@ fn main() {
         println!("{:?}", cache.get(&3)); // Some(&3)
         println!("{:?}", cache.get(&4)); // Some(&4)
     }
-
     {
         // std::collection::HashMap
         let mut cache: LRUCache<_, _, MAX, HashMap<_, _>> = LRUCache::new();

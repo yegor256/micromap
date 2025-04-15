@@ -53,7 +53,6 @@ impl<'de, T: PartialEq + Deserialize<'de>, const N: usize> Deserialize<'de> for 
 
 #[cfg(test)]
 mod tests {
-
     use crate::Set;
     use bincode::serde::{decode_from_slice, encode_into_slice};
 

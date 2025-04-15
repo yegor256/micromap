@@ -23,7 +23,6 @@ impl<T: Display, const N: usize> Display for Set<T, N> {
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
 
     #[test]

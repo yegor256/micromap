@@ -58,10 +58,9 @@ mod serialization;
 mod set;
 mod values;
 
-pub use crate::set::{Set, SetDrain, SetIntoIter, SetIter};
-
 pub use drain::Drain;
 pub use iterators::{IntoIter, Iter, IterMut};
+pub use set::{Set, SetDrain, SetIntoIter, SetIter};
 
 use core::mem::MaybeUninit;
 

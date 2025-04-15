@@ -116,7 +116,6 @@ impl<'a, K: PartialEq, V, const N: usize> VacantEntry<'a, K, V, N> {
 
 #[cfg(test)]
 mod tests {
-
     use super::Entry;
     use crate::Map;
 
@@ -137,7 +136,6 @@ mod tests {
         let value = if let Entry::Occupied(mut entry) = m.entry('e') {
             let value = *entry.get();
             assert_eq!(value, 42);
-
             *entry.get_mut() = b'E';
             assert_eq!(*entry.get(), 69);
             let e = entry.into_mut();

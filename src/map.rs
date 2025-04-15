@@ -22,7 +22,6 @@ impl<K, V, const N: usize> Map<K, V, N> {
     ///
     /// ```
     /// use micromap::Map;
-    ///
     /// let mut a = Map::<_, _, 3>::new();
     /// assert!(a.is_empty());
     /// a.insert(1, "a");
@@ -37,10 +36,8 @@ impl<K, V, const N: usize> Map<K, V, N> {
     /// Returns the number of key-value pairs in the map.
     ///
     /// # Examples
-    ///
     /// ```
     /// use micromap::Map;
-    ///
     /// let mut a = Map::<_, _, 3>::new();
     /// assert_eq!(a.len(), 0);
     /// a.insert(1, "a");
@@ -52,8 +49,9 @@ impl<K, V, const N: usize> Map<K, V, N> {
         self.len
     }
 
-    /// Clears the map, removing all key-value pairs (drop them). But keeps the
-    /// memory that was occupied when creating the [Map], that is, will not
+    /// Clears the map, removing all key-value pairs (drop them).
+    ///
+    /// But keeps the memory that was occupied when creating the [Map], that is, will not
     /// release any memory usage.
     #[inline]
     pub fn clear(&mut self) {
@@ -125,21 +123,17 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// [module-level documentation]: std::collections#insert-and-complex-keys
     ///
     /// # Examples
-    ///
     /// ```
     /// use micromap::Map;
-    ///
     /// let mut map: Map<_, _, 3> = Map::new();
     /// assert_eq!(map.insert(37, "a"), None);
     /// assert_eq!(map.is_empty(), false);
-    ///
     /// map.insert(37, "b");
     /// assert_eq!(map.insert(37, "c"), Some("b"));
     /// assert_eq!(map[&37], "c");
     /// ```
     ///
     /// # Panics
-    ///
     /// It may panic if there are too many pairs in the map already. If you
     /// want to avoid this, use [`checked_insert()`][Self::checked_insert] instead.
     ///
@@ -185,10 +179,8 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// [module-level documentation]: std::collections#insert-and-complex-keys
     ///
     /// # Examples
-    ///
     /// ```
     /// use micromap::Map;
-    ///
     /// #[derive(Debug)]
     /// struct Foo(u8, f32);
     /// impl PartialEq for Foo {
@@ -197,16 +189,13 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     ///     }
     /// }
     /// impl Eq for Foo {}
-    ///
     /// let mut map: Map<Foo, char, 3> = Map::new();
     /// assert_eq!(map.insert_key_value(Foo(b'a', 0.123), 'a'), None);
     /// assert_eq!(map.len(), 1);
-    ///
     /// assert_eq!(map.insert_key_value(Foo(b'b', 0.456), 'b'), None);
     /// assert_eq!(map.len(), 2);
     /// assert_eq!(map.insert_key_value(Foo(b'b', 0.789), 'B'), Some((Foo(b'b', 0.456), 'b')));
     /// assert_eq!(map[&Foo(b'b', 3.1416)], 'B');
-    ///
     /// assert_eq!(map.get_key_value(&Foo(b'b', 0.123)).unwrap().0.1, 0.789);
     /// ```
     #[inline]
@@ -218,14 +207,12 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// Insert a single pair into the map without bound check in release mode.
     ///
     /// # Panics
-    ///
     /// It may panic if there are too many pairs in the map already. Pay attention,
     /// it panics only in the `debug` mode. In the `release` mode, you are going to get
     /// **undefined behavior**. This is done for the sake of performance, in order to
     /// avoid a repetitive check for the boundary condition on every `insert()`.
     ///
     /// # Safety
-    ///
     /// Calling this method to add a new key-value pair when the [`Map`] is already
     /// full is undefined behavior instead of panic. So you need to make sure that
     /// the map is not full before calling.
@@ -254,7 +241,6 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// Get a mutable reference to a single value.
     ///
     /// # Panics
-    ///
     /// If can't turn it into a mutable state.
     #[inline]
     #[must_use]
@@ -295,26 +281,21 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// None will be used if the key is missing.
     ///
     /// # Panics
-    ///
     /// Panics if any keys are overlapping.
     ///
     /// # Examples
-    ///
     /// ```
     /// use micromap::Map;
-    ///
     /// let mut libraries: Map<String, u32, 5> = Map::new();
     /// libraries.insert("Bodleian Library".to_string(), 1602);
     /// libraries.insert("Athenæum".to_string(), 1807);
     /// libraries.insert("Herzogin-Anna-Amalia-Bibliothek".to_string(), 1691);
     /// libraries.insert("Library of Congress".to_string(), 1800);
-    ///
     /// // Get Athenæum and Bodleian Library
     /// let [Some(a), Some(b)] = libraries.get_disjoint_mut([
     ///     "Athenæum",
     ///     "Bodleian Library",
     /// ]) else { panic!() };
-    ///
     /// // Assert values of Athenæum and Library of Congress
     /// let got = libraries.get_disjoint_mut([
     ///     "Athenæum",
@@ -327,7 +308,6 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     ///         Some(&mut 1800),
     ///     ],
     /// );
-    ///
     /// // Missing keys result in None
     /// let got = libraries.get_disjoint_mut([
     ///     "Athenæum",
@@ -341,13 +321,10 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     ///     ]
     /// );
     /// ```
-    ///
     /// ```should_panic
     /// use micromap::Map;
-    ///
     /// let mut libraries: Map<String, u32, 3> = Map::new();
     /// libraries.insert("Athenæum".to_string(), 1807);
-    ///
     /// // Duplicate keys panic!
     /// let got = libraries.get_disjoint_mut([
     ///     "Athenæum",
@@ -382,29 +359,24 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// For a safe alternative see [`Map::get_disjoint_mut`].
     ///
     /// # Safety
-    ///
     /// Calling this method with overlapping keys is *[undefined behavior]* even if the resulting
     /// references are not used.
     ///
     /// [undefined behavior]: https://doc.rust-lang.org/reference/behavior-considered-undefined.html
     ///
     /// # Examples
-    ///
     /// ```
     /// use micromap::Map;
-    ///
     /// let mut libraries: Map<String, u32, 5> = Map::new();
     /// libraries.insert("Bodleian Library".to_string(), 1602);
     /// libraries.insert("Athenæum".to_string(), 1807);
     /// libraries.insert("Herzogin-Anna-Amalia-Bibliothek".to_string(), 1691);
     /// libraries.insert("Library of Congress".to_string(), 1800);
-    ///
     /// // SAFETY: The keys do not overlap.
     /// let [Some(a), Some(b)] = (unsafe { libraries.get_disjoint_unchecked_mut([
     ///     "Athenæum",
     ///     "Bodleian Library",
     /// ]) }) else { panic!() };
-    ///
     /// // SAFETY: The keys do not overlap.
     /// let got = unsafe { libraries.get_disjoint_unchecked_mut([
     ///     "Athenæum",
@@ -417,7 +389,6 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     ///         Some(&mut 1800),
     ///     ],
     /// );
-    ///
     /// // SAFETY: The keys do not overlap.
     /// let got = unsafe { libraries.get_disjoint_unchecked_mut([
     ///     "Athenæum",
@@ -542,7 +513,6 @@ mod internal {
         #[inline]
         pub(crate) unsafe fn remove_index_drop(&mut self, i: usize) {
             self.item_drop(i);
-
             self.len -= 1;
             if i != self.len {
                 let value = self.item_read(self.len);
@@ -554,13 +524,11 @@ mod internal {
         #[inline]
         pub(crate) unsafe fn remove_index_read(&mut self, i: usize) -> (K, V) {
             let result = self.item_read(i);
-
             self.len -= 1;
             if i != self.len {
                 let value = self.item_read(self.len);
                 self.item_write(i, value);
             }
-
             result
         }
     }
@@ -657,7 +625,6 @@ mod internal {
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
 
     #[test]

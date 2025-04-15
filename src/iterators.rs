@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 use super::Map;
-
 use core::{fmt, iter::FusedIterator, mem::MaybeUninit};
 
 impl<K, V, const N: usize> Map<K, V, N> {
@@ -13,19 +12,15 @@ impl<K, V, const N: usize> Map<K, V, N> {
     /// iteration, the order of iteration will not change.
     ///
     /// # Examples
-    ///
     /// ```
     /// use micromap::Map;
-    ///
     /// let map = Map::from([("a", 1), ("b", 2), ("c", 3)]);
-    ///
     /// for (k, v) in &map { // Implicit call as `map.iter()`
     ///     println!("key: {k} val: {v}");
     /// }
     /// ```
     ///
     /// # Performance
-    ///
     /// In the current implementation, iterating over map takes `O(len)` time.
     /// The average complexity is `O(len/2)`.
     #[inline]
@@ -41,24 +36,19 @@ impl<K, V, const N: usize> Map<K, V, N> {
     /// is `(&'a K, &'a mut V)`.
     ///
     /// # Examples
-    ///
     /// ```
     /// use micromap::Map;
-    ///
     /// let mut map = Map::from([("a", 1), ("b", 2), ("c", 3)]);
-    ///
     /// // Update all values
     /// for (_, val) in &mut map { // Implicit call as `map.iter_mut()`
     ///     *val *= 2;
     /// }
-    ///
     /// for (k, v) in &map { // Implicit call as `map.iter()`
     ///     println!("key: {k} val: {v}"); // vals are now 2, 4, 6
     /// }
     /// ```
     ///
     /// # Performance
-    ///
     /// In the current implementation, iterating over map takes `O(len)` time.
     /// The average complexity is `O(len/2)`.
     #[inline]
@@ -75,13 +65,10 @@ impl<K, V, const N: usize> Map<K, V, N> {
 /// See its documentation for more.
 ///
 /// # Example
-///
 /// ```
 /// use micromap::Map;
-///
 /// let map = Map::from([("a", 1), ("b", 2)]);
 /// let mut iter = map.iter();
-///
 /// assert_eq!(iter.len(), 2);
 /// assert_eq!(iter.next(), Some((&"a", &1)));
 /// assert_eq!(iter.len(), 1);
@@ -100,16 +87,12 @@ pub struct Iter<'a, K, V> {
 /// on [`Map`]. See its documentation for more.
 ///
 /// # Example
-///
 /// ```
 /// use micromap::Map;
-///
 /// let mut map = Map::from([("a", 1), ("b", 2)]);
 /// let mut iter = map.iter_mut();
-///
 /// iter.next().map(|(_, v)| *v *= 2); // ("a", 2)
 /// iter.next().map(|(_, v)| *v += 1); // ("b", 3)
-///
 /// assert_eq!(iter.len(), 0);
 /// assert_eq!(iter.next(), None);
 /// assert_eq!(map, Map::from([("a", 2), ("b", 3)]));
@@ -126,13 +109,10 @@ pub struct IterMut<'a, K, V> {
 /// documentation for more.
 ///
 /// # Example
-///
 /// ```
 /// use micromap::Map;
-///
 /// let map = Map::from([("a", 1)]);
 /// let _iter = map.into_iter(); // consumed map
-///
 /// let mut map = Map::from([('b', 2), ('c', 3)]);
 /// for (k, v) in map { // Implicit call as `map.into_iter()`
 ///     println!("key: {k} val: {v}");
@@ -333,7 +313,6 @@ impl<K, V, const N: usize> FusedIterator for IntoIter<K, V, N> {}
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
 
     #[test]

@@ -2,9 +2,8 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 owtotwo
 // SPDX-License-Identifier: MIT
 
-use core::ops::Sub;
-
 use super::Set;
+use core::ops::Sub;
 
 impl<T, const N: usize, const M: usize> Sub<&Set<T, M>> for &Set<T, N>
 where
@@ -34,7 +33,6 @@ where
 
 #[cfg(test)]
 mod tests {
-
     use crate::Set;
 
     #[test]

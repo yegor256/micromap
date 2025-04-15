@@ -94,7 +94,6 @@ impl<K: PartialEq, V, const N: usize> FusedIterator for IntoValues<K, V, N> {}
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
 
     #[test]

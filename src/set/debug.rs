@@ -12,7 +12,6 @@ impl<T: Debug, const N: usize> Debug for Set<T, N> {
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
 
     #[test]

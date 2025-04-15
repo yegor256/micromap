@@ -23,7 +23,6 @@ impl<K, V, const N: usize> Map<K, V, N> {
     /// len of the map.
     ///
     /// # Examples
-    ///
     /// ```
     /// use micromap::Map;
     /// let map: Map<&str, i32, 20> = Map::new();
@@ -46,11 +45,9 @@ impl<K, V, const N: usize> Map<K, V, N> {
     /// constant `N`.
     ///
     /// # Panics
-    ///
     /// If `capacity` is not equal to `N`, the function will panic.
     ///
     /// # Examples
-    ///
     /// ```should_panic
     /// # #![allow(deprecated)]
     /// use micromap::Map;
@@ -78,7 +75,6 @@ impl<K, V, const N: usize> Drop for Map<K, V, N> {
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
 
     #[test]

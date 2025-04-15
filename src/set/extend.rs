@@ -22,7 +22,6 @@ impl<'a, T: 'a + PartialEq + Copy, const N: usize> Extend<&'a T> for Set<T, N> {
 
 #[cfg(test)]
 mod tests {
-
     use crate::Set;
 
     #[test]

@@ -17,18 +17,14 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     /// copies of `T` in the two sets.
     ///
     /// # Examples
-    ///
     /// ```
     /// use micromap::Set;
-    ///
     /// let a = Set::from([1, 2, 3]);
     /// let b = Set::from([4, 2, 3, 4]);
-    ///
     /// // Print 2, 3 in arbitrary order.
     /// for x in a.intersection(&b) {
     ///     println!("{x}");
     /// }
-    ///
     /// let intersection: Set<_, 3> = a.intersection(&b).copied().collect();
     /// assert_eq!(intersection, Set::from([2, 3]));
     /// ```
@@ -52,13 +48,10 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
 /// [`intersection`]: Set::intersection
 ///
 /// # Examples
-///
 /// ```
 /// use micromap::Set;
-///
 /// let a = Set::from([1, 2, 3]);
 /// let b = Set::from([4, 2, 3, 4]);
-///
 /// let mut intersection = a.intersection(&b);
 /// ```
 #[must_use = "this returns the intersection as an iterator, without modifying either input set"]
@@ -119,7 +112,6 @@ impl<T: PartialEq + core::fmt::Debug, const M: usize> core::fmt::Debug for Inter
 
 #[cfg(test)]
 mod tests {
-
     use crate::Set;
 
     #[test]
@@ -127,7 +119,6 @@ mod tests {
         let set_a = Set::from([0, 1, 2, 3, 5, 7, 9]);
         let set_b = Set::from([2, 5, 6, 7, 8, 10]);
         let set_c = Set::from([0, 1, 2, 3, 5, 7, 9, 2, 5, 6, 7, 8]);
-
         let set_result: Set<_, 5> = set_a.intersection(&set_b).copied().collect();
         assert_eq!(set_result, Set::from([2, 5, 7]));
         let set_result: Set<_, 7> = set_a.intersection(&set_c).copied().collect();
@@ -174,16 +165,12 @@ mod tests {
         let set_b = Set::from([4, 5, 6, 6, 6, 7, 8, 9]); // cap is 8, but len() is 6
         let set_c = Set::from([]);
         let set_d = Set::from([3, 4]);
-
         assert_eq!(set_a.intersection(&set_b).size_hint(), (0, Some(3)));
         assert_eq!(set_a.intersection(&set_c).size_hint(), (0, Some(0)));
         assert_eq!(set_a.intersection(&set_d).size_hint(), (0, Some(2)));
-
         assert_eq!(set_b.intersection(&set_a).size_hint(), (0, Some(3)));
         assert_eq!(set_b.intersection(&set_d).size_hint(), (0, Some(2)));
-
         assert_eq!(set_c.intersection(&set_b).size_hint(), (0, Some(0)));
-
         assert_eq!(set_d.intersection(&set_a).size_hint(), (0, Some(2)));
         assert_eq!(set_d.intersection(&set_b).size_hint(), (0, Some(2)));
         assert_eq!(set_d.intersection(&set_c).size_hint(), (0, Some(0)));

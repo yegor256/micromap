@@ -75,7 +75,6 @@ impl<K, V, const N: usize> FusedIterator for IntoKeys<K, V, N> {}
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
 
     #[test]

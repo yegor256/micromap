@@ -23,7 +23,6 @@ impl<K: PartialEq, V, const N: usize> From<[(K, V); N]> for Map<K, V, N> {
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
 
     const TEST_ARRAY: [(i32, &str); 5] =

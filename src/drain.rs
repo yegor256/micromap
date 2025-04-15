@@ -14,19 +14,15 @@ impl<K, V, const N: usize> Map<K, V, N> {
     /// the map to optimize its implementation.
     ///
     /// # Examples
-    ///
     /// ```
     /// use micromap::Map;
-    ///
     /// let mut a = Map::<_, _, 3>::new();
     /// a.insert(1, "a");
     /// a.insert(2, "b");
-    ///
     /// for (k, v) in a.drain().take(1) {
     ///     assert!(k == 1 || k == 2);
     ///     assert!(v == "a" || v == "b");
     /// }
-    ///
     /// assert!(a.is_empty());
     /// ```
     pub fn drain(&mut self) -> Drain<'_, K, V> {
@@ -44,13 +40,10 @@ impl<K, V, const N: usize> Map<K, V, N> {
 /// See its documentation for more.
 ///
 /// # Example
-///
 /// ```
 /// use micromap::Map;
-///
 /// let mut map = Map::from([("a", 1), ("b", 2)]);
 /// assert_eq!(map.len(), 2);
-///
 /// let iter = map.drain();
 /// assert_eq!(iter.len(), 2);
 /// // assert_eq!(map.len(), 0); // Drain keeps a mutable borrow on the map
@@ -112,26 +105,20 @@ mod tests {
     fn normal_drain() {
         let mut map = Map::<char, u8, 10>::from_iter([('a', 97), ('b', 98), ('c', 99), ('d', 100)]);
         let mut cloned_map = map.clone();
-
         let mut drain = map.drain();
-
         // For ExactSizeIterator
         assert_eq!(drain.len(), drain.size_hint().0);
-
         // Consume the first two items by iterator
         assert_eq!(drain.next(), Some(('a', 97)));
         assert_eq!(drain.next(), Some(('b', 98)));
-
         // We can fuse the drain
         let mut fuse_it = drain.fuse();
         assert_eq!(fuse_it.next(), Some(('c', 99)));
         assert_eq!(fuse_it.next(), Some(('d', 100)));
-
         // Further calls to next() should return None
         assert!(fuse_it.next().is_none());
         // Then fuse works. (It doesn't make sense in our Drain really, but it can.)
         assert!(fuse_it.next().is_none());
-
         let mut drain = cloned_map.drain();
         assert_eq!(drain.next(), Some(('a', 97)));
         // Three elements left for Drop

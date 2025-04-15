@@ -26,9 +26,12 @@ impl<T, const N: usize> Set<T, N> {
         self.map.len()
     }
 
-    /// Clears the set, returning all elements as an iterator. Keeps the allocated memory for reuse.
+    /// Clears the set, returning all elements as an iterator. Keeps the allocated
+    /// memory for reuse.
     ///
-    /// If the returned iterator is dropped before being fully consumed, it drops the remaining elements. The returned iterator keeps a mutable borrow on the set to optimize its implementation.
+    /// If the returned iterator is dropped before being fully consumed, it drops the
+    /// remaining elements. The returned iterator keeps a mutable borrow on the set
+    /// to optimize its implementation.
     pub fn drain(&mut self) -> SetDrain<'_, T> {
         SetDrain {
             iter: self.map.drain(),
@@ -73,10 +76,10 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     /// Returns whether the value was newly inserted. That is:
     ///
     /// If the set did not previously contain this value, true is returned.
-    /// If the set already contained this value, false is returned, and the set is not modified: original value is not replaced, and the value passed as argument is dropped.
+    /// If the set already contained this value, false is returned, and the set is not
+    /// modified: original value is not replaced, and the value passed as argument is dropped.
     ///
     /// # Panics
-    ///
     /// It may panic if there are too many pairs in the set already. Pay attention,
     /// it panics only in the "debug" mode. In the "release" mode, you are going to get
     /// undefined behavior. This is done for the sake of performance, in order to
@@ -113,13 +116,10 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     /// This is equivalent to checking for an empty intersection.
     ///
     /// # Examples
-    ///
     /// ```
     /// use micromap::Set;
-    ///
     /// let a = Set::from([1, 2, 3]);
     /// let mut b: Set<u32, 5> = Set::new();
-    ///
     /// assert_eq!(a.is_disjoint(&b), true);
     /// b.insert(4);
     /// assert_eq!(a.is_disjoint(&b), true);
@@ -138,13 +138,10 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     /// i.e., `other` contains at least all the values in `self`.
     ///
     /// # Examples
-    ///
     /// ```
     /// use micromap::Set;
-    ///
     /// let sup = Set::from([1, 2, 3]);
     /// let mut set: Set<u32, 5> = Set::new();
-    ///
     /// assert_eq!(set.is_subset(&sup), true);
     /// set.insert(2);
     /// assert_eq!(set.is_subset(&sup), true);
@@ -163,19 +160,14 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     /// i.e., `self` contains at least all the values in `other`.
     ///
     /// # Examples
-    ///
     /// ```
     /// use micromap::Set;
-    ///
     /// let sub = Set::from([1, 2]);
     /// let mut set: Set<u32, 5> = Set::new();
-    ///
     /// assert_eq!(set.is_superset(&sub), false);
-    ///
     /// set.insert(0);
     /// set.insert(1);
     /// assert_eq!(set.is_superset(&sub), false);
-    ///
     /// set.insert(2);
     /// assert_eq!(set.is_superset(&sub), true);
     /// ```
@@ -188,13 +180,10 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     /// one. Returns the replaced value.
     ///
     /// # Examples
-    ///
     /// ```
     /// use micromap::Set;
-    ///
     /// let mut set: Set<_, 5> = Set::new();
     /// set.insert(Vec::<i32>::new());
-    ///
     /// assert_eq!(set.get(&[][..]).unwrap().capacity(), 0);
     /// set.replace(Vec::with_capacity(10));
     /// assert_eq!(set.get(&[][..]).unwrap().capacity(), 10);

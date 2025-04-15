@@ -36,7 +36,6 @@ pub fn insert_benchmark(c: &mut Criterion) {
             }
         });
     });
-
     c.bench_function("insert_same_ignore_return", |b| {
         let mut m: Map<u64, u64, 64> = Map::new();
         b.iter(|| {
@@ -45,7 +44,6 @@ pub fn insert_benchmark(c: &mut Criterion) {
             }
         });
     });
-
     c.bench_function("insert_different", |b| {
         const CAP: usize = 64;
         let mut m: Map<usize, u64, CAP> = Map::new();
@@ -55,7 +53,6 @@ pub fn insert_benchmark(c: &mut Criterion) {
             }
         });
     });
-
     c.bench_function("insert_different_ignore_return", |b| {
         const CAP: usize = 64;
         let mut m: Map<usize, u64, CAP> = Map::new();
@@ -65,7 +62,6 @@ pub fn insert_benchmark(c: &mut Criterion) {
             }
         });
     });
-
     c.bench_function("insert_and_remove", |b| {
         const CAP: usize = 64;
         let mut m: Map<usize, u64, CAP> = Map::new();
@@ -77,7 +73,6 @@ pub fn insert_benchmark(c: &mut Criterion) {
             }
         });
     });
-
     c.bench_function("insert_and_remove_ignore_return", |b| {
         const CAP: usize = 64;
         let mut m: Map<usize, u64, CAP> = Map::new();
@@ -102,7 +97,6 @@ pub fn length_benchmark(c: &mut Criterion) {
             }
         });
     });
-
     c.bench_function("fragmented_length", |b| {
         let mut m: Map<u64, u64, 64> = Map::new();
         for i in 0..1000 {
@@ -126,22 +120,18 @@ pub fn insert_exist_kv_in_diff_slot(c: &mut Criterion) {
         let mut m = Map::<u32, char, 64>::from_iter([(0, 'a')]);
         b.iter(|| black_box(m.insert(black_box(0), black_box('a'))));
     });
-
     c.bench_function("insert_index_3_slot_as_tail_in_small_map", |b| {
         let mut m = Map::<u32, char, 4>::from_iter([(0, 'a'), (1, 'b'), (2, 'c'), (3, 'd')]);
         b.iter(|| black_box(m.insert(black_box(3), black_box('d'))));
     });
-
     c.bench_function("insert_index_3_slot", |b| {
         let mut m = Map::<u32, char, 64>::from_iter([(0, 'a'), (1, 'b'), (2, 'c'), (3, 'd')]);
         b.iter(|| black_box(m.insert(black_box(3), black_box('d'))));
     });
-
     c.bench_function("insert_index_3_slot_in_large_map", |b| {
         let mut m = Map::<u32, char, 4096>::from_iter([(0, 'a'), (1, 'b'), (2, 'c'), (3, 'd')]);
         b.iter(|| black_box(m.insert(black_box(3), black_box('d'))));
     });
-
     c.bench_function("insert_index_3_slot_when_full", |b| {
         let mut m = Map::<u32, char, 64>::new();
         (0..64).for_each(|i| {
@@ -149,7 +139,6 @@ pub fn insert_exist_kv_in_diff_slot(c: &mut Criterion) {
         });
         b.iter(|| black_box(m.insert(black_box(3), black_box('d'))));
     });
-
     c.bench_function("insert_index_30_slot", |b| {
         let mut m = Map::<u32, char, 64>::new();
         (0..31).for_each(|i| {
@@ -157,7 +146,6 @@ pub fn insert_exist_kv_in_diff_slot(c: &mut Criterion) {
         });
         b.iter(|| black_box(m.insert(black_box(30), black_box('y'))));
     });
-
     c.bench_function("insert_0_to_63_slot", |b| {
         let mut m = Map::<u32, char, 64>::new();
         (0..64).for_each(|i| {
@@ -169,7 +157,6 @@ pub fn insert_exist_kv_in_diff_slot(c: &mut Criterion) {
             })
         });
     });
-
     c.bench_function("insert_63_to_0_slot", |b| {
         let mut m = Map::<u32, char, 64>::new();
         (0..64).for_each(|i| {
