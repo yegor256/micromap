@@ -10,6 +10,16 @@ impl<K, V, const N: usize> Map<K, V, N> {
     ///
     /// Note that the number of the inserted pairs (with difference keys)
     /// should not exceed this value.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// const N: usize = 3;
+    /// let mut m = Map::<_, _, N>::new();
+    /// m.insert(1, "a");
+    /// assert_eq!(m.capacity(), N);
+    /// assert_eq!(m.len(), 1);
+    /// ```
     #[inline]
     #[must_use]
     pub const fn capacity(&self) -> usize {
@@ -19,13 +29,12 @@ impl<K, V, const N: usize> Map<K, V, N> {
     /// Returns true if the map contains no key-value pair.
     ///
     /// # Examples
-    ///
     /// ```
     /// use micromap::Map;
-    /// let mut a = Map::<_, _, 3>::new();
-    /// assert!(a.is_empty());
-    /// a.insert(1, "a");
-    /// assert!(!a.is_empty());
+    /// let mut m = Map::<_, _, 3>::new();
+    /// assert!(m.is_empty());
+    /// m.insert(1, "a");
+    /// assert!(!m.is_empty());
     /// ```
     #[inline]
     #[must_use]
@@ -38,10 +47,10 @@ impl<K, V, const N: usize> Map<K, V, N> {
     /// # Examples
     /// ```
     /// use micromap::Map;
-    /// let mut a = Map::<_, _, 3>::new();
-    /// assert_eq!(a.len(), 0);
-    /// a.insert(1, "a");
-    /// assert_eq!(a.len(), 1);
+    /// let mut m = Map::<_, _, 3>::new();
+    /// assert_eq!(m.len(), 0);
+    /// m.insert(1, "a");
+    /// assert_eq!(m.len(), 1);
     /// ```
     #[inline]
     #[must_use]
@@ -53,6 +62,15 @@ impl<K, V, const N: usize> Map<K, V, N> {
     ///
     /// But keeps the memory that was occupied when creating the [Map], that is, will not
     /// release any memory usage.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// let mut m = Map::<_, _, 3>::new();
+    /// m.insert(1, "a");
+    /// m.clear();
+    /// assert!(m.is_empty());
+    /// ```
     #[inline]
     pub fn clear(&mut self) {
         for i in 0..self.len {
@@ -62,6 +80,21 @@ impl<K, V, const N: usize> Map<K, V, N> {
     }
 
     /// Retains only the elements specified by the predicate.
+    ///
+    /// In other words, remove all pairs `(k, v)` for which `f(&k, &mut v)`
+    /// returns false. The elements are visited in unsorted (and unspecified)
+    /// order.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// let mut map: Map<_, _, 8> = Map::from_iter((0..8).map(|x| (x, x*10)));
+    /// map.retain(|&k, _| k % 2 == 0);
+    /// assert_eq!(map.len(), 4);
+    /// ```
+    ///
+    /// # Performance
+    /// In the current implementation, this operation takes O(len) time.
     #[inline]
     pub fn retain<F: FnMut(&K, &mut V) -> bool>(&mut self, mut f: F) {
         let mut i = 0;
