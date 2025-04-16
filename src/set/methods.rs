@@ -52,7 +52,7 @@ impl<T, const N: usize> Set<T, N> {
 }
 
 impl<T: PartialEq, const N: usize> Set<T, N> {
-    /// Returns true if the set contains a value.
+    /// Returns `true` if the set contains a value.
     #[inline]
     #[must_use]
     pub fn contains<Q: PartialEq + ?Sized>(&self, k: &Q) -> bool
@@ -75,8 +75,8 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     ///
     /// Returns whether the value was newly inserted. That is:
     ///
-    /// If the set did not previously contain this value, true is returned.
-    /// If the set already contained this value, false is returned, and the set is not
+    /// If the set did not previously contain this value, `true` is returned.
+    /// If the set already contained this value, `false` is returned, and the set is not
     /// modified: original value is not replaced, and the value passed as argument is dropped.
     ///
     /// # Panics

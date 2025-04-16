@@ -26,7 +26,7 @@ impl<K, V, const N: usize> Map<K, V, N> {
         N
     }
 
-    /// Returns true if the map contains no key-value pair.
+    /// Returns `true` if the map contains no key-value pair.
     ///
     /// # Examples
     /// ```
@@ -112,33 +112,56 @@ impl<K, V, const N: usize> Map<K, V, N> {
 }
 
 impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
-    /// Returns true if the map contains a value for the specified key.
+    /// Returns `true` if the map contains a value for the specified key.
     ///
     /// The key may be any borrowed form of the map’s key type, but
     /// [`PartialEq`] on the borrowed form must match those for the key
     /// type.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// let mut m: Map<_, _, 3> = Map::new();
+    /// m.insert(1, "a");
+    /// assert_eq!(m.contains_key(&1), true);
+    /// assert_eq!(m.contains_key(&2), false);
+    /// ```
     #[inline]
     #[must_use]
-    pub fn contains_key<Q: PartialEq + ?Sized>(&self, k: &Q) -> bool
+    pub fn contains_key<Q>(&self, k: &Q) -> bool
     where
         K: Borrow<Q>,
+        Q: PartialEq + ?Sized,
     {
         self.iter().any(|(x, _)| x.borrow() == k)
     }
 
-    /// Remove by key.
+    /// Removes a key from the map, returning the value at the key if the key
+    /// was previously in the map.
+    ///
+    /// The key may be any borrowed form of the map’s key type, but
+    /// [`PartialEq`] on the borrowed form must match those for the key
+    /// type.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// let mut m: Map<_, _, 3> = Map::new();
+    /// m.insert(1, "a");
+    /// assert_eq!(m.remove(&1), Some("a"));
+    /// assert_eq!(m.remove(&1), None);
+    /// ```
     #[inline]
-    pub fn remove<Q: PartialEq + ?Sized>(&mut self, k: &Q) -> Option<V>
+    pub fn remove<Q>(&mut self, k: &Q) -> Option<V>
     where
         K: Borrow<Q>,
+        Q: PartialEq + ?Sized,
     {
-        for i in 0..self.len {
-            let p = unsafe { self.item_ref(i) };
-            if p.0.borrow() == k {
-                return Some(unsafe { self.remove_index_read(i).1 });
-            }
-        }
-        None
+        let (i, _) = self.pairs[..self.len]
+            .iter()
+            .enumerate()
+            .find(|(_, p)| unsafe { p.assume_init_ref() }.0.borrow() == k)?;
+        Some(unsafe { self.remove_index_read(i).1 })
     }
 
     /// Insert a single key-value pair into the map.
@@ -214,6 +237,8 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// # Examples
     /// ```
     /// use micromap::Map;
+    /// // Only the first element in the tuple is considered when
+    /// // determining whether two `Foo`s are equal.
     /// #[derive(Debug)]
     /// struct Foo(u8, f32);
     /// impl PartialEq for Foo {
@@ -221,12 +246,15 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     ///       self.0 == other.0
     ///     }
     /// }
+    /// // Not necessary
     /// impl Eq for Foo {}
+    /// // Use Foo as a key
     /// let mut map: Map<Foo, char, 3> = Map::new();
     /// assert_eq!(map.insert_key_value(Foo(b'a', 0.123), 'a'), None);
     /// assert_eq!(map.len(), 1);
     /// assert_eq!(map.insert_key_value(Foo(b'b', 0.456), 'b'), None);
     /// assert_eq!(map.len(), 2);
+    /// // Note that the f32 in `Foo` is meaningless here.
     /// assert_eq!(map.insert_key_value(Foo(b'b', 0.789), 'B'), Some((Foo(b'b', 0.456), 'b')));
     /// assert_eq!(map[&Foo(b'b', 3.1416)], 'B');
     /// assert_eq!(map.get_key_value(&Foo(b'b', 0.123)).unwrap().0.1, 0.789);
@@ -255,54 +283,73 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         existing_pair.map(|(_, v)| v)
     }
 
-    /// Get a reference to a single value.
+    /// Returns a reference to the value corresponding to the key.
+    ///
+    /// The key may be any borrowed form of the map’s key type, but
+    /// [`PartialEq`] on the borrowed form must match those for the key
+    /// type.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// let mut m: Map<_, _, 3> = Map::new();
+    /// m.insert(1, "a");
+    /// assert_eq!(m.get(&1), Some(&"a"));
+    /// assert_eq!(m.get(&2), None);
+    /// ```
     #[inline]
     #[must_use]
-    pub fn get<Q: PartialEq + ?Sized>(&self, k: &Q) -> Option<&V>
+    pub fn get<Q>(&self, k: &Q) -> Option<&V>
     where
         K: Borrow<Q>,
+        Q: PartialEq + ?Sized,
     {
-        for i in 0..self.len {
-            let p = unsafe { self.item_ref(i) };
-            if p.0.borrow() == k {
-                return Some(&p.1);
-            }
-        }
-        None
+        let pair = self.pairs[..self.len]
+            .iter()
+            .find(|p| unsafe { p.assume_init_ref() }.0.borrow() == k)?;
+        Some(unsafe { &pair.assume_init_ref().1 })
     }
 
-    /// Get a mutable reference to a single value.
+    /// Returns a mutable reference to the value corresponding to the key.
     ///
-    /// # Panics
-    /// If can't turn it into a mutable state.
-    #[inline]
+    /// The key may be any borrowed form of the map’s key type, but
+    /// [`PartialEq`] on the borrowed form must match those for the key
+    /// type.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// let mut m: Map<_, _, 3> = Map::new();
+    /// m.insert(1, "a");
+    /// if let Some(x) = m.get_mut(&1) {
+    ///     *x = "b";
+    /// }
+    /// assert_eq!(m[&1], "b");
+    /// ```
     #[must_use]
-    pub fn get_mut<Q: PartialEq + ?Sized>(&mut self, k: &Q) -> Option<&mut V>
+    pub fn get_mut<Q>(&mut self, k: &Q) -> Option<&mut V>
     where
         K: Borrow<Q>,
+        Q: PartialEq + ?Sized,
     {
-        for i in 0..self.len {
-            let p = unsafe { self.item_ref(i) };
-            if p.0.borrow() == k {
-                return Some(unsafe { self.value_mut(i) });
-            }
-        }
-        None
+        let pair = self.pairs[..self.len]
+            .iter_mut()
+            .find(|p| unsafe { p.assume_init_ref() }.0.borrow() == k)?;
+        Some(unsafe { &mut pair.assume_init_mut().1 })
     }
 
     /// Returns the key-value pair corresponding to the supplied key.
     #[inline]
-    pub fn get_key_value<Q: PartialEq + ?Sized>(&self, k: &Q) -> Option<(&K, &V)>
+    pub fn get_key_value<Q>(&self, k: &Q) -> Option<(&K, &V)>
     where
         K: Borrow<Q>,
+        Q: PartialEq + ?Sized,
     {
-        for i in 0..self.len {
-            let p = unsafe { self.item_ref(i) };
-            if p.0.borrow() == k {
-                return Some((&p.0, &p.1));
-            }
-        }
-        None
+        let pair = self.pairs[..self.len]
+            .iter()
+            .find(|p| unsafe { p.assume_init_ref() }.0.borrow() == k)?;
+        let (k, v) = unsafe { pair.assume_init_ref() };
+        Some((k, v))
     }
 
     /// Attempts to get mutable references to `J` values in the map at once.
