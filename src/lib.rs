@@ -58,8 +58,14 @@ mod serialization;
 mod set;
 mod values;
 
+// re-export
 pub use drain::Drain;
+pub use entry::{Entry, OccupiedEntry, VacantEntry};
 pub use iterators::{IntoIter, Iter, IterMut};
+pub use keys::{IntoKeys, Keys};
+pub use values::{IntoValues, Values, ValuesMut};
+
+// re-export Set
 pub use set::{Set, SetDrain, SetIntoIter, SetIter};
 
 use core::mem::MaybeUninit;
@@ -94,61 +100,4 @@ pub struct Map<K, V, const N: usize> {
     len: usize,
     /// The fixed-size array of key-value pairs.
     pairs: [MaybeUninit<(K, V)>; N],
-}
-
-/// An iterator over the values of the [`Map`].
-#[repr(transparent)]
-pub struct Values<'a, K, V> {
-    iter: Iter<'a, K, V>,
-}
-
-/// Mutable iterator over the values of the [`Map`].
-#[repr(transparent)]
-pub struct ValuesMut<'a, K, V> {
-    iter: IterMut<'a, K, V>,
-}
-
-/// Consuming iterator over the values of the [`Map`].
-#[repr(transparent)]
-pub struct IntoValues<K, V, const N: usize> {
-    iter: IntoIter<K, V, N>,
-}
-
-/// A read-only iterator over the keys of the [`Map`].
-#[repr(transparent)]
-pub struct Keys<'a, K, V> {
-    iter: Iter<'a, K, V>,
-}
-
-/// Consuming iterator over the keys of the [`Map`].
-#[repr(transparent)]
-pub struct IntoKeys<K, V, const N: usize> {
-    iter: IntoIter<K, V, N>,
-}
-
-/// A view into a single entry in a map, which may either be vacant or occupied.
-///
-/// This `enum` is constructed from the [`entry`] method on [`Map`].
-///
-/// [`entry`]: Map::entry
-pub enum Entry<'a, K, V, const N: usize> {
-    /// An occupied entry.
-    Occupied(OccupiedEntry<'a, K, V, N>),
-
-    /// A vacant entry.
-    Vacant(VacantEntry<'a, K, V, N>),
-}
-
-/// A view into an occupied entry in a `Map`.
-/// It is part of the [`Entry`] enum.
-pub struct OccupiedEntry<'a, K, V, const N: usize> {
-    index: usize,
-    table: &'a mut Map<K, V, N>,
-}
-
-/// A view into a vacant entry in a `Map`.
-/// It is part of the [`Entry`] enum.
-pub struct VacantEntry<'a, K, V, const N: usize> {
-    key: K,
-    table: &'a mut Map<K, V, N>,
 }

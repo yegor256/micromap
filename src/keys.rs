@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
-use crate::{IntoKeys, Keys, Map};
+use super::Map;
+use super::{IntoIter, Iter};
 use core::iter::FusedIterator;
 
 impl<K, V, const N: usize> Map<K, V, N> {
@@ -18,6 +19,18 @@ impl<K, V, const N: usize> Map<K, V, N> {
             iter: self.into_iter(),
         }
     }
+}
+
+/// A read-only iterator over the keys of the [`Map`].
+#[repr(transparent)]
+pub struct Keys<'a, K, V> {
+    iter: Iter<'a, K, V>,
+}
+
+/// Consuming iterator over the keys of the [`Map`].
+#[repr(transparent)]
+pub struct IntoKeys<K, V, const N: usize> {
+    iter: IntoIter<K, V, N>,
 }
 
 impl<K, V> Clone for Keys<'_, K, V> {

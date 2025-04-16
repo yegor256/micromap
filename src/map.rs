@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
-use crate::{Entry, Map, OccupiedEntry, VacantEntry};
+use crate::Map;
 use core::borrow::Borrow;
 
 impl<K, V, const N: usize> Map<K, V, N> {
@@ -450,22 +450,6 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
             }
         }
         None
-    }
-
-    pub fn entry(&mut self, k: K) -> Entry<'_, K, V, N> {
-        for i in 0..self.len {
-            let p = unsafe { self.item_ref(i) };
-            if p.0 == k {
-                return Entry::Occupied(OccupiedEntry {
-                    index: i,
-                    table: self,
-                });
-            }
-        }
-        Entry::Vacant(VacantEntry {
-            key: k,
-            table: self,
-        })
     }
 }
 

@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
-use crate::{IntoValues, Map, Values, ValuesMut};
+use super::{IntoIter, Iter, IterMut};
+use crate::Map;
 use core::iter::FusedIterator;
 
 impl<K, V, const N: usize> Map<K, V, N> {
@@ -26,6 +27,24 @@ impl<K, V, const N: usize> Map<K, V, N> {
             iter: self.into_iter(),
         }
     }
+}
+
+/// An iterator over the values of the [`Map`].
+#[repr(transparent)]
+pub struct Values<'a, K, V> {
+    iter: Iter<'a, K, V>,
+}
+
+/// Mutable iterator over the values of the [`Map`].
+#[repr(transparent)]
+pub struct ValuesMut<'a, K, V> {
+    iter: IterMut<'a, K, V>,
+}
+
+/// Consuming iterator over the values of the [`Map`].
+#[repr(transparent)]
+pub struct IntoValues<K, V, const N: usize> {
+    iter: IntoIter<K, V, N>,
 }
 
 impl<'a, K, V> Iterator for Values<'a, K, V> {

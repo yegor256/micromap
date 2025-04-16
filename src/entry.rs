@@ -1,8 +1,53 @@
 // SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
-use crate::{Entry, OccupiedEntry, VacantEntry};
+use super::Map;
 use core::mem;
+
+impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
+    pub fn entry(&mut self, k: K) -> Entry<'_, K, V, N> {
+        for i in 0..self.len {
+            let p = unsafe { self.item_ref(i) };
+            if p.0 == k {
+                return Entry::Occupied(OccupiedEntry {
+                    index: i,
+                    table: self,
+                });
+            }
+        }
+        Entry::Vacant(VacantEntry {
+            key: k,
+            table: self,
+        })
+    }
+}
+
+/// A view into a single entry in a map, which may either be vacant or occupied.
+///
+/// This `enum` is constructed from the [`entry`] method on [`Map`].
+///
+/// [`entry`]: Map::entry
+pub enum Entry<'a, K, V, const N: usize> {
+    /// An occupied entry.
+    Occupied(OccupiedEntry<'a, K, V, N>),
+
+    /// A vacant entry.
+    Vacant(VacantEntry<'a, K, V, N>),
+}
+
+/// A view into an occupied entry in a `Map`.
+/// It is part of the [`Entry`] enum.
+pub struct OccupiedEntry<'a, K, V, const N: usize> {
+    index: usize,
+    table: &'a mut Map<K, V, N>,
+}
+
+/// A view into a vacant entry in a `Map`.
+/// It is part of the [`Entry`] enum.
+pub struct VacantEntry<'a, K, V, const N: usize> {
+    key: K,
+    table: &'a mut Map<K, V, N>,
+}
 
 impl<K, V, const N: usize> Entry<'_, K, V, N> {
     pub fn key(&self) -> &K {
