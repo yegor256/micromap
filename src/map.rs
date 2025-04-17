@@ -597,6 +597,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
 mod internal {
     use crate::Map;
 
+    /// The unsafe wrapper operations for the `&[MaybeUninit]` array in [`Map`] struct.
     impl<K, V, const N: usize> Map<K, V, N> {
         /// Internal function to get mutable access via reference to the value in the internal array.
         #[inline]
@@ -622,19 +623,19 @@ mod internal {
             self.pairs.get_unchecked(i).assume_init_read()
         }
 
-        /// Internal function to get access to the element in the internal array.
+        /// Internal function to get access to the element in the internal array and drop it.
         #[inline]
         pub(crate) unsafe fn item_drop(&mut self, i: usize) {
             self.pairs.get_unchecked_mut(i).assume_init_drop();
         }
 
-        /// Internal function to get access to the element in the internal array.
+        /// Internal function to write key and value to the element in the internal array.
         #[inline]
         pub(crate) unsafe fn item_write(&mut self, i: usize, val: (K, V)) {
             self.pairs.get_unchecked_mut(i).write(val);
         }
 
-        /// Remove an index (by swapping the last one here and reducing the length)
+        /// Remove by index and drop it (by swapping the last one here and reducing the length).
         #[inline]
         pub(crate) unsafe fn remove_index_drop(&mut self, i: usize) {
             self.item_drop(i);
@@ -645,7 +646,7 @@ mod internal {
             }
         }
 
-        /// Remove an index (by swapping the last one here and reducing the length)
+        /// Remove by index and return it (by swapping the last one here and reducing the length).
         #[inline]
         pub(crate) unsafe fn remove_index_read(&mut self, i: usize) -> (K, V) {
             let result = self.item_read(i);
@@ -658,6 +659,7 @@ mod internal {
         }
     }
 
+    /// The insert core logic for the [`Map`] struct.
     impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         /// The core insert logic, which is used for `insert_unchecked()`, as it will
         /// disable the bound check (`debug_assert!`) in `release` mode.
