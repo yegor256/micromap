@@ -565,20 +565,32 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
         ret
     }
 
-    /// Removes a key from the map, returning the stored key and value if the
-    /// key was previously in the map.
+    /// Removes a key from the map, returning the stored key and value if
+    /// the key was previously in the map.
+    ///
+    /// The key may be any borrowed form of the map’s key type, but
+    /// [`PartialEq`] on the borrowed form must match those for the key
+    /// type.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// let mut m: Map<_, _, 3> = Map::new();
+    /// m.insert(1, "a");
+    /// assert_eq!(m.remove_entry(&1), Some((1, "a")));
+    /// assert_eq!(m.remove(&1), None);
+    /// ```
     #[inline]
-    pub fn remove_entry<Q: PartialEq + ?Sized>(&mut self, k: &Q) -> Option<(K, V)>
+    pub fn remove_entry<Q>(&mut self, k: &Q) -> Option<(K, V)>
     where
         K: Borrow<Q>,
+        Q: PartialEq + ?Sized,
     {
-        for i in 0..self.len {
-            let p = unsafe { self.item_ref(i) };
-            if p.0.borrow() == k {
-                return Some(unsafe { self.remove_index_read(i) });
-            }
-        }
-        None
+        let (i, _) = self.pairs[..self.len]
+            .iter()
+            .enumerate()
+            .find(|(_, p)| unsafe { p.assume_init_ref() }.0.borrow() == k)?;
+        Some(unsafe { self.remove_index_read(i) })
     }
 }
 
