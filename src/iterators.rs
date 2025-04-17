@@ -121,7 +121,7 @@ pub struct IterMut<'a, K, V> {
 /// ```
 #[repr(transparent)]
 pub struct IntoIter<K, V, const N: usize> {
-    map: Map<K, V, N>,
+    pub(super) map: Map<K, V, N>,
 }
 
 /// Utility function for implementing Debug trait for iterators (whose inner is a slice).

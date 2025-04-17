@@ -3,16 +3,46 @@
 
 use super::Map;
 use super::{IntoIter, Iter};
+use core::fmt;
 use core::iter::FusedIterator;
 
 impl<K, V, const N: usize> Map<K, V, N> {
-    /// An iterator visiting all keys in arbitrary order.
+    /// An iterator visiting all keys in arbitrary order. The iterator element
+    /// type is `&'a K`.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// let mut m = Map::from([("a", 1), ("b", 2), ("c", 3)]);
+    /// // print "a", "b", "c" in arbitrary order.
+    /// for key in m.keys() {
+    ///     println!("{key}");
+    /// }
+    /// ```
+    ///
+    /// # Performance
+    /// In the current implementation, iterating over keys takes O(len) time.
     #[inline]
     pub fn keys(&self) -> Keys<'_, K, V> {
         Keys { iter: self.iter() }
     }
 
-    /// Consuming iterator visiting all keys in arbitrary order.
+    /// Creates a consuming iterator visiting all the keys in arbitrary order.
+    /// The map cannot be used after calling this. The iterator element type is `K`.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// let m = Map::from([("a", 1), ("b", 2), ("c", 3)]);
+    /// let mut vec: Vec<&str> = m.into_keys().collect();
+    /// // The `IntoKeys` iterator produces keys in arbitrary order, so the
+    /// // keys must be sorted to test them against a sorted array.
+    /// vec.sort_unstable();
+    /// assert_eq!(vec, ["a", "b", "c"]);
+    /// ```
+    ///
+    /// # Performance
+    /// In the current implementation, iterating over keys takes O(len) time.
     #[inline]
     pub fn into_keys(self) -> IntoKeys<K, V, N> {
         IntoKeys {
@@ -21,13 +51,36 @@ impl<K, V, const N: usize> Map<K, V, N> {
     }
 }
 
-/// A read-only iterator over the keys of the [`Map`].
+/// An iterator over the keys of a `Map`.
+///
+/// This `struct` is created by the [`keys`][Map::keys] method on [`Map`]. See its
+/// documentation for more.
+///
+/// # Example
+/// ```
+/// use micromap::Map;
+/// let m = Map::from([("a", 1)]);
+/// let iter_keys = m.keys();
+/// assert_eq!(iter_keys.len(), 1);
+/// ```
 #[repr(transparent)]
 pub struct Keys<'a, K, V> {
     iter: Iter<'a, K, V>,
 }
 
-/// Consuming iterator over the keys of the [`Map`].
+/// An owning iterator over the keys of a `Map`.
+///
+/// This `struct` is created by the [`into_keys`][Map::into_keys] method on [`Map`].
+/// See its documentation for more.
+///
+/// # Example
+/// ```
+/// use micromap::Map;
+/// let m = Map::from([("a", 1)]);
+/// let iter_keys = m.into_keys(); // `.into_keys()` take the ownership
+/// // m.len(); // So map cannot be used after calling into_keys
+/// assert_eq!(iter_keys.len(), 1);
+/// ```
 #[repr(transparent)]
 pub struct IntoKeys<K, V, const N: usize> {
     iter: IntoIter<K, V, N>,
@@ -38,6 +91,38 @@ impl<K, V> Clone for Keys<'_, K, V> {
     fn clone(&self) -> Self {
         Keys {
             iter: self.iter.clone(),
+        }
+    }
+}
+
+impl<K: fmt::Debug, V> fmt::Debug for Keys<'_, K, V> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_list()
+            .entries(self.iter.clone().map(|(k, _)| k))
+            .finish()
+    }
+}
+
+impl<K: fmt::Debug, V, const N: usize> fmt::Debug for IntoKeys<K, V, N> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_list().entries(self.iter.map.keys()).finish()
+    }
+}
+
+impl<K, V> Default for Keys<'_, K, V> {
+    #[inline]
+    fn default() -> Self {
+        Keys {
+            iter: Iter::default(),
+        }
+    }
+}
+
+impl<K, V, const N: usize> Default for IntoKeys<K, V, N> {
+    #[inline]
+    fn default() -> Self {
+        Self {
+            iter: IntoIter::default(),
         }
     }
 }
