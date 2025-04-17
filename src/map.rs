@@ -208,10 +208,28 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
 
     /// Attempt to insert a pair into the map. (no panic)
     ///
-    /// - If the key existed, we update the pair, return `Some(old_value)`
+    /// - If the key existed, we update the pair, return `Some(Some(old_value))`
     /// - If the key does not exist and the map has empty slot, we insert into that slot
     ///   and return `Some(None)`.
     /// - If the key does not exist and the map is full already, return `None`.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// let mut m: Map<_, _, 3> = Map::new();
+    /// // For `Some(None)`, `Some(_)` indicates that the insertion was successful, `None`
+    /// // means that the inserted key was not in map, that is, insert instead of update.
+    /// assert_eq!(m.checked_insert(1, "a"), Some(None));
+    /// assert_eq!(m.checked_insert(1, "A"), Some(Some("a")));
+    /// assert_eq!(m.checked_insert(2, "b"), Some(None));
+    /// assert_eq!(m.checked_insert(3, "c"), Some(None));
+    /// assert_eq!(m.len(), m.capacity());
+    /// // map is full now.
+    /// assert_eq!(m.checked_insert(2, "B"), Some(Some("b")));
+    /// // This insertion will cause capacity overflow, so no insertion is performed
+    /// // and `None` is returned.
+    /// assert_eq!(m.checked_insert(4, "d"), None);
+    /// ```
     #[inline]
     pub fn checked_insert(&mut self, k: K, v: V) -> Option<Option<V>> {
         if self.len < N {
