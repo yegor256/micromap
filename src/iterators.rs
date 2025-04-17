@@ -99,7 +99,7 @@ pub struct Iter<'a, K, V> {
 /// ```
 #[repr(transparent)]
 pub struct IterMut<'a, K, V> {
-    iter: core::slice::IterMut<'a, MaybeUninit<(K, V)>>,
+    pub(super) iter: core::slice::IterMut<'a, MaybeUninit<(K, V)>>,
 }
 
 /// An owning iterator over the entries of a `Map`.

@@ -1,18 +1,49 @@
 // SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
+use super::iterators::slice_iter;
 use super::{IntoIter, Iter, IterMut};
 use crate::Map;
-use core::iter::FusedIterator;
+use core::{fmt, iter::FusedIterator};
 
 impl<K, V, const N: usize> Map<K, V, N> {
-    /// An iterator visiting all values in arbitrary order.
+    /// An iterator visiting all values in arbitrary order. The iterator element
+    /// type is `&'a V`.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// let mut m = Map::from([("a", 1), ("b", 2), ("c", 3)]);
+    /// // print "a", "b", "c" in arbitrary order.
+    /// for val in m.values() {
+    ///     println!("{val}");
+    /// }
+    /// ```
+    ///
+    /// # Performance
+    /// In the current implementation, iterating over keys takes O(len) time.
     #[inline]
     pub fn values(&self) -> Values<'_, K, V> {
         Values { iter: self.iter() }
     }
 
-    /// An iterator visiting all values mutably in arbitrary order.
+    /// An iterator visiting all values mutably in arbitrary order. The iterator
+    /// element type is `&'a mut V`.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// let mut m = Map::from([("a", 1), ("b", 2), ("c", 3)]);
+    /// for val in m.values_mut() {
+    ///     *val = *val + 10;
+    /// }
+    /// for val in m.values() {
+    ///     println!("{val}");
+    /// }
+    /// ```
+    ///
+    /// # Performance
+    /// In the current implementation, iterating over keys takes O(len) time.
     #[inline]
     pub fn values_mut(&mut self) -> ValuesMut<'_, K, V> {
         ValuesMut {
@@ -20,7 +51,22 @@ impl<K, V, const N: usize> Map<K, V, N> {
         }
     }
 
-    /// Consuming iterator visiting all the values in arbitrary order.
+    /// Creates a consuming iterator visiting all the values in arbitrary order.
+    /// The map cannot be used after calling this. The iterator element type is `V`.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// let m = Map::from([("a", 1), ("b", 2), ("c", 3)]);
+    /// let mut vec: Vec<i32> = m.into_values().collect();
+    /// // The `IntoValues` iterator produces values in arbitrary order, so the
+    /// // values must be sorted to test them against a sorted array.
+    /// vec.sort_unstable();
+    /// assert_eq!(vec, [1, 2, 3]);
+    /// ```
+    ///
+    /// # Performance
+    /// In the current implementation, iterating over keys takes O(len) time.
     #[inline]
     pub fn into_values(self) -> IntoValues<K, V, N> {
         IntoValues {
@@ -29,22 +75,116 @@ impl<K, V, const N: usize> Map<K, V, N> {
     }
 }
 
-/// An iterator over the values of the [`Map`].
+/// An iterator over the values of a `Map`.
+///
+/// This `struct` is created by the [`values`][Map::values] method on [`Map`]. See
+/// its documentation for more.
+///
+/// # Example
+/// ```
+/// use micromap::Map;
+/// let m = Map::from([("a", 1)]);
+/// let iter_values = m.values();
+/// assert_eq!(iter_values.len(), 1);
+/// ```
 #[repr(transparent)]
 pub struct Values<'a, K, V> {
     iter: Iter<'a, K, V>,
 }
 
-/// Mutable iterator over the values of the [`Map`].
+/// A mutable iterator over the values of a `Map`.
+///
+/// This `struct` is created by the [`values_mut`][Map::values_mut] method on [`Map`].
+/// See its documentation for more.
+///
+/// # Example
+/// ```
+/// use micromap::Map;
+/// let mut m = Map::from([("a", 1), ("b", 2)]);
+/// let iter_values = m.values_mut();
+/// iter_values.for_each(|v| *v *= 2);
+/// assert_eq!(m, Map::from([("a", 2), ("b", 4)]));
+/// ```
 #[repr(transparent)]
 pub struct ValuesMut<'a, K, V> {
     iter: IterMut<'a, K, V>,
 }
 
-/// Consuming iterator over the values of the [`Map`].
+/// An owning iterator over the values of a `Map`.
+///
+/// This `struct` is created by the [`into_values`][Map::into_values] method on
+/// [`Map`]. See its documentation for more.
+///
+/// # Example
+/// ```
+/// use micromap::Map;
+/// let m = Map::from([("a", 1), ("b", 2)]);
+/// let iter_values = m.into_values();
+/// let mut vec: Vec<_> = iter_values.collect();
+/// vec.sort_unstable();
+/// assert_eq!(vec, [1, 2]);
+/// ```
 #[repr(transparent)]
 pub struct IntoValues<K, V, const N: usize> {
     iter: IntoIter<K, V, N>,
+}
+
+impl<K, V> Clone for Values<'_, K, V> {
+    #[inline]
+    fn clone(&self) -> Self {
+        Self {
+            iter: self.iter.clone(),
+        }
+    }
+}
+
+impl<K, V> Default for Values<'_, K, V> {
+    #[inline]
+    fn default() -> Self {
+        Self {
+            iter: Iter::default(),
+        }
+    }
+}
+
+impl<K, V> Default for ValuesMut<'_, K, V> {
+    #[inline]
+    fn default() -> Self {
+        Self {
+            iter: IterMut::default(),
+        }
+    }
+}
+
+impl<K, V, const N: usize> Default for IntoValues<K, V, N> {
+    #[inline]
+    fn default() -> Self {
+        Self {
+            iter: IntoIter::default(),
+        }
+    }
+}
+
+impl<K, V: fmt::Debug> fmt::Debug for Values<'_, K, V> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_list()
+            .entries(self.iter.clone().map(|(_, v)| v))
+            .finish()
+    }
+}
+
+impl<K, V: fmt::Debug> fmt::Debug for ValuesMut<'_, K, V> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_list()
+            .entries(slice_iter(self.iter.iter.as_slice()).map(|(_, v)| v))
+            .finish()
+    }
+}
+
+impl<K, V: fmt::Debug, const N: usize> fmt::Debug for IntoValues<K, V, N> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_list().entries(self.iter.map.values()).finish()
+    }
 }
 
 impl<'a, K, V> Iterator for Values<'a, K, V> {
