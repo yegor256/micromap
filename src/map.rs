@@ -339,6 +339,37 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     }
 
     /// Returns the key-value pair corresponding to the supplied key.
+    ///
+    /// The key may be any borrowed form of the map’s key type, but
+    /// [`PartialEq`] on the borrowed form must match those for the key
+    /// type.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// // Only the first element in the tuple is considered when
+    /// // determining whether two `S` are equal.
+    /// #[derive(Clone, Copy, Debug)]
+    /// struct S {
+    ///     id: u32,
+    ///     name: &'static str, // ignored by equality and hashing operations
+    /// }
+    /// impl PartialEq for S {
+    ///     fn eq(&self, other: &S) -> bool {
+    ///         self.id == other.id
+    ///     }
+    /// }
+    /// // Note the impact of `.name` in code.
+    /// let j_a = S { id: 1, name: "Jessica" };
+    /// let j_b = S { id: 1, name: "Jess" };
+    /// let p = S { id: 2, name: "Paul" };
+    /// assert_ne!(j_a.name, j_b.name);
+    /// assert_eq!(j_a, j_b);
+    /// let mut m: Map<_, _, 3> = Map::new();
+    /// m.insert(j_a, "Paris");
+    /// assert_eq!(m.get_key_value(&j_a), Some((&j_a, &"Paris")));
+    /// assert_eq!(m.get_key_value(&j_b), Some((&j_a, &"Paris"))); // the notable case
+    /// assert_eq!(m.get_key_value(&p), None);
     #[inline]
     pub fn get_key_value<Q>(&self, k: &Q) -> Option<(&K, &V)>
     where
