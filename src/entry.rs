@@ -5,32 +5,46 @@ use super::Map;
 use core::mem;
 
 impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
+    /// Gets the given key’s corresponding entry in the map for in-place
+    /// manipulation.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// let mut letters: Map<_, _, 128> = Map::new();
+    /// for ch in "a short treatise on fungi".chars() {
+    ///     letters.entry(ch).and_modify(|counter| *counter += 1).or_insert(1);
+    /// }
+    /// assert_eq!(letters[&'s'], 2);
+    /// assert_eq!(letters[&'t'], 3);
+    /// assert_eq!(letters[&'u'], 1);
+    /// assert_eq!(letters.get(&'y'), None);
+    /// ```
     pub fn entry(&mut self, k: K) -> Entry<'_, K, V, N> {
-        for i in 0..self.len {
-            let p = unsafe { self.item_ref(i) };
-            if p.0 == k {
-                return Entry::Occupied(OccupiedEntry {
-                    index: i,
-                    table: self,
-                });
-            }
+        if let Some((i, _)) = self.pairs[..self.len]
+            .iter()
+            .enumerate()
+            .find(|(_, p)| unsafe { p.assume_init_ref() }.0 == k)
+        {
+            Entry::Occupied(OccupiedEntry {
+                index: i,
+                table: self,
+            })
+        } else {
+            Entry::Vacant(VacantEntry {
+                key: k,
+                table: self,
+            })
         }
-        Entry::Vacant(VacantEntry {
-            key: k,
-            table: self,
-        })
     }
 }
 
 /// A view into a single entry in a map, which may either be vacant or occupied.
 ///
-/// This `enum` is constructed from the [`entry`] method on [`Map`].
-///
-/// [`entry`]: Map::entry
+/// This `enum` is constructed from the [`entry`][Map::entry] method on [`Map`].
 pub enum Entry<'a, K, V, const N: usize> {
     /// An occupied entry.
     Occupied(OccupiedEntry<'a, K, V, N>),
-
     /// A vacant entry.
     Vacant(VacantEntry<'a, K, V, N>),
 }
@@ -50,6 +64,15 @@ pub struct VacantEntry<'a, K, V, const N: usize> {
 }
 
 impl<K, V, const N: usize> Entry<'_, K, V, N> {
+    /// Returns a reference to this entry's key.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// let mut map: Map<&str, u32, 3> = Map::new();
+    /// assert_eq!(map.entry("poneyland").key(), &"poneyland");
+    /// ```
+    #[inline]
     pub fn key(&self) -> &K {
         match self {
             Entry::Occupied(entry) => entry.key(),
@@ -57,6 +80,23 @@ impl<K, V, const N: usize> Entry<'_, K, V, N> {
         }
     }
 
+    /// Provides in-place mutable access to an occupied entry before any
+    /// potential inserts into the map.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// let mut map: Map<&str, u32, 3> = Map::new();
+    /// map.entry("poneyland")
+    ///    .and_modify(|e| { *e += 1 })
+    ///    .or_insert(42);
+    /// assert_eq!(map["poneyland"], 42);
+    /// map.entry("poneyland")
+    ///    .and_modify(|e| { *e += 1 })
+    ///    .or_insert(42);
+    /// assert_eq!(map["poneyland"], 43);
+    /// ```
+    #[inline]
     #[must_use]
     pub fn and_modify<F>(self, f: F) -> Self
     where
@@ -73,6 +113,19 @@ impl<K, V, const N: usize> Entry<'_, K, V, N> {
 }
 
 impl<'a, K: PartialEq, V, const N: usize> Entry<'a, K, V, N> {
+    /// Ensures a value is in the entry by inserting the default if empty, and
+    /// returns a mutable reference to the value in the entry.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// let mut map: Map<&str, u32, 3> = Map::new();
+    /// map.entry("poneyland").or_insert(3);
+    /// assert_eq!(map["poneyland"], 3);
+    /// *map.entry("poneyland").or_insert(10) *= 2;
+    /// assert_eq!(map["poneyland"], 6);
+    /// ```
+    #[inline]
     pub fn or_insert(self, default: V) -> &'a mut V {
         match self {
             Entry::Occupied(entry) => entry.into_mut(),
@@ -80,6 +133,19 @@ impl<'a, K: PartialEq, V, const N: usize> Entry<'a, K, V, N> {
         }
     }
 
+    /// Ensures a value is in the entry by inserting the result of the default
+    /// function if empty, and returns a mutable reference to the value in the
+    /// entry.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// let mut map: Map<_, _, 3> = Map::new();
+    /// let value = "hoho";
+    /// map.entry("poneyland").or_insert_with(|| value);
+    /// assert_eq!(map["poneyland"], "hoho");
+    /// ```
+    #[inline]
     pub fn or_insert_with<F: FnOnce() -> V>(self, default: F) -> &'a mut V {
         match self {
             Entry::Occupied(entry) => entry.into_mut(),
@@ -87,6 +153,24 @@ impl<'a, K: PartialEq, V, const N: usize> Entry<'a, K, V, N> {
         }
     }
 
+    /// Ensures a value is in the entry by inserting, if empty, the result of
+    /// the default function.
+    ///
+    /// This method allows for generating key-derived values
+    /// for insertion by providing the default function a reference to the key
+    /// that was moved during the `.entry(key)` method call.
+    ///
+    /// The reference to the moved key is provided so that cloning or copying the
+    /// key is unnecessary, unlike with `.or_insert_with(|| ... )`.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// let mut map: Map<&str, usize, 3> = Map::new();
+    /// map.entry("poneyland").or_insert_with_key(|key| key.chars().count());
+    /// assert_eq!(map["poneyland"], 9);
+    /// ```
+    #[inline]
     pub fn or_insert_with_key<F: FnOnce(&K) -> V>(self, default: F) -> &'a mut V {
         match self {
             Entry::Occupied(entry) => entry.into_mut(),
@@ -99,6 +183,17 @@ impl<'a, K: PartialEq, V, const N: usize> Entry<'a, K, V, N> {
 }
 
 impl<'a, K: PartialEq, V: Default, const N: usize> Entry<'a, K, V, N> {
+    /// Ensures a value is in the entry by inserting the default value if empty,
+    /// and returns a mutable reference to the value in the entry.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// let mut map: Map<&str, Option<u32>, 3> = Map::new();
+    /// map.entry("poneyland").or_default();
+    /// assert_eq!(map["poneyland"], None);
+    /// ```
+    #[inline]
     pub fn or_default(self) -> &'a mut V {
         match self {
             Entry::Occupied(entry) => entry.into_mut(),
@@ -108,34 +203,142 @@ impl<'a, K: PartialEq, V: Default, const N: usize> Entry<'a, K, V, N> {
 }
 
 impl<'a, K, V, const N: usize> OccupiedEntry<'a, K, V, N> {
+    /// Gets a reference to the key in the entry.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// let mut map: Map<&str, u32, 3> = Map::new();
+    /// map.entry("poneyland").or_insert(12);
+    /// assert_eq!(map.entry("poneyland").key(), &"poneyland");
+    /// ```
+    #[inline]
     #[must_use]
     pub fn key(&self) -> &K {
         unsafe { &self.table.item_ref(self.index).0 }
     }
 
+    /// Converts the `OccupiedEntry` into a mutable reference to the value in
+    /// the entry with a lifetime bound to the map itself.
+    ///
+    /// If you need multiple references to the `OccupiedEntry`, see
+    /// [`get_mut`][Self::get_mut].
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// use micromap::Entry;
+    /// let mut map: Map<&str, u32, 3> = Map::new();
+    /// map.entry("poneyland").or_insert(12);
+    /// assert_eq!(map["poneyland"], 12);
+    /// if let Entry::Occupied(o) = map.entry("poneyland") {
+    ///     *o.into_mut() += 10;
+    /// }
+    /// assert_eq!(map["poneyland"], 22);
+    /// ```
+    #[inline]
     #[must_use]
     pub fn into_mut(self) -> &'a mut V {
         unsafe { self.table.value_mut(self.index) }
     }
 
+    /// Gets a reference to the value in the entry.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use micromap::Map;
+    /// use micromap::Entry;
+    /// let mut map: Map<&str, u32, 3> = Map::new();
+    /// map.entry("poneyland").or_insert(12);
+    /// if let Entry::Occupied(o) = map.entry("poneyland") {
+    ///     assert_eq!(o.get(), &12);
+    /// }
+    /// ```
+    #[inline]
     #[must_use]
     pub fn get(&self) -> &V {
         unsafe { &self.table.item_ref(self.index).1 }
     }
 
+    /// Gets a mutable reference to the value in the entry.
+    ///
+    /// If you need a reference to the `OccupiedEntry` which may outlive the
+    /// destruction of the `Entry` value, see [`into_mut`][Self::into_mut].
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// use micromap::Entry;
+    /// let mut map: Map<&str, u32, 3> = Map::new();
+    /// map.entry("poneyland").or_insert(12);
+    /// assert_eq!(map["poneyland"], 12);
+    /// if let Entry::Occupied(mut o) = map.entry("poneyland") {
+    ///     *o.get_mut() += 10;
+    ///     assert_eq!(*o.get(), 22);
+    ///     // We can use the same Entry multiple times.
+    ///     *o.get_mut() += 2;
+    /// }
+    /// assert_eq!(map["poneyland"], 24);
+    /// ```
+    #[inline]
     pub fn get_mut(&mut self) -> &mut V {
         unsafe { self.table.value_mut(self.index) }
     }
 
+    /// Sets the value of the entry, and returns the entry's old value.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use micromap::Map;
+    /// use micromap::Entry;
+    /// let mut map: Map<&str, u32, 3> = Map::new();
+    /// map.entry("poneyland").or_insert(12);
+    /// if let Entry::Occupied(mut o) = map.entry("poneyland") {
+    ///     assert_eq!(o.insert(15), 12);
+    /// }
+    /// assert_eq!(map["poneyland"], 15);
+    /// ```
+    #[inline]
     pub fn insert(&mut self, value: V) -> V {
         mem::replace(self.get_mut(), value)
     }
 
+    /// Take the ownership of the key and value from the map.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// use micromap::Entry;
+    /// let mut map: Map<&str, u32, 3> = Map::new();
+    /// map.entry("poneyland").or_insert(12);
+    /// if let Entry::Occupied(o) = map.entry("poneyland") {
+    ///     // We delete the entry from the map.
+    ///     o.remove_entry();
+    /// }
+    /// assert_eq!(map.contains_key("poneyland"), false);
+    /// ```
+    #[inline]
     #[must_use]
     pub fn remove_entry(self) -> (K, V) {
         unsafe { self.table.remove_index_read(self.index) }
     }
 
+    /// Takes the value out of the entry, and returns it.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// use micromap::Entry;
+    /// let mut map: Map<&str, u32, 3> = Map::new();
+    /// map.entry("poneyland").or_insert(12);
+    /// if let Entry::Occupied(o) = map.entry("poneyland") {
+    ///     assert_eq!(o.remove(), 12);
+    /// }
+    /// assert_eq!(map.contains_key("poneyland"), false);
+    /// ```
+    #[inline]
     #[must_use]
     pub fn remove(self) -> V {
         unsafe { self.table.remove_index_read(self.index).1 }
@@ -143,16 +346,50 @@ impl<'a, K, V, const N: usize> OccupiedEntry<'a, K, V, N> {
 }
 
 impl<K, V, const N: usize> VacantEntry<'_, K, V, N> {
+    /// Gets a reference to the key that would be used when inserting a
+    /// value through the `VacantEntry`.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// let mut map: Map<&str, u32, 3> = Map::new();
+    /// assert_eq!(map.entry("poneyland").key(), &"poneyland");
+    /// ```
+    #[inline]
     pub const fn key(&self) -> &K {
         &self.key
     }
 
+    /// Take ownership of the key.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// use micromap::Entry;
+    /// let mut map: Map<&str, u32, 3> = Map::new();
+    /// if let Entry::Vacant(v) = map.entry("poneyland") {
+    ///     v.into_key();
+    /// }
+    /// ```
     pub fn into_key(self) -> K {
         self.key
     }
 }
 
 impl<'a, K: PartialEq, V, const N: usize> VacantEntry<'a, K, V, N> {
+    /// Sets the value of the entry with the `VacantEntry`'s key,
+    /// and returns a mutable reference to it.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// use micromap::Entry;
+    /// let mut map: Map<&str, u32, 3> = Map::new();
+    /// if let Entry::Vacant(o) = map.entry("poneyland") {
+    ///     o.insert(37);
+    /// }
+    /// assert_eq!(map["poneyland"], 37);
+    /// ```
     pub fn insert(self, value: V) -> &'a mut V {
         let (index, _) = self.table.insert_ii(self.key, value, false);
         unsafe { self.table.value_mut(index) }
