@@ -180,6 +180,26 @@ impl<'a, K: PartialEq, V, const N: usize> Entry<'a, K, V, N> {
             }
         }
     }
+
+    /// Sets the value of the entry, and returns an `OccupiedEntry`.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// let mut map: Map<&str, String, 3> = Map::new();
+    /// let entry = map.entry("poneyland").insert_entry("hoho".to_string());
+    /// assert_eq!(entry.key(), &"poneyland");
+    /// ```
+    #[inline]
+    pub fn insert_entry(self, value: V) -> OccupiedEntry<'a, K, V, N> {
+        match self {
+            Entry::Occupied(mut entry) => {
+                entry.insert(value);
+                entry
+            }
+            Entry::Vacant(entry) => entry.insert_entry(value),
+        }
+    }
 }
 
 impl<'a, K: PartialEq, V: Default, const N: usize> Entry<'a, K, V, N> {
@@ -393,6 +413,29 @@ impl<'a, K: PartialEq, V, const N: usize> VacantEntry<'a, K, V, N> {
     pub fn insert(self, value: V) -> &'a mut V {
         let (index, _) = self.table.insert_ii(self.key, value, false);
         unsafe { self.table.value_mut(index) }
+    }
+
+    /// Sets the value of the entry with the `VacantEntry`'s key,
+    /// and returns an `OccupiedEntry`.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Map;
+    /// use micromap::Entry;
+    /// let mut map: Map<&str, u32, 3> = Map::new();
+    /// if let Entry::Vacant(o) = map.entry("poneyland") {
+    ///     o.insert_entry(37);
+    /// }
+    /// assert_eq!(map["poneyland"], 37);
+    /// ```
+    #[inline]
+    pub fn insert_entry(self, value: V) -> OccupiedEntry<'a, K, V, N> {
+        let (i, pair) = self.table.insert_ii(self.key, value, false);
+        debug_assert!(pair.is_none());
+        OccupiedEntry {
+            index: i,
+            table: self.table,
+        }
     }
 }
 
