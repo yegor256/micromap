@@ -41,7 +41,6 @@ use crate::map::Map;
 /// let mut m : micromap::Set<u64, 8> = micromap::Set::new();
 /// m.insert(1);
 /// m.insert(2);
-/// # #[cfg(std)]
 /// assert_eq!(2, m.len());
 /// ```
 ///
