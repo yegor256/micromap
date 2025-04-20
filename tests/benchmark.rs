@@ -1,9 +1,6 @@
 // SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
-// In order to run this single test from the command line:
-// $ cargo test --test benchmark -- --nocapture
-
 use std::collections::HashMap;
 use std::env;
 use std::time::{Duration, Instant};
@@ -144,7 +141,7 @@ fn benchmark(total: usize) -> HashMap<&'static str, Duration> {
 /// Run it like this from the command line:
 ///
 /// ```text
-/// $ cargo test --test benchmark -- --include-ignored --nocapture
+/// $ cargo test --release --test benchmark -- --include-ignored --nocapture
 /// ```
 #[test]
 #[ignore]
