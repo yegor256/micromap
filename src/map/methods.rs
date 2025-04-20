@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
+// SPDX-FileCopyrightText: Copyright (c) 2025 owtotwo
+// SPDX-License-Identifier: MIT
+
 use super::Map;
 use core::borrow::Borrow;
 
