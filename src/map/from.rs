@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
-use crate::Map;
+use super::Map;
 
 impl<K: PartialEq, V, const N: usize> FromIterator<(K, V)> for Map<K, V, N> {
     #[inline]

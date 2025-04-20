@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 use super::iterators::slice_iter;
-use super::{IntoIter, Iter, IterMut};
-use crate::Map;
+use super::iterators::{IntoIter, Iter, IterMut};
+use super::Map;
 use core::{fmt, iter::FusedIterator};
 
 impl<K, V, const N: usize> Map<K, V, N> {
@@ -262,7 +262,7 @@ mod tests {
         m.insert("two".to_string(), 16);
         let it = m.values();
         assert_eq!(it.len(), 2);
-        assert_eq!(58, it.sum());
+        assert_eq!(58, it.sum::<i32>());
     }
 
     #[test]
@@ -275,7 +275,7 @@ mod tests {
         assert_eq!(it_mut.len(), it_mut.size_hint().0);
         assert_eq!(it_mut.len(), it_mut.size_hint().1.unwrap());
         it_mut.for_each(|v| *v *= 2);
-        assert_eq!(116, m.values().sum());
+        assert_eq!(116, m.values().sum::<i32>());
     }
 
     #[test]

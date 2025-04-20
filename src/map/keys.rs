@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
+use super::iterators::{IntoIter, Iter};
 use super::Map;
-use super::{IntoIter, Iter};
 use core::fmt;
 use core::iter::FusedIterator;
 

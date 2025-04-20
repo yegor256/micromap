@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 owtotwo
 // SPDX-License-Identifier: MIT
 
-use crate::Set;
+use super::Set;
 
 impl<T: PartialEq, const N: usize, const M: usize> PartialEq<Set<T, M>> for Set<T, N> {
     /// Two sets can be compared. (The capacity does not affect comparison.)

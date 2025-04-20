@@ -1,30 +1,42 @@
 // SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
-use crate::set::{Set, SetIntoIter, SetIter};
+use super::Set;
 use core::iter::FusedIterator;
+
+/// Iterator over the [`Set`].
+#[repr(transparent)]
+pub struct Iter<'a, T> {
+    iter: crate::map::keys::Keys<'a, T, ()>,
+}
+
+/// Into-iterator over the [`Set`].
+#[repr(transparent)]
+pub struct IntoIter<T, const N: usize> {
+    iter: crate::map::keys::IntoKeys<T, (), N>,
+}
 
 impl<T, const N: usize> Set<T, N> {
     /// Make an iterator over all pairs.
     #[inline]
     #[must_use]
-    pub fn iter(&self) -> SetIter<'_, T> {
-        SetIter {
+    pub fn iter(&self) -> Iter<'_, T> {
+        Iter {
             iter: self.map.keys(),
         }
     }
 }
 
-impl<T> Clone for SetIter<'_, T> {
+impl<T> Clone for Iter<'_, T> {
     #[inline]
     fn clone(&self) -> Self {
-        SetIter {
+        Iter {
             iter: self.iter.clone(),
         }
     }
 }
 
-impl<'a, T> Iterator for SetIter<'a, T> {
+impl<'a, T: 'a> Iterator for Iter<'a, T> {
     type Item = &'a T;
 
     #[inline]
@@ -38,7 +50,7 @@ impl<'a, T> Iterator for SetIter<'a, T> {
     }
 }
 
-impl<T, const N: usize> Iterator for SetIntoIter<T, N> {
+impl<T, const N: usize> Iterator for IntoIter<T, N> {
     type Item = T;
 
     #[inline]
@@ -54,7 +66,7 @@ impl<T, const N: usize> Iterator for SetIntoIter<T, N> {
 
 impl<'a, T, const N: usize> IntoIterator for &'a Set<T, N> {
     type Item = &'a T;
-    type IntoIter = SetIter<'a, T>;
+    type IntoIter = Iter<'a, T>;
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter {
@@ -64,28 +76,28 @@ impl<'a, T, const N: usize> IntoIterator for &'a Set<T, N> {
 
 impl<T, const N: usize> IntoIterator for Set<T, N> {
     type Item = T;
-    type IntoIter = SetIntoIter<T, N>;
+    type IntoIter = IntoIter<T, N>;
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter {
-        SetIntoIter {
+        IntoIter {
             iter: self.map.into_keys(),
         }
     }
 }
 
-impl<T> ExactSizeIterator for SetIter<'_, T> {
+impl<'a, T: 'a> ExactSizeIterator for Iter<'a, T> {
     fn len(&self) -> usize {
         self.iter.len()
     }
 }
 
-impl<T, const N: usize> ExactSizeIterator for SetIntoIter<T, N> {
+impl<T, const N: usize> ExactSizeIterator for IntoIter<T, N> {
     fn len(&self) -> usize {
         self.iter.len()
     }
 }
 
-impl<T> FusedIterator for SetIter<'_, T> {}
+impl<'a, T: 'a> FusedIterator for Iter<'a, T> {}
 
-impl<T, const N: usize> FusedIterator for SetIntoIter<T, N> {}
+impl<T, const N: usize> FusedIterator for IntoIter<T, N> {}

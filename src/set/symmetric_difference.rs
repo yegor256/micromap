@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 owtotwo
 // SPDX-License-Identifier: MIT
 
-use crate::set::difference::Difference;
-use crate::Set;
+use super::difference::Difference;
+use super::Set;
 
 impl<T: PartialEq, const N: usize> Set<T, N> {
     /// Visits the values representing the symmetric difference,
@@ -99,7 +99,7 @@ impl<T: PartialEq, const N: usize, const M: usize> core::iter::FusedIterator
 
 #[cfg(test)]
 mod tests {
-    use crate::Set;
+    use super::Set;
 
     #[test]
     fn symmetric_difference_simple() {

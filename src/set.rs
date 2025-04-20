@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
+//! A small Set implemented as a Linear Map where the value is `()`.
+
 mod clone;
 mod ctors;
 mod debug;
@@ -20,7 +22,15 @@ mod sub;
 mod symmetric_difference;
 mod union;
 
-use crate::Map;
+// re-export
+pub use difference::Difference;
+pub use drain::Drain;
+pub use intersection::Intersection;
+pub use iterators::{IntoIter, Iter};
+pub use symmetric_difference::SymmetricDifference;
+pub use union::Union;
+
+use crate::map::Map;
 
 /// A faster alternative of [`std::collections::HashSet`].
 ///
@@ -52,29 +62,9 @@ pub struct Set<T, const N: usize> {
     map: Map<T, (), N>,
 }
 
-/// Iterator over the [`Set`].
-#[repr(transparent)]
-#[allow(clippy::module_name_repetitions)]
-pub struct SetIter<'a, T> {
-    iter: crate::Keys<'a, T, ()>,
-}
-
-/// Into-iterator over the [`Set`].
-#[repr(transparent)]
-#[allow(clippy::module_name_repetitions)]
-pub struct SetIntoIter<T, const N: usize> {
-    iter: crate::IntoKeys<T, (), N>,
-}
-
-#[repr(transparent)]
-#[allow(clippy::module_name_repetitions)]
-pub struct SetDrain<'a, T> {
-    iter: crate::Drain<'a, T, ()>,
-}
-
 #[cfg(test)]
 mod tests {
-    use crate::Set;
+    use super::Set;
 
     /// This is a deliberately lengthy test function.
     /// As a test under the mod root path, it is necessary to consider the impact

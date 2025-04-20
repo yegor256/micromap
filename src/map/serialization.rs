@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
-use crate::Map;
+use super::Map;
 use core::fmt::Formatter;
 use core::marker::PhantomData;
 use serde::de::{MapAccess, Visitor};
@@ -57,7 +57,7 @@ impl<'de, K: PartialEq + Deserialize<'de>, V: Deserialize<'de>, const N: usize> 
 
 #[cfg(test)]
 mod tests {
-    use crate::Map;
+    use super::Map;
     use bincode::serde::{decode_from_slice, encode_into_slice};
 
     #[test]

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
-use crate::Set;
+use super::Set;
 
 impl<T: PartialEq, const N: usize> FromIterator<T> for Set<T, N> {
     #[inline]

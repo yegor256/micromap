@@ -2,9 +2,9 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 owtotwo
 // SPDX-License-Identifier: MIT
 
-use crate::set::difference::Difference;
-use crate::Set;
-use crate::SetIter;
+use super::difference::Difference;
+use super::iterators::Iter;
+use super::Set;
 
 impl<T: PartialEq, const N: usize> Set<T, N> {
     /// Visits the values representing the union,
@@ -45,7 +45,7 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
 /// ```
 #[must_use = "this returns the union as an iterator, without modifying either input set"]
 pub struct Union<'a, T, const M: usize> {
-    iter: core::iter::Chain<SetIter<'a, T>, Difference<'a, 'a, T, M>>,
+    iter: core::iter::Chain<Iter<'a, T>, Difference<'a, 'a, T, M>>,
 }
 
 impl<T: PartialEq, const M: usize> Clone for Union<'_, T, M> {
@@ -95,7 +95,7 @@ impl<T: PartialEq, const M: usize> core::iter::FusedIterator for Union<'_, T, M>
 
 #[cfg(test)]
 mod tests {
-    use crate::Set;
+    use super::Set;
 
     #[test]
     fn union_simple() {

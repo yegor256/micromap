@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
-use crate::Map;
+use super::Map;
 use core::fmt;
 
 impl<K, V, const N: usize> fmt::Debug for Map<K, V, N>

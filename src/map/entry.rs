@@ -247,7 +247,7 @@ impl<'a, K, V, const N: usize> OccupiedEntry<'a, K, V, N> {
     /// # Examples
     /// ```
     /// use micromap::Map;
-    /// use micromap::Entry;
+    /// use micromap::map::Entry;
     /// let mut map: Map<&str, u32, 3> = Map::new();
     /// map.entry("poneyland").or_insert(12);
     /// assert_eq!(map["poneyland"], 12);
@@ -268,7 +268,7 @@ impl<'a, K, V, const N: usize> OccupiedEntry<'a, K, V, N> {
     ///
     /// ```
     /// use micromap::Map;
-    /// use micromap::Entry;
+    /// use micromap::map::Entry;
     /// let mut map: Map<&str, u32, 3> = Map::new();
     /// map.entry("poneyland").or_insert(12);
     /// if let Entry::Occupied(o) = map.entry("poneyland") {
@@ -289,7 +289,7 @@ impl<'a, K, V, const N: usize> OccupiedEntry<'a, K, V, N> {
     /// # Examples
     /// ```
     /// use micromap::Map;
-    /// use micromap::Entry;
+    /// use micromap::map::Entry;
     /// let mut map: Map<&str, u32, 3> = Map::new();
     /// map.entry("poneyland").or_insert(12);
     /// assert_eq!(map["poneyland"], 12);
@@ -312,7 +312,7 @@ impl<'a, K, V, const N: usize> OccupiedEntry<'a, K, V, N> {
     ///
     /// ```
     /// use micromap::Map;
-    /// use micromap::Entry;
+    /// use micromap::map::Entry;
     /// let mut map: Map<&str, u32, 3> = Map::new();
     /// map.entry("poneyland").or_insert(12);
     /// if let Entry::Occupied(mut o) = map.entry("poneyland") {
@@ -330,7 +330,7 @@ impl<'a, K, V, const N: usize> OccupiedEntry<'a, K, V, N> {
     /// # Examples
     /// ```
     /// use micromap::Map;
-    /// use micromap::Entry;
+    /// use micromap::map::Entry;
     /// let mut map: Map<&str, u32, 3> = Map::new();
     /// map.entry("poneyland").or_insert(12);
     /// if let Entry::Occupied(o) = map.entry("poneyland") {
@@ -350,7 +350,7 @@ impl<'a, K, V, const N: usize> OccupiedEntry<'a, K, V, N> {
     /// # Examples
     /// ```
     /// use micromap::Map;
-    /// use micromap::Entry;
+    /// use micromap::map::Entry;
     /// let mut map: Map<&str, u32, 3> = Map::new();
     /// map.entry("poneyland").or_insert(12);
     /// if let Entry::Occupied(o) = map.entry("poneyland") {
@@ -385,7 +385,7 @@ impl<K, V, const N: usize> VacantEntry<'_, K, V, N> {
     /// # Examples
     /// ```
     /// use micromap::Map;
-    /// use micromap::Entry;
+    /// use micromap::map::Entry;
     /// let mut map: Map<&str, u32, 3> = Map::new();
     /// if let Entry::Vacant(v) = map.entry("poneyland") {
     ///     v.into_key();
@@ -403,7 +403,7 @@ impl<'a, K: PartialEq, V, const N: usize> VacantEntry<'a, K, V, N> {
     /// # Examples
     /// ```
     /// use micromap::Map;
-    /// use micromap::Entry;
+    /// use micromap::map::Entry;
     /// let mut map: Map<&str, u32, 3> = Map::new();
     /// if let Entry::Vacant(o) = map.entry("poneyland") {
     ///     o.insert(37);
@@ -421,7 +421,7 @@ impl<'a, K: PartialEq, V, const N: usize> VacantEntry<'a, K, V, N> {
     /// # Examples
     /// ```
     /// use micromap::Map;
-    /// use micromap::Entry;
+    /// use micromap::map::Entry;
     /// let mut map: Map<&str, u32, 3> = Map::new();
     /// if let Entry::Vacant(o) = map.entry("poneyland") {
     ///     o.insert_entry(37);
@@ -442,7 +442,7 @@ impl<'a, K: PartialEq, V, const N: usize> VacantEntry<'a, K, V, N> {
 #[cfg(test)]
 mod tests {
     use super::Entry;
-    use crate::Map;
+    use super::Map;
 
     #[test]
     fn various() {

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
-use crate::Set;
+use super::Set;
 use core::fmt::Formatter;
 use core::marker::PhantomData;
 use serde::de::{SeqAccess, Visitor};
@@ -53,7 +53,7 @@ impl<'de, T: PartialEq + Deserialize<'de>, const N: usize> Deserialize<'de> for 
 
 #[cfg(test)]
 mod tests {
-    use crate::Set;
+    use super::Set;
     use bincode::serde::{decode_from_slice, encode_into_slice};
 
     #[test]

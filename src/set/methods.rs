@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
-use crate::{Set, SetDrain};
+use super::Set;
 use core::borrow::Borrow;
 
 impl<T, const N: usize> Set<T, N> {
@@ -24,18 +24,6 @@ impl<T, const N: usize> Set<T, N> {
     #[must_use]
     pub const fn len(&self) -> usize {
         self.map.len()
-    }
-
-    /// Clears the set, returning all elements as an iterator. Keeps the allocated
-    /// memory for reuse.
-    ///
-    /// If the returned iterator is dropped before being fully consumed, it drops the
-    /// remaining elements. The returned iterator keeps a mutable borrow on the set
-    /// to optimize its implementation.
-    pub fn drain(&mut self) -> SetDrain<'_, T> {
-        SetDrain {
-            iter: self.map.drain(),
-        }
     }
 
     /// Remove all pairs from it, but keep the space intact for future use.

@@ -11,20 +11,20 @@
 //! for the recent benchmarking results.
 //!
 //! For example, here is how a map with a few keys can be created:
-//!
 //! ```
 //! use micromap::Map;
 //! let mut m : Map<u64, &str, 10> = Map::new();
 //! m.insert(1, "Hello, world!");
 //! m.insert(2, "Good bye!");
-//! # #[cfg(std)]
-//! assert_eq!(2, m.len());
+//! assert_eq!(m.len(), 2);
+//! assert_eq!(m.capacity(), 10);
 //! ```
 //!
 //! Creating a [`Map`] requires knowing the maximum size of it, upfront. This is
 //! what the third type argument `10` is for, in the example above. The array
-//! will have exactly ten elements. An attempt to add an 11th element will lead
-//! to a panic.
+//! will have exactly ten elements. An attempt to [`insert`][Map::insert] an 11th
+//! element will lead to a panic. (Or use [`checked_insert`][Map::checked_insert]
+//! instead to avoid panics by returning an [`Option`].)
 
 #![cfg_attr(all(not(feature = "std"), not(doc), not(test)), no_std)]
 #![doc(html_root_url = "https://docs.rs/micromap/0.0.0")]
@@ -40,64 +40,9 @@
 // #![doc(test(attr(deny(unused))))]
 #![doc(test(attr(warn(unused))))]
 
-mod clone;
-mod ctors;
-mod debug;
-mod display;
-mod drain;
-mod entry;
-mod eq;
-mod from;
-mod index;
-mod iterators;
-mod keys;
-mod map;
-#[cfg(feature = "serde")]
-#[cfg_attr(docsrs, doc(cfg(feature = "serde")))]
-mod serialization;
-mod set;
-mod values;
-
-// re-export
-pub use drain::Drain;
-pub use entry::{Entry, OccupiedEntry, VacantEntry};
-pub use iterators::{IntoIter, Iter, IterMut};
-pub use keys::{IntoKeys, Keys};
-pub use values::{IntoValues, Values, ValuesMut};
+pub mod map;
+pub mod set;
 
 // re-export Set
-pub use set::{Set, SetDrain, SetIntoIter, SetIter};
-
-use core::mem::MaybeUninit;
-
-/// A faster alternative of [`std::collections::HashMap`].
-///
-/// For example, this is how you make a map, which is allocated on stack and is capable of storing
-/// up to eight key-values pairs:
-///
-/// ```
-/// let mut m : micromap::Map<u64, &str, 8> = micromap::Map::new();
-/// m.insert(1, "Jeff Lebowski");
-/// m.insert(2, "Walter Sobchak");
-/// # #[cfg(std)]
-/// assert_eq!(2, m.len());
-/// ```
-///
-/// It is faster because it doesn't use a hash function at all. It simply keeps
-/// all pairs in an array and when it's necessary to find a value, it goes through
-/// all pairs comparing the needle with each pair available. Also it is faster
-/// because it doesn't use heap. When a [`Map`] is being created, it allocates the necessary
-/// space on stack. That's why the maximum size of the map must be provided in
-/// compile time.
-///
-/// It is also faster because it doesn't grow in size. When a [`Map`] is created,
-/// its size is fixed on stack. If an attempt is made to insert too many keys
-/// into it, it simply panics. Moreover, in the "release" mode it doesn't panic,
-/// but its behaviour is undefined. In the "release" mode all boundary checks
-/// are disabled, for the sake of higher performance.
-pub struct Map<K, V, const N: usize> {
-    /// The next available pair in the array.
-    len: usize,
-    /// The fixed-size array of key-value pairs.
-    pairs: [MaybeUninit<(K, V)>; N],
-}
+pub use map::Map;
+pub use set::Set;

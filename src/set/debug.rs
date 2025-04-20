@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
-use crate::Set;
+use super::Set;
 use core::fmt::{self, Debug, Formatter};
 
 impl<T: Debug, const N: usize> Debug for Set<T, N> {

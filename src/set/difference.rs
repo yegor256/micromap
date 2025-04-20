@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 owtotwo
 // SPDX-License-Identifier: MIT
 
-use crate::Set;
-use crate::SetIter;
+use super::iterators::Iter;
+use super::Set;
 
 impl<T: PartialEq, const N: usize> Set<T, N> {
     /// Visits the values representing the difference,
@@ -53,7 +53,7 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
 #[must_use = "this returns the difference as an iterator, without modifying either input set"]
 pub struct Difference<'a, 'b, T, const M: usize> {
     // iterator of the first set
-    iter: SetIter<'a, T>,
+    iter: Iter<'a, T>,
     // the second set
     other: &'b Set<T, M>,
 }
@@ -115,7 +115,7 @@ impl<T: core::fmt::Debug + PartialEq, const M: usize> core::fmt::Debug
 }
 
 mod difference_ref {
-    use super::{Set, SetIter};
+    use super::{Iter, Set};
 
     impl<'a, T: PartialEq + ?Sized, const N: usize> Set<&'a T, N> {
         #[inline]
@@ -137,7 +137,7 @@ mod difference_ref {
     #[must_use = "this returns the difference as an iterator, without modifying either input set"]
     pub struct DifferenceRef<'a, 'b, 'set, T: ?Sized, const M: usize> {
         // iterator of the first set
-        iter: SetIter<'a, &'a T>,
+        iter: Iter<'a, &'a T>,
         // the second set
         other: &'set Set<&'b T, M>,
     }
@@ -201,7 +201,7 @@ mod difference_ref {
 
 #[cfg(test)]
 mod tests {
-    use crate::Set;
+    use super::Set;
 
     // NOTE: This is a BUG in the standard library function.
     #[test]

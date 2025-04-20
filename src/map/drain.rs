@@ -99,7 +99,7 @@ impl<K, V> FusedIterator for Drain<'_, K, V> {}
 
 #[cfg(test)]
 mod tests {
-    use crate::Map;
+    use super::Map;
 
     #[test]
     fn normal_drain() {

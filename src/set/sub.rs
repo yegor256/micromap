@@ -33,7 +33,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::Set;
+    use super::Set;
 
     #[test]
     fn test_sub_with_non_overlapping_sets() {

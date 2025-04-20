@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
-use crate::{Map, Set};
+use super::Set;
+use crate::map::Map;
 
 impl<T, const N: usize> Default for Set<T, N> {
     /// Make a default empty [`Set`].

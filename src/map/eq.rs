@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
-use crate::Map;
+use super::Map;
 
 impl<K: PartialEq, V: PartialEq, const N: usize, const M: usize> PartialEq<Map<K, V, M>>
     for Map<K, V, N>

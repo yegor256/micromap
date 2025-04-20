@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 owtotwo
 // SPDX-License-Identifier: MIT
 
-use crate::Set;
-use crate::SetIter;
+use super::iterators::Iter;
+use super::Set;
 
 impl<T: PartialEq, const N: usize> Set<T, N> {
     /// Visits the values representing the intersection,
@@ -57,7 +57,7 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
 #[must_use = "this returns the intersection as an iterator, without modifying either input set"]
 pub struct Intersection<'a, T, const M: usize> {
     // iterator of the first set
-    iter: SetIter<'a, T>,
+    iter: Iter<'a, T>,
     // the second set
     other: &'a Set<T, M>,
 }
@@ -112,7 +112,7 @@ impl<T: PartialEq + core::fmt::Debug, const M: usize> core::fmt::Debug for Inter
 
 #[cfg(test)]
 mod tests {
-    use crate::Set;
+    use super::Set;
 
     #[test]
     fn intersection_simple() {

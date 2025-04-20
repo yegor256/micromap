@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 owtotwo
 // SPDX-License-Identifier: MIT
 
-use crate::Set;
+use super::Set;
 
 impl<T: PartialEq, const N: usize> Extend<T> for Set<T, N> {
     #[inline]
@@ -22,7 +22,7 @@ impl<'a, T: 'a + PartialEq + Copy, const N: usize> Extend<&'a T> for Set<T, N> {
 
 #[cfg(test)]
 mod tests {
-    use crate::Set;
+    use super::Set;
 
     #[test]
     fn extend_set_empty() {
