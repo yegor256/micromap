@@ -147,6 +147,7 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     /// assert_eq!(set.insert(2), false);
     /// assert_eq!(set.len(), 1);
     /// ```
+    ///
     /// # Panics
     /// It may panic if there are too many items in the set already to contain another new item.
     #[inline]
@@ -215,6 +216,44 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
                 .insert_ii_for_full(k, (), false)
                 .map(|(_, (k, ()))| k)
         }
+    }
+
+    /// Insert a value into the set without bound check in release mode. (with panic
+    /// and undefined behavior possible)
+    ///
+    /// Returns whether the value was newly inserted. That is:
+    ///
+    /// - If the set did not previously contain this value, `true` is returned.
+    /// - If the set already contained this value, `false` is returned, and the set is not
+    ///   modified: original value is not replaced, and the value passed as argument is dropped.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Set;
+    /// let mut set: Set<_, 3> = Set::new();
+    /// assert_eq!(set.len(), 0);
+    /// assert_eq!(set.capacity(), 3);
+    /// assert_eq!(set.insert_unchecked(0), true);
+    /// assert_eq!(set.insert_unchecked(1), true);
+    /// assert_eq!(set.insert_unchecked(2), true);
+    /// assert_eq!(set.insert_unchecked(2), false);
+    /// assert_eq!(set.len(), set.capacity()); // 3
+    /// // assert_eq!(set.insert_unchecked(3), true); // CAN NOT DO THIS!
+    /// ```
+    ///
+    /// # Panics
+    /// It may panic if there are too many items in the set already. Pay attention,
+    /// it panics only in the `debug` mode. In the `release` mode, you are going to get
+    /// **undefined behavior**. This is done for the sake of performance, in order to
+    /// avoid a repetitive check for the boundary condition on every `insert()`.
+    ///
+    /// # Safety
+    /// Calling this method to add a new key-value pair when the [`Map`] is already
+    /// full is **undefined behavior instead of panic**. So you need to make sure that
+    /// the set is not full before calling.
+    #[inline]
+    pub unsafe fn insert_unchecked(&mut self, k: T) -> bool {
+        self.map.insert_unchecked(k, ()).is_none()
     }
 
     /// Returns a reference to the value in the set, if any, that is equal
