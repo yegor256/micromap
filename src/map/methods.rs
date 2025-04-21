@@ -209,17 +209,21 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
 
     /// Attempt to insert a pair into the map. (no panic)
     ///
-    /// - If the key existed, we update the pair, return `Some(Some(old_value))`
-    /// - If the key does not exist and the map has empty slot, we insert into that slot
-    ///   and return `Some(None)`.
-    /// - If the key does not exist and the map is full already, return `None`.
+    /// - If the key does not exist and the map is full already, we can do
+    ///   nothing, so just return `None`;
+    /// - If the key does not exist and the map has empty slot, we insert
+    ///   into that slot and return `Some(None)`.
+    /// - If the key exists, whether the map is full or not, we update the
+    ///   value (exclude key), and return `Some(Some(old_value))`;
     ///
     /// # Examples
     /// ```
     /// use micromap::Map;
     /// let mut m: Map<_, _, 3> = Map::new();
     /// // For `Some(None)`, `Some(_)` indicates that the insertion was successful, `None`
-    /// // means that the inserted key was not in map, that is, insert instead of update.
+    /// // in the former means that the inserted key was not in map, that is, insert
+    /// // the key-value pair. Otherwise, when returning to the latter, only value will be
+    /// // update.
     /// assert_eq!(m.checked_insert(1, "a"), Some(None));
     /// assert_eq!(m.checked_insert(1, "A"), Some(Some("a")));
     /// assert_eq!(m.checked_insert(2, "b"), Some(None));
