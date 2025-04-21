@@ -425,6 +425,8 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     ///     "Athenæum",
     ///     "Bodleian Library",
     /// ]) else { panic!() };
+    /// *a += 10000;
+    /// *b += 10000;
     /// // Assert values of Athenæum and Library of Congress
     /// let got = libraries.get_disjoint_mut([
     ///     "Athenæum",
@@ -433,7 +435,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// assert_eq!(
     ///     got,
     ///     [
-    ///         Some(&mut 1807),
+    ///         Some(&mut 11807),
     ///         Some(&mut 1800),
     ///     ],
     /// );
@@ -445,17 +447,18 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// assert_eq!(
     ///     got,
     ///     [
-    ///         Some(&mut 1807),
+    ///         Some(&mut 11807),
     ///         None
     ///     ]
     /// );
     /// ```
+    /// Duplicate keys will panic:
     /// ```should_panic
     /// use micromap::Map;
     /// let mut libraries: Map<String, u32, 3> = Map::new();
     /// libraries.insert("Athenæum".to_string(), 1807);
-    /// // Duplicate keys panic!
-    /// let got = libraries.get_disjoint_mut([
+    /// // panic!
+    /// let _got = libraries.get_disjoint_mut([
     ///     "Athenæum",
     ///     "Athenæum",
     /// ]);
@@ -506,6 +509,8 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     ///     "Athenæum",
     ///     "Bodleian Library",
     /// ]) }) else { panic!() };
+    /// *a += 10000;
+    /// *b += 10000;
     /// // SAFETY: The keys do not overlap.
     /// let got = unsafe { libraries.get_disjoint_unchecked_mut([
     ///     "Athenæum",
@@ -514,7 +519,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// assert_eq!(
     ///     got,
     ///     [
-    ///         Some(&mut 1807),
+    ///         Some(&mut 11807),
     ///         Some(&mut 1800),
     ///     ],
     /// );
@@ -524,7 +529,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     ///     "New York Public Library",
     /// ]) };
     /// // Missing keys result in None
-    /// assert_eq!(got, [Some(&mut 1807), None]);
+    /// assert_eq!(got, [Some(&mut 11807), None]);
     /// ```
     #[inline]
     pub unsafe fn get_disjoint_unchecked_mut<Q, const J: usize>(
