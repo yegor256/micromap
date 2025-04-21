@@ -21,6 +21,9 @@ mod serialization;
 mod sub;
 mod symmetric_difference;
 mod union;
+mod bitand;
+// mod bitor; // need nightly Rust to enable `#![feature(generic_const_exprs)]`
+// mod bitxor; // need nightly Rust to enable `#![feature(generic_const_exprs)]`
 
 // re-export
 pub use difference::Difference;
