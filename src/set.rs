@@ -3,6 +3,7 @@
 
 //! A small Set implemented as a Linear Map where the value is `()`.
 
+mod bitand;
 mod clone;
 mod ctors;
 mod debug;
@@ -21,7 +22,6 @@ mod serialization;
 mod sub;
 mod symmetric_difference;
 mod union;
-mod bitand;
 // mod bitor; // need nightly Rust to enable `#![feature(generic_const_exprs)]`
 // mod bitxor; // need nightly Rust to enable `#![feature(generic_const_exprs)]`
 
