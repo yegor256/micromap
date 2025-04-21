@@ -68,10 +68,7 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     ///   modified: original value is not replaced, and the value passed as argument is dropped.
     ///
     /// # Panics
-    /// It may panic if there are too many pairs in the set already. Pay attention,
-    /// it panics only in the "debug" mode. In the "release" mode, you are going to get
-    /// undefined behavior. This is done for the sake of performance, in order to
-    /// avoid a repetitive check for the boundary condition on every `insert()`.
+    /// It may panic if there are too many items in the set already to contain another new item.
     #[inline]
     pub fn insert(&mut self, k: T) -> bool {
         self.map.insert(k, ()).is_none()
