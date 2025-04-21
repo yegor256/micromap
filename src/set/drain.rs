@@ -4,6 +4,18 @@
 use super::Set;
 use core::iter::FusedIterator;
 
+/// A draining iterator over the items of a `Set`.
+///
+/// This `struct` is created by the [`drain`][Set::drain] method on [`Set`].
+/// See its documentation for more.
+///
+/// # Examples
+/// ```
+/// use micromap::Set;
+/// let mut set = Set::from([1, 2, 3]);
+/// let drain = set.drain();
+/// assert_eq!(drain.len(), 3);
+/// ```
 #[repr(transparent)]
 pub struct Drain<'a, T> {
     iter: crate::map::drain::Drain<'a, T, ()>,
