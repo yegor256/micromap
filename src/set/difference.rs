@@ -48,8 +48,11 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
 /// use micromap::Set;
 /// let a = Set::from([1, 2, 3]);
 /// let b = Set::from([4, 2, 3, 4]);
-/// let mut difference = a.difference(&b);
+/// let diff = a.difference(&b);
+/// assert_eq!(diff.count(), 1);
 /// ```
+#[must_use = "this returns the difference as an iterator, without modifying \
+              either input set"]
 pub struct Difference<'a, 'b, T, const M: usize> {
     // iterator of the first set
     iter: Iter<'a, T>,
@@ -113,12 +116,13 @@ impl<T: core::fmt::Debug + PartialEq, const M: usize> core::fmt::Debug
     }
 }
 
-mod difference_ref {
+pub mod difference_ref {
     use super::{Iter, Set};
 
     impl<'a, T: PartialEq + ?Sized, const N: usize> Set<&'a T, N> {
+        /// A [`difference()`][Set::difference] method with more elaborate lifetime and
+        /// just for `Set<&T>`.
         #[inline]
-        #[must_use]
         pub fn difference_ref<'b, 'set1, 'set2, const M: usize>(
             &'set1 self,
             other: &'set2 Set<&'b T, M>,
@@ -134,6 +138,23 @@ mod difference_ref {
         }
     }
 
+    /// A lazy iterator producing reference elements in the difference of
+    /// Linear `Set`s.
+    ///
+    /// This `struct` is created by the [`difference_ref`] method on [`Set`].
+    ///
+    /// [`difference_ref`]: Set::difference_ref
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Set;
+    /// let a = Set::from(["foo", "bar", "baz"]);
+    /// let b = Set::from(["fox", "foo", "baz", "bro"]);
+    /// let diff = (&a).difference_ref(&b);
+    /// assert_eq!(diff.count(), 1);
+    /// ```
+    #[must_use = "this returns the difference as an iterator, without modifying \
+                  either input set"]
     pub struct DifferenceRef<'a, 'b, 'set, T: ?Sized, const M: usize> {
         // iterator of the first set
         iter: Iter<'a, &'a T>,

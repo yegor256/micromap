@@ -52,8 +52,11 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
 /// use micromap::Set;
 /// let a = Set::from([1, 2, 3]);
 /// let b = Set::from([4, 2, 3, 4]);
-/// let mut intersection = a.intersection(&b);
+/// let intersection = a.intersection(&b);
+/// assert_eq!(intersection.count(), 2);
 /// ```
+#[must_use = "this returns the intersection as an iterator, without modifying \
+              either input set"]
 pub struct Intersection<'a, T, const M: usize> {
     // iterator of the first set
     iter: Iter<'a, T>,

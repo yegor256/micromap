@@ -41,8 +41,11 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
 /// use micromap::Set;
 /// let a = Set::from([1, 2, 3]);
 /// let b = Set::from([4, 2, 3, 4]);
-/// let mut union = a.union(&b);
+/// let union = a.union(&b);
+/// assert_eq!(union.count(), 4);
 /// ```
+#[must_use = "this returns the union as an iterator, without modifying either \
+              input set"]
 pub struct Union<'a, T, const M: usize> {
     iter: core::iter::Chain<Iter<'a, T>, Difference<'a, 'a, T, M>>,
 }
