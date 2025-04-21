@@ -97,7 +97,7 @@ impl<K, V, const N: usize> Entry<'_, K, V, N> {
     /// assert_eq!(map["poneyland"], 43);
     /// ```
     #[inline]
-    #[must_use]
+    #[allow(clippy::return_self_not_must_use)] // function has side effects (impure)
     pub fn and_modify<F>(self, f: F) -> Self
     where
         F: FnOnce(&mut V),
@@ -233,7 +233,6 @@ impl<'a, K, V, const N: usize> OccupiedEntry<'a, K, V, N> {
     /// assert_eq!(map.entry("poneyland").key(), &"poneyland");
     /// ```
     #[inline]
-    #[must_use]
     pub fn key(&self) -> &K {
         unsafe { &self.table.item_ref(self.index).0 }
     }
@@ -257,7 +256,6 @@ impl<'a, K, V, const N: usize> OccupiedEntry<'a, K, V, N> {
     /// assert_eq!(map["poneyland"], 22);
     /// ```
     #[inline]
-    #[must_use]
     pub fn into_mut(self) -> &'a mut V {
         unsafe { self.table.value_mut(self.index) }
     }
@@ -276,7 +274,6 @@ impl<'a, K, V, const N: usize> OccupiedEntry<'a, K, V, N> {
     /// }
     /// ```
     #[inline]
-    #[must_use]
     pub fn get(&self) -> &V {
         unsafe { &self.table.item_ref(self.index).1 }
     }
@@ -340,7 +337,6 @@ impl<'a, K, V, const N: usize> OccupiedEntry<'a, K, V, N> {
     /// assert_eq!(map.contains_key("poneyland"), false);
     /// ```
     #[inline]
-    #[must_use]
     pub fn remove_entry(self) -> (K, V) {
         unsafe { self.table.remove_index_read(self.index) }
     }
@@ -359,7 +355,6 @@ impl<'a, K, V, const N: usize> OccupiedEntry<'a, K, V, N> {
     /// assert_eq!(map.contains_key("poneyland"), false);
     /// ```
     #[inline]
-    #[must_use]
     pub fn remove(self) -> V {
         unsafe { self.table.remove_index_read(self.index).1 }
     }

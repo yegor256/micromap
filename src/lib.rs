@@ -30,6 +30,8 @@
 #![doc(html_root_url = "https://docs.rs/micromap/0.0.0")]
 #![deny(warnings)]
 #![warn(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
+// `clippy::pedantic` have false positives about the `#[must_use]` attr.
+#![allow(clippy::must_use_candidate)]
 #![warn(rust_2018_idioms)]
 // About the docs
 #![cfg_attr(docsrs, feature(doc_cfg))]
@@ -37,8 +39,7 @@
 #![warn(rustdoc::missing_crate_level_docs)]
 // Our Goal, uncomment these!
 // #![warn(missing_docs)]
-// #![doc(test(attr(deny(unused))))]
-#![doc(test(attr(warn(unused))))]
+#![doc(test(attr(deny(unused))))]
 
 pub mod map;
 pub mod set;
