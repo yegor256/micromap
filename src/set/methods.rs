@@ -159,9 +159,9 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     ///
     /// - If the value exists, whether the set is full or not, we update the
     ///   value (exclude key), and return `Some(Some(old_value))`;
-    /// - If the key does not exist and the map is full already, we can do
+    /// - If the key does not exist and the set is full already, we can do
     ///   nothing, so just return `None`;
-    /// - If the key does not exist and the map has empty slot, we insert
+    /// - If the key does not exist and the set has empty slot, we insert
     ///   into that slot and return `Some(None)`.
     ///
     ///
@@ -201,7 +201,7 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     /// assert_eq!(set.checked_insert(Foo(2, 'b')), None);
     /// assert_eq!(set.checked_insert(Foo(3, 'c')), None);
     /// assert_eq!(set.len(), set.capacity());
-    /// // map is full now.
+    /// // set is full now.
     /// assert_eq!(set.checked_insert(Foo(2, 'B')).unwrap().1, 'B');
     /// // This insertion will cause capacity overflow, so no insertion is performed
     /// // and `None` is returned.
@@ -250,7 +250,7 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     /// avoid a repetitive check for the boundary condition on every `insert()`.
     ///
     /// # Safety
-    /// Calling this method to add a new key-value pair when the [`Map`] is already
+    /// Calling this method to add a new key-value pair when the [`Set`] is already
     /// full is **undefined behavior instead of panic**. So you need to make sure that
     /// the set is not full before calling.
     #[inline]
