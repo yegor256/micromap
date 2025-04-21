@@ -5,34 +5,79 @@ use super::Set;
 use core::borrow::Borrow;
 
 impl<T, const N: usize> Set<T, N> {
-    /// Get its total capacity.
+    /// Returns the number of elements the set can hold.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Set;
+    /// let set: Set<i32, 100> = Set::new();
+    /// assert_eq!(set.capacity(), 100);
+    /// ```
     #[inline]
-    #[must_use]
     pub const fn capacity(&self) -> usize {
         self.map.capacity()
     }
 
-    /// Is it empty?
+    /// Returns `true` if the set contains no elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Set;
+    /// let mut set: Set<_, 3> = Set::new();
+    /// assert!(set.is_empty());
+    /// set.insert(1);
+    /// assert!(!set.is_empty());
+    /// ```
     #[inline]
-    #[must_use]
     pub const fn is_empty(&self) -> bool {
         self.map.is_empty()
     }
 
-    /// Return the total number of pairs inside.
+    /// Returns the number of elements in the set.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Set;
+    /// let mut set: Set<_, 3> = Set::new();
+    /// assert_eq!(set.len(), 0);
+    /// set.insert(1);
+    /// assert_eq!(set.len(), 1);
+    /// ```
     #[inline]
-    #[must_use]
     pub const fn len(&self) -> usize {
         self.map.len()
     }
 
-    /// Remove all pairs from it, but keep the space intact for future use.
+    /// Clears the set, removing all values.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Set;
+    /// let mut set: Set<_, 3> = Set::new();
+    /// set.insert(1);
+    /// set.clear();
+    /// assert!(set.is_empty());
+    /// ```
     #[inline]
     pub fn clear(&mut self) {
         self.map.clear();
     }
 
     /// Retains only the elements specified by the predicate.
+    ///
+    /// In other words, remove all elements `e` for which `f(&e)` returns `false`.
+    /// The elements are visited in unsorted (and unspecified) order.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Set;
+    /// let mut set = Set::from([1, 2, 3, 4, 5, 6]);
+    /// set.retain(|&k| k % 2 == 0);
+    /// assert_eq!(set, Set::from([2, 4, 6]));
+    /// ```
+    ///
+    /// # Performance
+    /// In the current implementation, this operation takes O(len) time.
     #[inline]
     pub fn retain<F: FnMut(&T) -> bool>(&mut self, mut f: F) {
         self.map.retain(|k, ()| f(k));
@@ -41,20 +86,47 @@ impl<T, const N: usize> Set<T, N> {
 
 impl<T: PartialEq, const N: usize> Set<T, N> {
     /// Returns `true` if the set contains a value.
+    ///
+    /// The value may be any borrowed form of the set's value type, but
+    /// [`PartialEq`] on the borrowed form *must* match those for the value
+    /// type.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Set;
+    /// let set = Set::from([1, 2, 3]);
+    /// assert_eq!(set.contains(&1), true);
+    /// assert_eq!(set.contains(&4), false);
+    /// ```
     #[inline]
-    #[must_use]
-    pub fn contains<Q: PartialEq + ?Sized>(&self, k: &Q) -> bool
+    pub fn contains<Q>(&self, k: &Q) -> bool
     where
         T: Borrow<Q>,
+        Q: PartialEq + ?Sized,
     {
         self.map.contains_key(k)
     }
 
-    /// Removes a value from the set. Returns whether the value was present in the set.
+    /// Removes a value from the set. Returns whether the value was present
+    /// in the set.
+    ///
+    /// The value may be any borrowed form of the set's value type, but
+    /// [`PartialEq`] on the borrowed form *must* match those for the value
+    /// type.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Set;
+    /// let mut set: Set<_, 3> = Set::new();
+    /// set.insert(2);
+    /// assert_eq!(set.remove(&2), true);
+    /// assert_eq!(set.remove(&2), false);
+    /// ```
     #[inline]
-    pub fn remove<Q: PartialEq + ?Sized>(&mut self, k: &Q) -> bool
+    pub fn remove<Q>(&mut self, k: &Q) -> bool
     where
         T: Borrow<Q>,
+        Q: PartialEq + ?Sized,
     {
         self.map.remove(k).is_some()
     }
@@ -67,6 +139,14 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     /// - If the set already contained this value, `false` is returned, and the set is not
     ///   modified: original value is not replaced, and the value passed as argument is dropped.
     ///
+    /// # Examples
+    /// ```
+    /// use micromap::Set;
+    /// let mut set: Set<_, 3> = Set::new();
+    /// assert_eq!(set.insert(2), true);
+    /// assert_eq!(set.insert(2), false);
+    /// assert_eq!(set.len(), 1);
+    /// ```
     /// # Panics
     /// It may panic if there are too many items in the set already to contain another new item.
     #[inline]
@@ -137,22 +217,48 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
         }
     }
 
-    /// Get a reference to a single value.
+    /// Returns a reference to the value in the set, if any, that is equal
+    /// to the given value.
+    ///
+    /// The value may be any borrowed form of the set's value type, but
+    /// [`PartialEq`] on the borrowed form *must* match those for the value
+    /// type.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Set;
+    /// let set = Set::from([1, 2, 3]);
+    /// assert_eq!(set.get(&2), Some(&2));
+    /// assert_eq!(set.get(&4), None);
+    /// ```
     #[inline]
-    #[must_use]
-    pub fn get<Q: PartialEq + ?Sized>(&self, k: &Q) -> Option<&T>
+    pub fn get<Q>(&self, k: &Q) -> Option<&T>
     where
         T: Borrow<Q>,
+        Q: PartialEq + ?Sized,
     {
         self.map.get_key_value(k).map(|p| p.0)
     }
 
-    /// Removes a key from the set, returning the stored key and value if the
-    /// key was previously in the set.
+    /// Removes and returns the value in the set, if any, that is equal to the
+    /// given one.
+    ///
+    /// The value may be any borrowed form of the set's value type, but
+    /// [`PartialEq`] on the borrowed form *must* match those for the value
+    /// type.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Set;
+    /// let mut set = Set::from([1, 2, 3]);
+    /// assert_eq!(set.take(&2), Some(2));
+    /// assert_eq!(set.take(&2), None);
+    /// ```
     #[inline]
-    pub fn take<Q: PartialEq + ?Sized>(&mut self, k: &Q) -> Option<T>
+    pub fn take<Q>(&mut self, k: &Q) -> Option<T>
     where
         T: Borrow<Q>,
+        Q: PartialEq + ?Sized,
     {
         self.map.remove_entry(k).map(|p| p.0)
     }
