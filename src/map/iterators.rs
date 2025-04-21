@@ -112,7 +112,7 @@ pub struct IterMut<'a, K, V> {
 /// use micromap::Map;
 /// let map = Map::from([("a", 1)]);
 /// let _iter = map.into_iter(); // consumed map
-/// let mut map = Map::from([('b', 2), ('c', 3)]);
+/// let map = Map::from([('b', 2), ('c', 3)]);
 /// for (k, v) in map { // Implicit call as `map.into_iter()`
 ///     println!("key: {k} val: {v}");
 /// }

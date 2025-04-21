@@ -13,7 +13,7 @@ impl<K, V, const N: usize> Map<K, V, N> {
     /// # Examples
     /// ```
     /// use micromap::Map;
-    /// let mut m = Map::from([("a", 1), ("b", 2), ("c", 3)]);
+    /// let m = Map::from([("a", 1), ("b", 2), ("c", 3)]);
     /// // print "a", "b", "c" in arbitrary order.
     /// for key in m.keys() {
     ///     println!("{key}");
