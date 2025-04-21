@@ -37,8 +37,8 @@
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![cfg_attr(docsrs, feature(rustdoc_missing_doc_code_examples))]
 #![warn(rustdoc::missing_crate_level_docs)]
-// Our Goal, uncomment these!
-// #![warn(missing_docs)]
+// Our Goal, uncomment these! (now we hit it.)
+#![warn(missing_docs)]
 #![doc(test(attr(deny(unused))))]
 
 pub mod map;
