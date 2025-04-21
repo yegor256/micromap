@@ -59,13 +59,13 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
         self.map.remove(k).is_some()
     }
 
-    /// Adds a value to the set.
+    /// Adds a value to the set. (will not update)
     ///
     /// Returns whether the value was newly inserted. That is:
     ///
-    /// If the set did not previously contain this value, `true` is returned.
-    /// If the set already contained this value, `false` is returned, and the set is not
-    /// modified: original value is not replaced, and the value passed as argument is dropped.
+    /// - If the set did not previously contain this value, `true` is returned.
+    /// - If the set already contained this value, `false` is returned, and the set is not
+    ///   modified: original value is not replaced, and the value passed as argument is dropped.
     ///
     /// # Panics
     /// It may panic if there are too many pairs in the set already. Pay attention,
@@ -75,6 +75,69 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     #[inline]
     pub fn insert(&mut self, k: T) -> bool {
         self.map.insert(k, ()).is_none()
+    }
+
+    /// Attempt to insert a value into the set. (will not update, and no panic)
+    ///
+    /// - If the value exists, whether the set is full or not, we update the
+    ///   value (exclude key), and return `Some(Some(old_value))`;
+    /// - If the key does not exist and the map is full already, we can do
+    ///   nothing, so just return `None`;
+    /// - If the key does not exist and the map has empty slot, we insert
+    ///   into that slot and return `Some(None)`.
+    ///
+    ///
+    /// - If the value existed, we do nothing, and return `Some(T)`, which is the value
+    ///   parameter we passed in.
+    /// - If the value does not exist and the set is full already, return `Some(T)` like
+    ///   above.
+    /// - If the value does not exist and the set has empty slot, we insert into that slot
+    ///   and return `None`.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Set;
+    /// // Only the first element in the tuple is considered when determining whether
+    /// // two `Foo`s are equal.
+    /// #[derive(Debug)]
+    /// struct Foo(u8, char);
+    /// impl PartialEq for Foo {
+    ///    fn eq(&self, other: &Self) -> bool {
+    ///       self.0 == other.0
+    ///     }
+    /// }
+    /// // Not necessary
+    /// impl Eq for Foo {}
+    /// // create Set for Foo
+    /// let mut set: Set<Foo, 3> = Set::new();
+    /// // For `Some(None)`, `Some(_)` indicates that the insertion was successful, `None`
+    /// // in the former means that the inserted value was not in set before, that is, the
+    /// // insertion occurred, otherwise, no-op was performed.
+    /// assert_eq!(set.checked_insert(Foo(1, 'a')), None);
+    /// let owned_foo = Foo(1, 'A'); // no `Clone` and `Copy` trait
+    /// if let Some(getback_foo) = set.checked_insert(owned_foo) { // take the ownership
+    ///     assert_eq!(getback_foo.1, 'A'); // get back the `owned_foo`
+    /// } else {
+    ///     unreachable!();
+    /// }
+    /// assert_eq!(set.checked_insert(Foo(2, 'b')), None);
+    /// assert_eq!(set.checked_insert(Foo(3, 'c')), None);
+    /// assert_eq!(set.len(), set.capacity());
+    /// // map is full now.
+    /// assert_eq!(set.checked_insert(Foo(2, 'B')).unwrap().1, 'B');
+    /// // This insertion will cause capacity overflow, so no insertion is performed
+    /// // and `None` is returned.
+    /// assert_eq!(set.checked_insert(Foo(4, 'd')), None);
+    /// ```
+    #[inline]
+    pub fn checked_insert(&mut self, k: T) -> Option<T> {
+        if self.len() < N {
+            self.map.insert_ii(k, (), false).1.map(|(k, ())| k)
+        } else {
+            self.map
+                .insert_ii_for_full(k, (), false)
+                .map(|(_, (k, ()))| k)
+        }
     }
 
     /// Get a reference to a single value.

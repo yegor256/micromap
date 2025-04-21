@@ -38,24 +38,33 @@ use crate::map::Map;
 /// up to eight key-values pairs:
 ///
 /// ```
-/// let mut m : micromap::Set<u64, 8> = micromap::Set::new();
-/// m.insert(1);
-/// m.insert(2);
-/// assert_eq!(2, m.len());
+/// use micromap::Set;
+/// let mut set : Set<u64, 8> = Set::new();
+/// set.insert(1);
+/// set.insert(2);
+/// assert_eq!(set.len(), 2);
+/// assert_eq!(set.capacity(), 8);
 /// ```
 ///
 /// It is faster because it doesn't use a hash function at all. It simply keeps
-/// all pairs in an array and when it's necessary to find a value, it goes through
-/// all pairs comparing the needle with each pair available. Also it is faster
-/// because it doesn't use heap. When a [`Set`] is being created, it allocates the necessary
-/// space on stack. That's why the maximum size of the set must be provided in
-/// compile time.
+/// all items in an array and when it's necessary to find a value, it goes through
+/// all items comparing the needle with each pair available. Also it is faster
+/// because it doesn't use heap. When a [`Set`] is being created, it allocates the
+/// necessary space on stack. That's why the maximum size of the set must be
+/// provided in compile time.
 ///
 /// It is also faster because it doesn't grow in size. When a [`Set`] is created,
-/// its size is fixed on stack. If an attempt is made to insert too many keys
-/// into it, it simply panics. Moreover, in the "release" mode it doesn't panic,
-/// but its behaviour is undefined. In the "release" mode all boundary checks
-/// are disabled, for the sake of higher performance.
+/// its size is fixed on stack (or as `Box<Set<_>>` on heap if you like). If an
+/// attempt is made to [`insert()`] too many value into it, it simply panics (or
+/// you can use [`checked_insert()`]). Moreover, for method [`insert_unchecked()`]
+/// in the "release" mode, it doesn't panic, instead, **its behaviour is undefined**.
+/// In the "release" mode all boundary checks are disabled, for the sake of higher
+/// performance (But in general, you can just use [`insert()`] or [`checked_insert()`]
+/// in most cases).
+///
+/// [`insert()`]: Set::insert
+/// [`checked_insert()`]: Set::checked_insert
+/// [`insert_unchecked()`]: Set::insert_unchecked
 #[repr(transparent)]
 pub struct Set<T, const N: usize> {
     map: Map<T, (), N>,

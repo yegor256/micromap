@@ -209,12 +209,12 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
 
     /// Attempt to insert a pair into the map. (no panic)
     ///
+    /// - If the key exists, whether the map is full or not, we update the
+    ///   value (exclude key), and return `Some(Some(old_value))`;
     /// - If the key does not exist and the map is full already, we can do
     ///   nothing, so just return `None`;
     /// - If the key does not exist and the map has empty slot, we insert
     ///   into that slot and return `Some(None)`.
-    /// - If the key exists, whether the map is full or not, we update the
-    ///   value (exclude key), and return `Some(Some(old_value))`;
     ///
     /// # Examples
     /// ```
@@ -247,7 +247,8 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
 
     /// Insert a single key-value pair into the map, updating the key as well.
     ///
-    /// If the map did not have this key present, [None] is returned.
+    /// If the map did not have this key present, [`None`] is returned, which
+    /// means the insertion successful.
     ///
     /// If the map did have this key present, the key-value pair is updated, and
     /// the old key-value pair is returned. Note that unlike
