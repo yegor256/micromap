@@ -17,9 +17,24 @@ pub struct IntoIter<T, const N: usize> {
 }
 
 impl<T, const N: usize> Set<T, N> {
-    /// Make an iterator over all pairs.
+    /// An iterator visiting all elements in arbitrary order. The iterator
+    /// element type is `&'a T`.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Set;
+    /// let mut set: Set<_, 3> = Set::new();
+    /// set.insert("a");
+    /// set.insert("b");
+    /// // Will print in an arbitrary order.
+    /// for x in set.iter() {
+    ///     println!("{x}");
+    /// }
+    /// ```
+    ///
+    /// # Performance
+    /// In the current implementation, iterating over set takes O(len) time.
     #[inline]
-    #[must_use]
     pub fn iter(&self) -> Iter<'_, T> {
         Iter {
             iter: self.map.keys(),

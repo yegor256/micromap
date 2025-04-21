@@ -43,7 +43,6 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
 /// let b = Set::from([4, 2, 3, 4]);
 /// let mut union = a.union(&b);
 /// ```
-#[must_use = "this returns the union as an iterator, without modifying either input set"]
 pub struct Union<'a, T, const M: usize> {
     iter: core::iter::Chain<Iter<'a, T>, Difference<'a, 'a, T, M>>,
 }

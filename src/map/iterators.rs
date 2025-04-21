@@ -24,7 +24,6 @@ impl<K, V, const N: usize> Map<K, V, N> {
     /// In the current implementation, iterating over map takes `O(len)` time.
     /// The average complexity is `O(len/2)`.
     #[inline]
-    #[must_use]
     pub fn iter(&self) -> Iter<'_, K, V> {
         Iter {
             iter: self.pairs[..self.len].as_ref().iter(),

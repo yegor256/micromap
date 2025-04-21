@@ -16,6 +16,18 @@ impl<T, const N: usize> Set<T, N> {
     /// If the returned iterator is dropped before being fully consumed, it drops the
     /// remaining elements. The returned iterator keeps a mutable borrow on the set
     /// to optimize its implementation.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Set;
+    /// let mut set = Set::from([1, 2, 3]);
+    /// assert!(!set.is_empty());
+    /// // print 1, 2, 3 in an arbitrary order
+    /// for i in set.drain() {
+    ///     println!("{i}");
+    /// }
+    /// assert!(set.is_empty());
+    /// ```
     pub fn drain(&mut self) -> Drain<'_, T> {
         Drain {
             iter: self.map.drain(),

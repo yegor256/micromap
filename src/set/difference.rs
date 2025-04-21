@@ -50,7 +50,6 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
 /// let b = Set::from([4, 2, 3, 4]);
 /// let mut difference = a.difference(&b);
 /// ```
-#[must_use = "this returns the difference as an iterator, without modifying either input set"]
 pub struct Difference<'a, 'b, T, const M: usize> {
     // iterator of the first set
     iter: Iter<'a, T>,
@@ -119,6 +118,7 @@ mod difference_ref {
 
     impl<'a, T: PartialEq + ?Sized, const N: usize> Set<&'a T, N> {
         #[inline]
+        #[must_use]
         pub fn difference_ref<'b, 'set1, 'set2, const M: usize>(
             &'set1 self,
             other: &'set2 Set<&'b T, M>,
@@ -134,7 +134,6 @@ mod difference_ref {
         }
     }
 
-    #[must_use = "this returns the difference as an iterator, without modifying either input set"]
     pub struct DifferenceRef<'a, 'b, 'set, T: ?Sized, const M: usize> {
         // iterator of the first set
         iter: Iter<'a, &'a T>,

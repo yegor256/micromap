@@ -22,7 +22,6 @@ impl<K, V, const N: usize> Map<K, V, N> {
     /// assert_eq!(m.len(), 1);
     /// ```
     #[inline]
-    #[must_use]
     pub const fn capacity(&self) -> usize {
         N
     }
@@ -38,7 +37,6 @@ impl<K, V, const N: usize> Map<K, V, N> {
     /// assert!(!m.is_empty());
     /// ```
     #[inline]
-    #[must_use]
     pub const fn is_empty(&self) -> bool {
         self.len == 0
     }
@@ -54,7 +52,6 @@ impl<K, V, const N: usize> Map<K, V, N> {
     /// assert_eq!(m.len(), 1);
     /// ```
     #[inline]
-    #[must_use]
     pub const fn len(&self) -> usize {
         self.len
     }
@@ -128,7 +125,6 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// assert_eq!(m.contains_key(&2), false);
     /// ```
     #[inline]
-    #[must_use]
     pub fn contains_key<Q>(&self, k: &Q) -> bool
     where
         K: Borrow<Q>,
@@ -322,7 +318,6 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// assert_eq!(m.get(&2), None);
     /// ```
     #[inline]
-    #[must_use]
     pub fn get<Q>(&self, k: &Q) -> Option<&V>
     where
         K: Borrow<Q>,
@@ -350,7 +345,6 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// }
     /// assert_eq!(m[&1], "b");
     /// ```
-    #[must_use]
     pub fn get_mut<Q>(&mut self, k: &Q) -> Option<&mut V>
     where
         K: Borrow<Q>,
