@@ -233,12 +233,14 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     /// let mut set: Set<_, 3> = Set::new();
     /// assert_eq!(set.len(), 0);
     /// assert_eq!(set.capacity(), 3);
-    /// assert_eq!(set.insert_unchecked(0), true);
-    /// assert_eq!(set.insert_unchecked(1), true);
-    /// assert_eq!(set.insert_unchecked(2), true);
-    /// assert_eq!(set.insert_unchecked(2), false);
-    /// assert_eq!(set.len(), set.capacity()); // 3
-    /// // assert_eq!(set.insert_unchecked(3), true); // CAN NOT DO THIS!
+    /// unsafe {
+    ///     assert_eq!(set.insert_unchecked(0), true);
+    ///     assert_eq!(set.insert_unchecked(1), true);
+    ///     assert_eq!(set.insert_unchecked(2), true);
+    ///     assert_eq!(set.insert_unchecked(2), false);
+    ///     assert_eq!(set.len(), set.capacity()); // 3
+    ///     // assert_eq!(set.insert_unchecked(3), true); // CAN NOT DO THIS!
+    /// }
     /// ```
     ///
     /// # Panics
