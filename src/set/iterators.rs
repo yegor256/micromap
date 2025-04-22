@@ -62,7 +62,6 @@ impl<'a, T: 'a> Iterator for Iter<'a, T> {
     }
 
     #[inline]
-    #[must_use]
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.iter.size_hint()
     }
@@ -77,7 +76,6 @@ impl<T, const N: usize> Iterator for IntoIter<T, N> {
     }
 
     #[inline]
-    #[must_use]
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.iter.size_hint()
     }
@@ -107,7 +105,6 @@ impl<T, const N: usize> IntoIterator for Set<T, N> {
 
 impl<'a, T: 'a> ExactSizeIterator for Iter<'a, T> {
     #[inline]
-    #[must_use]
     fn len(&self) -> usize {
         self.iter.len()
     }
@@ -115,7 +112,6 @@ impl<'a, T: 'a> ExactSizeIterator for Iter<'a, T> {
 
 impl<T, const N: usize> ExactSizeIterator for IntoIter<T, N> {
     #[inline]
-    #[must_use]
     fn len(&self) -> usize {
         self.iter.len()
     }

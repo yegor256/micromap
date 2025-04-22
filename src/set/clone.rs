@@ -5,7 +5,6 @@ use super::Set;
 
 impl<T: Clone, const N: usize> Clone for Set<T, N> {
     #[inline]
-    #[must_use]
     fn clone(&self) -> Self {
         Self {
             map: self.map.clone(),

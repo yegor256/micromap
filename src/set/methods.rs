@@ -14,6 +14,7 @@ impl<T, const N: usize> Set<T, N> {
     /// assert_eq!(set.capacity(), 100);
     /// ```
     #[inline]
+    #[must_use]
     pub const fn capacity(&self) -> usize {
         self.map.capacity()
     }
@@ -29,6 +30,7 @@ impl<T, const N: usize> Set<T, N> {
     /// assert!(!set.is_empty());
     /// ```
     #[inline]
+    #[must_use]
     pub const fn is_empty(&self) -> bool {
         self.map.is_empty()
     }
@@ -44,6 +46,7 @@ impl<T, const N: usize> Set<T, N> {
     /// assert_eq!(set.len(), 1);
     /// ```
     #[inline]
+    #[must_use]
     pub const fn len(&self) -> usize {
         self.map.len()
     }
@@ -99,6 +102,7 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     /// assert_eq!(set.contains(&4), false);
     /// ```
     #[inline]
+    #[must_use]
     pub fn contains<Q>(&self, k: &Q) -> bool
     where
         T: Borrow<Q>,
@@ -273,6 +277,7 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     /// assert_eq!(set.get(&4), None);
     /// ```
     #[inline]
+    #[must_use]
     pub fn get<Q>(&self, k: &Q) -> Option<&T>
     where
         T: Borrow<Q>,
@@ -296,6 +301,7 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     /// assert_eq!(set.take(&2), None);
     /// ```
     #[inline]
+    #[must_use = "if no need the return value, use `remove()` instead."]
     pub fn take<Q>(&mut self, k: &Q) -> Option<T>
     where
         T: Borrow<Q>,
@@ -321,6 +327,8 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     /// b.insert(1);
     /// assert_eq!(a.is_disjoint(&b), false);
     /// ```
+    #[inline]
+    #[must_use]
     pub fn is_disjoint<const M: usize>(&self, other: &'_ Set<T, M>) -> bool {
         if self.len() <= other.len() {
             self.iter().all(|v| !other.contains(v))
@@ -343,6 +351,8 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     /// set.insert(4);
     /// assert_eq!(set.is_subset(&sup), false);
     /// ```
+    #[inline]
+    #[must_use]
     pub fn is_subset<const M: usize>(&self, other: &'_ Set<T, M>) -> bool {
         if self.len() <= other.len() {
             self.iter().all(|v| other.contains(v))
@@ -367,6 +377,7 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
     /// assert_eq!(set.is_superset(&sub), true);
     /// ```
     #[inline]
+    #[must_use]
     pub fn is_superset<const M: usize>(&self, other: &'_ Set<T, M>) -> bool {
         other.is_subset(self)
     }

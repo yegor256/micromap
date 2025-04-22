@@ -203,13 +203,11 @@ impl<'a, K, V> Iterator for Iter<'a, K, V> {
     }
 
     #[inline]
-    #[must_use]
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.iter.size_hint()
     }
 
     #[inline]
-    #[must_use]
     fn count(self) -> usize {
         self.iter.len()
     }
@@ -227,13 +225,11 @@ impl<'a, K, V> Iterator for IterMut<'a, K, V> {
     }
 
     #[inline]
-    #[must_use]
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.iter.size_hint()
     }
 
     #[inline]
-    #[must_use]
     fn count(self) -> usize {
         self.iter.len()
     }
@@ -253,13 +249,11 @@ impl<K, V, const N: usize> Iterator for IntoIter<K, V, N> {
     }
 
     #[inline]
-    #[must_use]
     fn size_hint(&self) -> (usize, Option<usize>) {
         (self.map.len, Some(self.map.len))
     }
 
     #[inline]
-    #[must_use]
     fn count(self) -> usize {
         self.map.len()
     }
@@ -297,7 +291,6 @@ impl<K, V, const N: usize> IntoIterator for Map<K, V, N> {
 
 impl<K, V> ExactSizeIterator for Iter<'_, K, V> {
     #[inline]
-    #[must_use]
     fn len(&self) -> usize {
         self.iter.len()
     }
@@ -305,7 +298,6 @@ impl<K, V> ExactSizeIterator for Iter<'_, K, V> {
 
 impl<K, V> ExactSizeIterator for IterMut<'_, K, V> {
     #[inline]
-    #[must_use]
     fn len(&self) -> usize {
         self.iter.len()
     }
@@ -313,7 +305,6 @@ impl<K, V> ExactSizeIterator for IterMut<'_, K, V> {
 
 impl<K, V, const N: usize> ExactSizeIterator for IntoIter<K, V, N> {
     #[inline]
-    #[must_use]
     fn len(&self) -> usize {
         self.map.len
     }

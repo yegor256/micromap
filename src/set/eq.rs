@@ -22,7 +22,6 @@ impl<T: PartialEq, const N: usize, const M: usize> PartialEq<Set<T, M>> for Set<
     /// assert_eq!(m1, m2);
     /// ```
     #[inline]
-    #[must_use]
     fn eq(&self, other: &Set<T, M>) -> bool {
         self.map.eq(&other.map)
     }

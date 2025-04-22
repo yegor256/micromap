@@ -11,7 +11,6 @@ impl<K: PartialEq + Borrow<Q>, Q: PartialEq + ?Sized, V, const N: usize> Index<&
     type Output = V;
 
     #[inline]
-    #[must_use]
     fn index(&self, key: &Q) -> &V {
         self.get(key).expect("No entry found for the key")
     }
@@ -21,7 +20,6 @@ impl<K: PartialEq + Borrow<Q>, Q: PartialEq + ?Sized, V, const N: usize> IndexMu
     for Map<K, V, N>
 {
     #[inline]
-    #[must_use]
     fn index_mut(&mut self, key: &Q) -> &mut V {
         self.get_mut(key).expect("No entry found for the key")
     }

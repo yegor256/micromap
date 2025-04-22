@@ -199,7 +199,6 @@ impl<'a, K, V> Iterator for Values<'a, K, V> {
     }
 
     #[inline]
-    #[must_use]
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.iter.size_hint()
     }
@@ -214,7 +213,6 @@ impl<'a, K, V> Iterator for ValuesMut<'a, K, V> {
     }
 
     #[inline]
-    #[must_use]
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.iter.size_hint()
     }
@@ -229,7 +227,6 @@ impl<K, V, const N: usize> Iterator for IntoValues<K, V, N> {
     }
 
     #[inline]
-    #[must_use]
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.iter.size_hint()
     }
@@ -237,7 +234,6 @@ impl<K, V, const N: usize> Iterator for IntoValues<K, V, N> {
 
 impl<K, V> ExactSizeIterator for Values<'_, K, V> {
     #[inline]
-    #[must_use]
     fn len(&self) -> usize {
         self.iter.len()
     }
@@ -245,7 +241,6 @@ impl<K, V> ExactSizeIterator for Values<'_, K, V> {
 
 impl<K, V> ExactSizeIterator for ValuesMut<'_, K, V> {
     #[inline]
-    #[must_use]
     fn len(&self) -> usize {
         self.iter.len()
     }
@@ -253,7 +248,6 @@ impl<K, V> ExactSizeIterator for ValuesMut<'_, K, V> {
 
 impl<K, V, const N: usize> ExactSizeIterator for IntoValues<K, V, N> {
     #[inline]
-    #[must_use]
     fn len(&self) -> usize {
         self.iter.len()
     }

@@ -23,7 +23,6 @@ impl<K: PartialEq, V: PartialEq, const N: usize, const M: usize> PartialEq<Map<K
     /// assert_eq!(m1, m2);
     /// ```
     #[inline]
-    #[must_use]
     fn eq(&self, other: &Map<K, V, M>) -> bool {
         self.len() == other.len() && self.iter().all(|(k, v)| other.get(k) == Some(v))
     }
