@@ -22,6 +22,7 @@ impl<K, V, const N: usize> Map<K, V, N> {
     /// assert_eq!(m.len(), 1);
     /// ```
     #[inline]
+    #[must_use]
     pub const fn capacity(&self) -> usize {
         N
     }
@@ -37,6 +38,7 @@ impl<K, V, const N: usize> Map<K, V, N> {
     /// assert!(!m.is_empty());
     /// ```
     #[inline]
+    #[must_use]
     pub const fn is_empty(&self) -> bool {
         self.len == 0
     }
@@ -52,6 +54,7 @@ impl<K, V, const N: usize> Map<K, V, N> {
     /// assert_eq!(m.len(), 1);
     /// ```
     #[inline]
+    #[must_use]
     pub const fn len(&self) -> usize {
         self.len
     }
@@ -125,6 +128,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// assert_eq!(m.contains_key(&2), false);
     /// ```
     #[inline]
+    #[must_use]
     pub fn contains_key<Q>(&self, k: &Q) -> bool
     where
         K: Borrow<Q>,
@@ -318,6 +322,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// assert_eq!(m.get(&2), None);
     /// ```
     #[inline]
+    #[must_use]
     pub fn get<Q>(&self, k: &Q) -> Option<&V>
     where
         K: Borrow<Q>,
@@ -345,6 +350,8 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// }
     /// assert_eq!(m[&1], "b");
     /// ```
+    #[inline]
+    #[must_use]
     pub fn get_mut<Q>(&mut self, k: &Q) -> Option<&mut V>
     where
         K: Borrow<Q>,
@@ -389,6 +396,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// assert_eq!(m.get_key_value(&j_b), Some((&j_a, &"Paris"))); // the notable case
     /// assert_eq!(m.get_key_value(&p), None);
     #[inline]
+    #[must_use]
     pub fn get_key_value<Q>(&self, k: &Q) -> Option<(&K, &V)>
     where
         K: Borrow<Q>,
@@ -464,6 +472,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// ]);
     /// ```
     #[inline]
+    #[must_use]
     pub fn get_disjoint_mut<Q, const J: usize>(&mut self, ks: [&Q; J]) -> [Option<&mut V>; J]
     where
         K: Borrow<Q>,
@@ -532,6 +541,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// assert_eq!(got, [Some(&mut 11807), None]);
     /// ```
     #[inline]
+    #[must_use]
     pub unsafe fn get_disjoint_unchecked_mut<Q, const J: usize>(
         &mut self,
         ks: [&Q; J],
@@ -586,6 +596,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// assert_eq!(m.remove(&1), None);
     /// ```
     #[inline]
+    #[must_use = "if no need a return value, use `remove()` instead."]
     pub fn remove_entry<Q>(&mut self, k: &Q) -> Option<(K, V)>
     where
         K: Borrow<Q>,
@@ -606,24 +617,28 @@ mod internal {
     impl<K, V, const N: usize> Map<K, V, N> {
         /// Internal function to get mutable access via reference to the value in the internal array.
         #[inline]
+        #[must_use]
         pub(crate) unsafe fn value_mut(&mut self, i: usize) -> &mut V {
             &mut self.pairs.get_unchecked_mut(i).assume_init_mut().1
         }
 
         /// Internal function to get access via reference to the element in the internal array.
         #[inline]
+        #[must_use]
         pub(crate) unsafe fn item_ref(&self, i: usize) -> &(K, V) {
             self.pairs.get_unchecked(i).assume_init_ref()
         }
 
         /// Internal function to get mutable access via reference to the element in the internal array.
         #[inline]
+        #[must_use]
         pub(crate) unsafe fn item_mut(&mut self, i: usize) -> &mut (K, V) {
             self.pairs.get_unchecked_mut(i).assume_init_mut()
         }
 
         /// Internal function to get access to the element in the internal array.
         #[inline]
+        #[must_use]
         pub(crate) unsafe fn item_read(&mut self, i: usize) -> (K, V) {
             self.pairs.get_unchecked(i).assume_init_read()
         }
@@ -653,6 +668,7 @@ mod internal {
 
         /// Remove by index and return it (by swapping the last one here and reducing the length).
         #[inline]
+        #[must_use = "if no need a return value, use `remove_index_drop()` instead."]
         pub(crate) unsafe fn remove_index_read(&mut self, i: usize) -> (K, V) {
             let result = self.item_read(i);
             self.len -= 1;
