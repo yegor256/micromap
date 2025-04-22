@@ -42,6 +42,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
 /// A view into a single entry in a map, which may either be vacant or occupied.
 ///
 /// This `enum` is constructed from the [`entry`][Map::entry] method on [`Map`].
+#[must_use]
 pub enum Entry<'a, K, V, const N: usize> {
     /// An occupied entry.
     Occupied(OccupiedEntry<'a, K, V, N>),
@@ -51,6 +52,7 @@ pub enum Entry<'a, K, V, const N: usize> {
 
 /// A view into an occupied entry in a `Map`.
 /// It is part of the [`Entry`] enum.
+#[must_use]
 pub struct OccupiedEntry<'a, K, V, const N: usize> {
     index: usize,
     table: &'a mut Map<K, V, N>,
@@ -58,6 +60,7 @@ pub struct OccupiedEntry<'a, K, V, const N: usize> {
 
 /// A view into a vacant entry in a `Map`.
 /// It is part of the [`Entry`] enum.
+#[must_use]
 pub struct VacantEntry<'a, K, V, const N: usize> {
     key: K,
     table: &'a mut Map<K, V, N>,
@@ -73,6 +76,7 @@ impl<K, V, const N: usize> Entry<'_, K, V, N> {
     /// assert_eq!(map.entry("poneyland").key(), &"poneyland");
     /// ```
     #[inline]
+    #[must_use]
     pub fn key(&self) -> &K {
         match self {
             Entry::Occupied(entry) => entry.key(),
@@ -214,6 +218,7 @@ impl<'a, K: PartialEq, V: Default, const N: usize> Entry<'a, K, V, N> {
     /// assert_eq!(map["poneyland"], None);
     /// ```
     #[inline]
+    #[must_use]
     pub fn or_default(self) -> &'a mut V {
         match self {
             Entry::Occupied(entry) => entry.into_mut(),
@@ -233,6 +238,7 @@ impl<'a, K, V, const N: usize> OccupiedEntry<'a, K, V, N> {
     /// assert_eq!(map.entry("poneyland").key(), &"poneyland");
     /// ```
     #[inline]
+    #[must_use]
     pub fn key(&self) -> &K {
         unsafe { &self.table.item_ref(self.index).0 }
     }
@@ -256,6 +262,7 @@ impl<'a, K, V, const N: usize> OccupiedEntry<'a, K, V, N> {
     /// assert_eq!(map["poneyland"], 22);
     /// ```
     #[inline]
+    #[must_use]
     pub fn into_mut(self) -> &'a mut V {
         unsafe { self.table.value_mut(self.index) }
     }
@@ -274,6 +281,7 @@ impl<'a, K, V, const N: usize> OccupiedEntry<'a, K, V, N> {
     /// }
     /// ```
     #[inline]
+    #[must_use]
     pub fn get(&self) -> &V {
         unsafe { &self.table.item_ref(self.index).1 }
     }
@@ -299,6 +307,7 @@ impl<'a, K, V, const N: usize> OccupiedEntry<'a, K, V, N> {
     /// assert_eq!(map["poneyland"], 24);
     /// ```
     #[inline]
+    #[must_use]
     pub fn get_mut(&mut self) -> &mut V {
         unsafe { self.table.value_mut(self.index) }
     }
@@ -337,6 +346,7 @@ impl<'a, K, V, const N: usize> OccupiedEntry<'a, K, V, N> {
     /// assert_eq!(map.contains_key("poneyland"), false);
     /// ```
     #[inline]
+    #[must_use = "if no need a return value, use `remove()` instead."]
     pub fn remove_entry(self) -> (K, V) {
         unsafe { self.table.remove_index_read(self.index) }
     }
@@ -371,6 +381,7 @@ impl<K, V, const N: usize> VacantEntry<'_, K, V, N> {
     /// assert_eq!(map.entry("poneyland").key(), &"poneyland");
     /// ```
     #[inline]
+    #[must_use]
     pub const fn key(&self) -> &K {
         &self.key
     }
@@ -386,6 +397,8 @@ impl<K, V, const N: usize> VacantEntry<'_, K, V, N> {
     ///     v.into_key();
     /// }
     /// ```
+    #[inline]
+    #[must_use]
     pub fn into_key(self) -> K {
         self.key
     }
@@ -405,6 +418,7 @@ impl<'a, K: PartialEq, V, const N: usize> VacantEntry<'a, K, V, N> {
     /// }
     /// assert_eq!(map["poneyland"], 37);
     /// ```
+    #[inline]
     pub fn insert(self, value: V) -> &'a mut V {
         let (index, _) = self.table.insert_ii(self.key, value, false);
         unsafe { self.table.value_mut(index) }
