@@ -29,8 +29,10 @@
 #![cfg_attr(all(not(feature = "std"), not(doc), not(test)), no_std)]
 #![doc(html_root_url = "https://docs.rs/micromap/0.0.0")]
 #![deny(warnings)]
+// `clippy::pedantic` have false positives about the `#[must_use]` attr
+// sometimes If a false positive occurs, we explicitly mark it
+// `#[allow(clippy::must_use_candidate)]` separately.
 #![warn(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
-// `clippy::pedantic` have false positives about the `#[must_use]` attr.
 #![allow(clippy::must_use_candidate)]
 #![warn(rust_2018_idioms)]
 // About the docs

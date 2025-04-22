@@ -361,6 +361,7 @@ impl<'a, K, V, const N: usize> OccupiedEntry<'a, K, V, N> {
     /// assert_eq!(map.contains_key("poneyland"), false);
     /// ```
     #[inline]
+    #[allow(clippy::must_use_candidate)]
     pub fn remove(self) -> V {
         unsafe { self.table.remove_index_read(self.index).1 }
     }
