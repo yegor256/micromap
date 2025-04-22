@@ -88,6 +88,7 @@ impl<K, V, const N: usize> Map<K, V, N> {
 /// assert_eq!(iter_values.len(), 1);
 /// ```
 #[repr(transparent)]
+#[must_use = "iterators are lazy and do nothing unless consumed"]
 pub struct Values<'a, K, V> {
     iter: Iter<'a, K, V>,
 }
@@ -106,6 +107,7 @@ pub struct Values<'a, K, V> {
 /// assert_eq!(m, Map::from([("a", 2), ("b", 4)]));
 /// ```
 #[repr(transparent)]
+#[must_use = "iterators are lazy and do nothing unless consumed"]
 pub struct ValuesMut<'a, K, V> {
     iter: IterMut<'a, K, V>,
 }
@@ -125,6 +127,7 @@ pub struct ValuesMut<'a, K, V> {
 /// assert_eq!(vec, [1, 2]);
 /// ```
 #[repr(transparent)]
+#[must_use = "iterators are lazy and do nothing unless consumed"]
 pub struct IntoValues<K, V, const N: usize> {
     iter: IntoIter<K, V, N>,
 }

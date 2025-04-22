@@ -64,6 +64,7 @@ impl<K, V, const N: usize> Map<K, V, N> {
 /// assert_eq!(iter_keys.len(), 1);
 /// ```
 #[repr(transparent)]
+#[must_use = "iterators are lazy and do nothing unless consumed"]
 pub struct Keys<'a, K, V> {
     iter: Iter<'a, K, V>,
 }
@@ -82,6 +83,7 @@ pub struct Keys<'a, K, V> {
 /// assert_eq!(iter_keys.len(), 1);
 /// ```
 #[repr(transparent)]
+#[must_use = "iterators are lazy and do nothing unless consumed"]
 pub struct IntoKeys<K, V, const N: usize> {
     iter: IntoIter<K, V, N>,
 }

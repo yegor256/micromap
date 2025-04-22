@@ -8,6 +8,7 @@ where
     K: Clone,
     V: Clone,
 {
+    #[must_use]
     fn clone(&self) -> Self {
         let mut m = Self::new();
         m.len = self.len;

@@ -50,6 +50,7 @@ impl<K, V, const N: usize> Map<K, V, N> {
 /// drop(iter);
 /// assert_eq!(map.len(), 0); // Now we can use the map's borrow
 /// ```
+#[must_use = "iterators are lazy and do nothing unless consumed"]
 pub struct Drain<'a, K, V> {
     iter: core::slice::IterMut<'a, MaybeUninit<(K, V)>>,
 }

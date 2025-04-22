@@ -76,6 +76,7 @@ impl<K, V, const N: usize> Map<K, V, N> {
 /// assert_eq!(iter.next(), None);
 /// ```
 #[repr(transparent)]
+#[must_use = "iterators are lazy and do nothing unless consumed"]
 pub struct Iter<'a, K, V> {
     iter: core::slice::Iter<'a, MaybeUninit<(K, V)>>,
 }
@@ -97,6 +98,7 @@ pub struct Iter<'a, K, V> {
 /// assert_eq!(map, Map::from([("a", 2), ("b", 3)]));
 /// ```
 #[repr(transparent)]
+#[must_use = "iterators are lazy and do nothing unless consumed"]
 pub struct IterMut<'a, K, V> {
     pub(super) iter: core::slice::IterMut<'a, MaybeUninit<(K, V)>>,
 }
@@ -119,6 +121,7 @@ pub struct IterMut<'a, K, V> {
 /// // assert_eq!(map.len(), 2); // `into_iter()` takes ownership, so can not do this
 /// ```
 #[repr(transparent)]
+#[must_use = "iterators are lazy and do nothing unless consumed"]
 pub struct IntoIter<K, V, const N: usize> {
     pub(super) map: Map<K, V, N>,
 }

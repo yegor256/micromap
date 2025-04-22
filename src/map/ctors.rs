@@ -7,6 +7,7 @@ use core::mem::MaybeUninit;
 impl<K, V, const N: usize> Default for Map<K, V, N> {
     /// Creates a empty [Map] like [`new()`][`Map::new`].
     #[inline]
+    #[must_use]
     fn default() -> Self {
         Self::new()
     }
