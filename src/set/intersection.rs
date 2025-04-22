@@ -83,11 +83,13 @@ impl<'a, T: PartialEq, const M: usize> Iterator for Intersection<'a, T, M> {
     }
 
     #[inline]
+    #[must_use]
     fn size_hint(&self) -> (usize, Option<usize>) {
         (0, Some(usize::min(self.iter.len(), self.other.len())))
     }
 
     #[inline]
+    #[must_use = "if closure `f` has side effects, you should use `for_each()` instead."]
     fn fold<B, F>(self, init: B, mut f: F) -> B
     where
         Self: Sized,

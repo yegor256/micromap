@@ -72,11 +72,13 @@ impl<'a, T: PartialEq, const N: usize, const M: usize> Iterator
     }
 
     #[inline]
+    #[must_use]
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.iter.size_hint()
     }
 
     #[inline]
+    #[must_use = "if closure `f` has side effects, you should use `for_each()` instead."]
     fn fold<B, F>(self, init: B, f: F) -> B
     where
         Self: Sized,

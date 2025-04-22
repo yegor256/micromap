@@ -26,6 +26,8 @@ where
     ///
     /// assert_eq!(set, expected);
     /// ```
+    #[inline]
+    #[must_use]
     fn sub(self, rhs: &Set<T, M>) -> Set<T, N> {
         self.difference(rhs).cloned().collect()
     }

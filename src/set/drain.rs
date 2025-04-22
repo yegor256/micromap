@@ -17,6 +17,7 @@ use core::iter::FusedIterator;
 /// assert_eq!(drain.len(), 3);
 /// ```
 #[repr(transparent)]
+#[must_use = "iterators are lazy and do nothing unless consumed"]
 pub struct Drain<'a, T> {
     iter: crate::map::drain::Drain<'a, T, ()>,
 }
@@ -56,6 +57,7 @@ impl<K> Iterator for Drain<'_, K> {
     }
 
     #[inline]
+    #[must_use]
     fn size_hint(&self) -> (usize, Option<usize>) {
         (self.iter.len(), Some(self.iter.len()))
     }
@@ -63,6 +65,7 @@ impl<K> Iterator for Drain<'_, K> {
 
 impl<K> ExactSizeIterator for Drain<'_, K> {
     #[inline]
+    #[must_use]
     fn len(&self) -> usize {
         self.iter.len()
     }

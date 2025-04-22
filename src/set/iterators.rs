@@ -6,12 +6,14 @@ use core::iter::FusedIterator;
 
 /// Iterator over the [`Set`].
 #[repr(transparent)]
+#[must_use = "iterators are lazy and do nothing unless consumed"]
 pub struct Iter<'a, T> {
     iter: crate::map::keys::Keys<'a, T, ()>,
 }
 
 /// Into-iterator over the [`Set`].
 #[repr(transparent)]
+#[must_use = "iterators are lazy and do nothing unless consumed"]
 pub struct IntoIter<T, const N: usize> {
     iter: crate::map::keys::IntoKeys<T, (), N>,
 }
@@ -60,6 +62,7 @@ impl<'a, T: 'a> Iterator for Iter<'a, T> {
     }
 
     #[inline]
+    #[must_use]
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.iter.size_hint()
     }
@@ -74,6 +77,7 @@ impl<T, const N: usize> Iterator for IntoIter<T, N> {
     }
 
     #[inline]
+    #[must_use]
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.iter.size_hint()
     }
@@ -102,12 +106,16 @@ impl<T, const N: usize> IntoIterator for Set<T, N> {
 }
 
 impl<'a, T: 'a> ExactSizeIterator for Iter<'a, T> {
+    #[inline]
+    #[must_use]
     fn len(&self) -> usize {
         self.iter.len()
     }
 }
 
 impl<T, const N: usize> ExactSizeIterator for IntoIter<T, N> {
+    #[inline]
+    #[must_use]
     fn len(&self) -> usize {
         self.iter.len()
     }

@@ -79,6 +79,7 @@ impl<'a, T: PartialEq, const M: usize> Iterator for Difference<'a, '_, T, M> {
     }
 
     #[inline]
+    #[must_use]
     fn size_hint(&self) -> (usize, Option<usize>) {
         let lower = if self.iter.len() > self.other.len() {
             self.iter.len() - self.other.len()
@@ -90,6 +91,7 @@ impl<'a, T: PartialEq, const M: usize> Iterator for Difference<'a, '_, T, M> {
     }
 
     #[inline]
+    #[must_use = "if closure `f` has side effects, you should use `for_each()` instead."]
     fn fold<B, F>(self, init: B, mut f: F) -> B
     where
         Self: Sized,
@@ -181,6 +183,7 @@ pub mod difference_ref {
         }
 
         #[inline]
+        #[must_use]
         fn size_hint(&self) -> (usize, Option<usize>) {
             let lower = if self.iter.len() > self.other.len() {
                 self.iter.len() - self.other.len()
@@ -192,6 +195,7 @@ pub mod difference_ref {
         }
 
         #[inline]
+        #[must_use = "if closure `f` has side effects, you should use `for_each()` instead."]
         fn fold<B, F>(self, init: B, mut f: F) -> B
         where
             Self: Sized,

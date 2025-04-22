@@ -5,6 +5,7 @@ use super::Set;
 
 impl<T: PartialEq, const N: usize> FromIterator<T> for Set<T, N> {
     #[inline]
+    #[must_use]
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
         let mut s: Self = Self::new();
         for k in iter {
@@ -16,6 +17,7 @@ impl<T: PartialEq, const N: usize> FromIterator<T> for Set<T, N> {
 
 impl<T: PartialEq, const N: usize> From<[T; N]> for Set<T, N> {
     #[inline]
+    #[must_use]
     fn from(arr: [T; N]) -> Self {
         Self::from_iter(arr)
     }

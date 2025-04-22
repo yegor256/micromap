@@ -28,6 +28,8 @@ where
     /// }
     /// assert_eq!(i, expected.len());
     /// ```
+    #[inline]
+    #[must_use]
     fn bitand(self, rhs: &Set<T, M>) -> Set<T, N> {
         self.intersection(rhs).cloned().collect()
     }
