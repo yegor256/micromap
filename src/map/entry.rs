@@ -42,7 +42,6 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
 /// A view into a single entry in a map, which may either be vacant or occupied.
 ///
 /// This `enum` is constructed from the [`entry`][Map::entry] method on [`Map`].
-#[must_use]
 pub enum Entry<'a, K, V, const N: usize> {
     /// An occupied entry.
     Occupied(OccupiedEntry<'a, K, V, N>),
@@ -52,7 +51,6 @@ pub enum Entry<'a, K, V, const N: usize> {
 
 /// A view into an occupied entry in a `Map`.
 /// It is part of the [`Entry`] enum.
-#[must_use]
 pub struct OccupiedEntry<'a, K, V, const N: usize> {
     index: usize,
     table: &'a mut Map<K, V, N>,
@@ -60,7 +58,6 @@ pub struct OccupiedEntry<'a, K, V, const N: usize> {
 
 /// A view into a vacant entry in a `Map`.
 /// It is part of the [`Entry`] enum.
-#[must_use]
 pub struct VacantEntry<'a, K, V, const N: usize> {
     key: K,
     table: &'a mut Map<K, V, N>,
@@ -218,7 +215,6 @@ impl<'a, K: PartialEq, V: Default, const N: usize> Entry<'a, K, V, N> {
     /// assert_eq!(map["poneyland"], None);
     /// ```
     #[inline]
-    #[must_use]
     pub fn or_default(self) -> &'a mut V {
         match self {
             Entry::Occupied(entry) => entry.into_mut(),
@@ -341,12 +337,12 @@ impl<'a, K, V, const N: usize> OccupiedEntry<'a, K, V, N> {
     /// map.entry("poneyland").or_insert(12);
     /// if let Entry::Occupied(o) = map.entry("poneyland") {
     ///     // We delete the entry from the map.
-    ///     o.remove_entry();
+    ///     let _ = o.remove_entry();
     /// }
     /// assert_eq!(map.contains_key("poneyland"), false);
     /// ```
     #[inline]
-    #[must_use = "if no need a return value, use `remove()` instead."]
+    #[must_use = "if no need the return value, use `remove()` instead."]
     pub fn remove_entry(self) -> (K, V) {
         unsafe { self.table.remove_index_read(self.index) }
     }
@@ -394,7 +390,7 @@ impl<K, V, const N: usize> VacantEntry<'_, K, V, N> {
     /// use micromap::map::Entry;
     /// let mut map: Map<&str, u32, 3> = Map::new();
     /// if let Entry::Vacant(v) = map.entry("poneyland") {
-    ///     v.into_key();
+    ///     let _ = v.into_key();
     /// }
     /// ```
     #[inline]
@@ -433,7 +429,7 @@ impl<'a, K: PartialEq, V, const N: usize> VacantEntry<'a, K, V, N> {
     /// use micromap::map::Entry;
     /// let mut map: Map<&str, u32, 3> = Map::new();
     /// if let Entry::Vacant(o) = map.entry("poneyland") {
-    ///     o.insert_entry(37);
+    ///     let _ = o.insert_entry(37);
     /// }
     /// assert_eq!(map["poneyland"], 37);
     /// ```

@@ -596,7 +596,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// assert_eq!(m.remove(&1), None);
     /// ```
     #[inline]
-    #[must_use = "if no need a return value, use `remove()` instead."]
+    #[must_use = "if no need the return value, use `remove()` instead."]
     pub fn remove_entry<Q>(&mut self, k: &Q) -> Option<(K, V)>
     where
         K: Borrow<Q>,
@@ -668,7 +668,7 @@ mod internal {
 
         /// Remove by index and return it (by swapping the last one here and reducing the length).
         #[inline]
-        #[must_use = "if no need a return value, use `remove_index_drop()` instead."]
+        #[must_use = "if no need the return value, use `remove_index_drop()` instead."]
         pub(crate) unsafe fn remove_index_read(&mut self, i: usize) -> (K, V) {
             let result = self.item_read(i);
             self.len -= 1;

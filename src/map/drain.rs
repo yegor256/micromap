@@ -84,6 +84,7 @@ impl<K, V> Iterator for Drain<'_, K, V> {
     }
 
     #[inline]
+    #[must_use]
     fn size_hint(&self) -> (usize, Option<usize>) {
         (self.iter.len(), Some(self.iter.len()))
     }
@@ -91,6 +92,7 @@ impl<K, V> Iterator for Drain<'_, K, V> {
 
 impl<K, V> ExactSizeIterator for Drain<'_, K, V> {
     #[inline]
+    #[must_use]
     fn len(&self) -> usize {
         self.iter.len()
     }
