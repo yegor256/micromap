@@ -2,6 +2,8 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 owtotwo
 // SPDX-License-Identifier: MIT
 
+#![cfg(debug_assertions)]
+
 use seq_macro::seq;
 use std::hash::Hash;
 use std::vec;
@@ -14,19 +16,19 @@ use std::collections::HashMap;
 use uuid::Builder;
 use uuid::Uuid;
 
+// This is a deterministic random test.
 // DON'T change the code unless you know what you are doing.
 
 const ROUNDS: usize = 12345; // 123456 is ok, but a bit slower. (XOR_EXPECT=0xFD9A2154FC6C60DD)
 const XOR_EXPECT: u64 = 0x150D46E005A17B7C; // for a specific ROUNDS=12345
 
-// cargo test --test random (without --release)
+/// Run this by:
+/// `$ cargo test --test random (without --release)`
+///
+/// Note: only run in debug mode (opt-level=0), cause this is a deterministic result, it will be
+/// calculated at compile time when optimization is enabled and it will stuck.
 #[test]
 fn each_capacity() {
-    // Only run in debug mode (opt-level=0). Because this is a deterministic result, it is
-    // calculated at compile time when optimization is enabled.
-    if !cfg!(debug_assertions) {
-        return;
-    }
     let mut xor_hash = 0u64;
     seq!(N in 0..257 {
         let micro_map: Map<Uuid, [u8; 16], N> = Map::new();
