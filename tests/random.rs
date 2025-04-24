@@ -14,6 +14,8 @@ use std::collections::HashMap;
 use uuid::Builder;
 use uuid::Uuid;
 
+// DON'T change the code unless you know what you are doing.
+
 const ROUNDS: usize = 12345; // 123456 is ok, but a bit slower. (XOR_EXPECT=0xFD9A2154FC6C60DD)
 const XOR_EXPECT: u64 = 0x150D46E005A17B7C; // for a specific ROUNDS=12345
 
