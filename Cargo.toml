@@ -30,6 +30,10 @@ indexmap = "2.2.6"
 litemap = "0.7.0"
 flurry = "0.5.2"
 criterion = "0.5.1"
+seq-macro = "0.3.6"
+rand = { version = "0.9.0", default-features = false, features = ["small_rng"] }
+uuid = { version = "1.16.0", default-features = false, features = ["v4"] }
+foldhash = { version = "0.1.5", default-features = false }
 
 [features]
 default = []
@@ -45,3 +49,6 @@ rustdoc-args = ["--cfg", "docsrs"]
 [[bench]]
 name = "bench"
 harness = false
+
+[[test]]
+name = "random"
