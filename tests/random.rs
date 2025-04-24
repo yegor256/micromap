@@ -17,12 +17,14 @@ use uuid::Uuid;
 const ROUNDS: usize = 12345; // 123456 is ok, but a bit slower. (XOR_EXPECT=0xFD9A2154FC6C60DD)
 const XOR_EXPECT: u64 = 0x150D46E005A17B7C; // for a specific ROUNDS=12345
 
-fn main() {
-    each_capacity();
-}
-
+// cargo test --test random (without --release)
 #[test]
 fn each_capacity() {
+    // Only run in debug mode (opt-level=0). Because this is a deterministic result, it is
+    // calculated at compile time when optimization is enabled.
+    if !cfg!(debug_assertions) {
+        return;
+    }
     let mut xor_hash = 0u64;
     seq!(N in 0..257 {
         let micro_map: Map<Uuid, [u8; 16], N> = Map::new();
