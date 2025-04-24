@@ -8,6 +8,7 @@ use seq_macro::seq;
 use std::hash::Hash;
 use std::vec;
 
+use indexmap::IndexMap;
 use micromap::Map;
 use rand::rngs::SmallRng;
 use rand::Rng;
@@ -36,6 +37,11 @@ fn each_capacity() {
         let hash_map: HashMap<Uuid, [u8; 16]> = HashMap::new();
         let hashmap_results = for_n::<N>(hash_map);
         assert_eq!(micromap_results, hashmap_results);
+        // Or use IndexMap instead of HashMap if you want, the final
+        // result sequence is consistent.
+        // let index_map: IndexMap<Uuid, [u8; 16]> = IndexMap::new();
+        // let indexmap_results = for_n::<N>(index_map);
+        // assert_eq!(indexmap_results, micromap_results);
         for result in micromap_results {
             let hash_val = make_hash(&result, ROUNDS as u64);
             xor_hash ^= hash_val;
@@ -113,6 +119,42 @@ where
 
     fn remove(&mut self, key: &K) -> Option<V> {
         self.remove(key)
+    }
+
+    fn retain<F>(&mut self, f: F)
+    where
+        F: FnMut(&K, &mut V) -> bool,
+    {
+        self.retain(f)
+    }
+
+    fn len(&self) -> usize {
+        self.len()
+    }
+
+    fn contains_key(&self, key: &K) -> bool {
+        self.contains_key(key)
+    }
+
+    fn clear(&mut self) {
+        self.clear()
+    }
+}
+
+impl<K, V, const N: usize> IsMap<K, V, N> for IndexMap<K, V>
+where
+    K: PartialEq + Eq + Hash,
+{
+    fn get(&self, key: &K) -> Option<&V> {
+        self.get(key)
+    }
+
+    fn insert(&mut self, key: K, value: V) -> Option<V> {
+        self.insert(key, value)
+    }
+
+    fn remove(&mut self, key: &K) -> Option<V> {
+        self.swap_remove(key)
     }
 
     fn retain<F>(&mut self, f: F)
