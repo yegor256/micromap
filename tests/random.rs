@@ -14,7 +14,8 @@ use std::collections::HashMap;
 use uuid::Builder;
 use uuid::Uuid;
 
-const ROUNDS: usize = 12345; // 123456 is ok, but a bit slower.
+const ROUNDS: usize = 12345; // 123456 is ok, but a bit slower. (XOR_EXPECT=0xFD9A2154FC6C60DD)
+const XOR_EXPECT: u64 = 0x150D46E005A17B7C; // for a specific ROUNDS=12345
 
 fn main() {
     each_capacity();
@@ -22,18 +23,23 @@ fn main() {
 
 #[test]
 fn each_capacity() {
+    let mut xor_hash = 0u64;
     seq!(N in 0..257 {
         let micro_map: Map<Uuid, [u8; 16], N> = Map::new();
         let micromap_results = for_n::<N>(micro_map);
-        // println!("[MicroMap] results for N={}: \n{:?}", N, micromap_results);
         let hash_map: HashMap<Uuid, [u8; 16]> = HashMap::new();
         let hashmap_results = for_n::<N>(hash_map);
-        // println!("[HashMap ] results for N={}: \n{:?}", N, hashmap_results);
         assert_eq!(micromap_results, hashmap_results);
-        // let result_hashes = results.iter().map(|result| make_hash(result, 0)).collect::<Vec<_>>();
-        // hint::black_box(result_hashes);
-        // println!("result_hashes for N={}: {:?}", N, result_hashes);
+        for result in micromap_results {
+            let hash_val = make_hash(&result, ROUNDS as u64);
+            xor_hash ^= hash_val;
+        }
     });
+    assert_eq!(
+        xor_hash, XOR_EXPECT,
+        "xor_hash=0x{:0X} is not eq to XOR_EXPECT=0x{:0X} for ROUNDS={}",
+        xor_hash, XOR_EXPECT, ROUNDS
+    );
 }
 
 trait IsMap<K, V, const N: usize>
@@ -302,74 +308,3 @@ fn make_hash<K: core::hash::Hash>(k: &K, seed: u64) -> u64 {
     let state = foldhash::fast::FixedState::with_seed(seed);
     state.hash_one(k)
 }
-
-// #[test]
-// fn random_test() {
-//     let mut rng = SmallRng::seed_from_u64(1);
-
-//     let mut uuids = vec![];
-//     for _ in 0..64 {
-//         let random_bytes = rng.random();
-//         let uuid = Builder::from_bytes(random_bytes).into_uuid();
-//         uuids.push(uuid);
-//     }
-
-//     let key_index_list: Vec<usize> = (0..10000).map(|_| rng.random_range(0..64)).collect();
-//     let value_list: Vec<[u8; 16]> = (0..10000).map(|_| rng.random()).collect();
-//     let remove_key_index_list: Vec<usize> = (0..10000)
-//         .step_by(20)
-//         .map(|i| key_index_list[i + rng.random_range(0..20)])
-//         .collect();
-//     let remove_or_not_list: Vec<bool> = (0..10000).map(|_| rng.random_range(0..100) < 10).collect();
-//     // let mut do_remove_after_insert_i: Vec<usize> = (0..remove_key_index_list.len()).map(|_| rng.random_range(0..10000)).collect();
-//     // do_remove_after_insert_i.sort();
-//     // println!("remove_key_index_list is {:?}", remove_key_index_list);
-
-//     // get average of key_index_list
-//     let mut sum = 0;
-//     for i in 0..key_index_list.len() {
-//         sum += key_index_list[i];
-//     }
-//     let avg = sum as f64 / key_index_list.len() as f64;
-//     println!("key_index_list avg is {:?}", avg);
-
-//     let mut sum = 0;
-
-//     for _ in 0..1234 {
-//         let mut m: Map<Uuid, [u8; 16], 64> = Map::new();
-
-//         // let mut before_full = vec![];
-//         // let mut not_full = true;
-//         let mut rm_it = remove_key_index_list.iter();
-//         for i in 0..10000 {
-//             let index = key_index_list[i];
-//             let key = uuids[index];
-//             let value = value_list[i];
-
-//             m.insert(black_box(key), black_box(value));
-
-//             if remove_or_not_list[i] {
-//                 let Some(rm_i) = rm_it.next() else {
-//                     break;
-//                 };
-//                 let key = uuids[*rm_i];
-//                 m.remove(black_box(&key));
-//             }
-
-//             // if not_full {
-//             //     before_full.push(m.len());
-//             //     if m.len() == m.capacity() {
-//             //         not_full = false;
-//             //         println!(
-//             //             "before_full(len={}) is {:?}",
-//             //             before_full.len(),
-//             //             before_full
-//             //         );
-//             //     }
-//             // }
-//         }
-
-//         sum += m.len();
-//     }
-//     println!("sum is {}", sum);
-// }
