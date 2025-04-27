@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
-//! ## Map
+//! ## [`Map`]
 //! This is a **simpler and faster** alternative implementation of the standard
 //! [`HashMap`][std::collections::HashMap] in **small-scale**. It does **not use
 //! heap** and **not need the [`Hash`][core::hash::Hash] or [`Ord`] trait** at all.
@@ -30,7 +30,7 @@
 //! element will lead to a panic. (Or use [`checked_insert`][Map::checked_insert]
 //! instead to avoid panics by returning an [`Option`].)
 //!
-//! ## Set
+//! ## [`Set`]
 //! Similarly, you can also create a **small [`Set`] on stack** directly. It has basic
 //! but adequate operations as a real set. (As is common practice, `Set<T>` is actually
 //! a `Map<T, ()>`)
