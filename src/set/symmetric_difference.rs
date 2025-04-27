@@ -164,4 +164,37 @@ mod tests {
         assert_eq!(set_d.symmetric_difference(&set_b).size_hint(), (4, Some(8)));
         assert_eq!(set_d.symmetric_difference(&set_c).size_hint(), (2, Some(2)));
     }
+
+    #[test]
+    fn symmetric_difference_clone() {
+        let set_a = Set::from([1, 2, 3]);
+        let set_b = Set::from([3, 4, 5]);
+        let sym_diff = set_a.symmetric_difference(&set_b);
+        let cloned = sym_diff.clone();
+        let collected_original: Set<_, 6> = sym_diff.copied().collect();
+        let collected_cloned: Set<_, 6> = cloned.copied().collect();
+        assert_eq!(collected_original, collected_cloned);
+    }
+
+    #[test]
+    fn symmetric_difference_fold() {
+        let set_a = Set::from([1, 2, 3]);
+        let set_b = Set::from([3, 4, 5]);
+        let sym_diff = set_a.symmetric_difference(&set_b);
+        let sum = sym_diff.fold(0, |acc, &x| acc + x);
+        assert_eq!(sum, 1 + 2 + 4 + 5);
+    }
+
+    #[test]
+    fn symmetric_difference_fmt_debug() {
+        let set_a = Set::from([1, 2, 3]);
+        let set_b = Set::from([3, 4, 5]);
+        let sym_diff = set_a.symmetric_difference(&set_b);
+        let debug_output = format!("{:?}", sym_diff);
+        assert!(debug_output.contains("1"));
+        assert!(debug_output.contains("2"));
+        assert!(debug_output.contains("4"));
+        assert!(debug_output.contains("5"));
+        assert!(!debug_output.contains("3"));
+    }
 }

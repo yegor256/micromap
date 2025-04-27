@@ -90,8 +90,16 @@ mod tests {
     }
 
     #[test]
+    fn makes_map_by_with_capacity() {
+        #[allow(deprecated)]
+        let m: Map<u8, u8, 8> = Map::with_capacity(8);
+        assert_eq!(0, m.len());
+    }
+
+    #[test]
     fn drops_correctly() {
-        let _m: Map<Vec<u8>, u8, 8> = Map::new();
+        let m: Map<Vec<u8>, u8, 8> = Map::new();
+        drop(m);
     }
 
     #[test]

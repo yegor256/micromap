@@ -44,4 +44,25 @@ mod tests {
         set.extend([2, 3, 5, 6]);
         assert_eq!(set, Set::from([1, 2, 3, 4, 5, 6]));
     }
+
+    #[test]
+    fn extend_set_with_str_references() {
+        let mut set = Set::<&str, 6>::new();
+        set.extend(["a", "b", "c"].iter());
+        assert_eq!(set, Set::from(["a", "b", "c"]));
+    }
+
+    #[test]
+    fn extend_set_with_str_references_overlap() {
+        let mut set = Set::<&str, 6>::from_iter(["a", "b"]);
+        set.extend(["b", "c", "d"].iter());
+        assert_eq!(set, Set::from(["a", "b", "c", "d"]));
+    }
+
+    #[test]
+    fn extend_set_with_str_references_empty() {
+        let mut set = Set::<&str, 6>::from_iter(["a", "b", "c"]);
+        <Set<&str, 6> as Extend<&str>>::extend(&mut set, []); // Fully Qualified Syntax
+        assert_eq!(set, Set::from(["a", "b", "c"]));
+    }
 }

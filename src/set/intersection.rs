@@ -177,4 +177,24 @@ mod tests {
         assert_eq!(set_d.intersection(&set_b).size_hint(), (0, Some(2)));
         assert_eq!(set_d.intersection(&set_c).size_hint(), (0, Some(0)));
     }
+
+    #[test]
+    fn intersection_clone_fmt_fold() {
+        use core::fmt::Write;
+        let set_a = Set::from([1, 2, 3, 4]);
+        let set_b = Set::from([3, 4, 5, 6]);
+        // Test `clone`
+        let intersection = set_a.intersection(&set_b);
+        let cloned = intersection.clone();
+        let result: Set<_, 2> = cloned.copied().collect();
+        assert_eq!(result, Set::from([3, 4]));
+        // Test `fmt`
+        let mut debug_output = String::new();
+        write!(&mut debug_output, "{:?}", intersection).unwrap();
+        assert!(debug_output.contains("3"));
+        assert!(debug_output.contains("4"));
+        // Test `fold`
+        let sum = intersection.fold(0, |acc, &x| acc + x);
+        assert_eq!(sum, 7); // 3 + 4 = 7
+    }
 }

@@ -900,10 +900,18 @@ mod tests {
 
     #[test]
     fn clears_it_up() {
-        let mut m: Map<String, i32, 10> = Map::new();
-        assert_eq!(m.insert("one".to_string(), 42), None);
+        use std::rc::Rc;
+        let v = vec![1, 2, 3];
+        let vrc = Rc::new(v);
+        let mut m: Map<String, Rc<Vec<i32>>, 10> = Map::new();
+        let vrc_1 = Rc::clone(&vrc);
+        let vrc_2 = Rc::clone(&vrc);
+        assert_eq!(m.insert("one".to_string(), vrc_1), None);
+        assert_eq!(m.insert("two".to_string(), vrc_2), None);
+        assert_eq!(Rc::strong_count(&vrc), 3);
         m.clear();
         assert_eq!(0, m.len());
+        assert_eq!(Rc::strong_count(&vrc), 1);
     }
 
     #[test]
@@ -1024,6 +1032,73 @@ mod tests {
     }
 
     #[test]
+    fn insert_unchecked_inserts_new_key() {
+        let mut m: Map<i32, i32, 3> = Map::new();
+        unsafe {
+            assert_eq!(m.insert_unchecked(1, 10), None);
+            assert_eq!(m.get(&1), Some(&10));
+        }
+    }
+
+    #[test]
+    fn insert_unchecked_overwrites_existing_key() {
+        let mut m: Map<i32, i32, 3> = Map::new();
+        unsafe {
+            assert_eq!(m.insert_unchecked(1, 10), None);
+            assert_eq!(m.insert_unchecked(1, 20), Some(10));
+            assert_eq!(m.get(&1), Some(&20));
+        }
+    }
+
+    #[test]
+    #[should_panic(expected = "No more key-value slot available in the map")]
+    #[cfg(debug_assertions)]
+    fn insert_unchecked_panics_when_map_is_full() {
+        let mut m: Map<i32, i32, 1> = Map::new();
+        unsafe {
+            assert_eq!(m.insert_unchecked(1, 10), None);
+            m.insert_unchecked(2, 20); // This should panic in debug mode.
+        }
+    }
+
+    #[test]
+    fn insert_unchecked_does_not_panic_in_release_mode() {
+        let mut m: Map<i32, i32, 1> = Map::new();
+        unsafe {
+            assert_eq!(m.insert_unchecked(1, 10), None);
+            // In release mode, this will cause undefined behavior if accessed.
+            // m.insert_unchecked(2, 20);
+        }
+    }
+
+    #[test]
+    fn insert_unchecked_handles_duplicate_keys() {
+        let mut m: Map<i32, i32, 2> = Map::new();
+        unsafe {
+            assert_eq!(m.insert_unchecked(1, 10), None);
+            assert_eq!(m.insert_unchecked(1, 15), Some(10));
+            assert_eq!(m.get(&1), Some(&15));
+        }
+    }
+
+    #[test]
+    fn insert_unchecked_with_struct_key() {
+        #[derive(PartialEq, Debug)]
+        struct Key {
+            id: u32,
+        }
+        let mut m: Map<Key, i32, 2> = Map::new();
+        let key1 = Key { id: 1 };
+        let key2 = Key { id: 2 };
+        unsafe {
+            assert_eq!(m.insert_unchecked(key1, 42), None);
+            assert_eq!(m.insert_unchecked(key2, 84), None);
+            assert_eq!(m.get(&Key { id: 1 }), Some(&42));
+            assert_eq!(m.get(&Key { id: 2 }), Some(&84));
+        }
+    }
+
+    #[test]
     fn checked_insert_updates_existing_key() {
         let mut m: Map<String, i32, 10> = Map::new();
         assert_eq!(m.checked_insert("key".to_string(), 42), Some(None));
@@ -1103,6 +1178,32 @@ mod tests {
     }
 
     #[test]
+    fn get_disjoint_unchecked_mut_non_overlapping_keys() {
+        let mut map: Map<&str, i32, 5> = Map::new();
+        map.insert("key1", 10);
+        map.insert("key2", 20);
+        map.insert("key3", 30);
+        map.insert("key4", 40);
+        let [v3, v1, v2] = unsafe { map.get_disjoint_unchecked_mut(["key3", "key1", "key2"]) };
+        assert_eq!(v1, Some(&mut 10));
+        assert_eq!(v2, Some(&mut 20));
+        assert_eq!(v3, Some(&mut 30));
+        if let Some(v1) = v1 {
+            *v1 = 100;
+        }
+        if let Some(v2) = v2 {
+            *v2 = 200;
+        }
+        if let Some(v3) = v3 {
+            *v3 = 300;
+        }
+        assert_eq!(map.get("key1"), Some(&100));
+        assert_eq!(map.get("key2"), Some(&200));
+        assert_eq!(map.get("key3"), Some(&300));
+        assert_eq!(map.get("key4"), Some(&40));
+    }
+
+    #[test]
     #[should_panic(expected = "Overlapping keys")]
     fn get_disjoint_mut_overlapping_keys() {
         let mut map: Map<&str, i32, 5> = Map::new();
@@ -1122,9 +1223,26 @@ mod tests {
     }
 
     #[test]
+    fn get_disjoint_unchecked_mut_missing_keys() {
+        let mut map: Map<&str, i32, 5> = Map::new();
+        map.insert("key2", 20);
+        let [v1, v2] = unsafe { map.get_disjoint_unchecked_mut(["key1", "key2"]) };
+        assert_eq!(v1, None);
+        assert_eq!(v2, Some(&mut 20));
+    }
+
+    #[test]
     fn get_disjoint_mut_empty_keys() {
         let mut map: Map<&str, i32, 5> = Map::new();
         let result: [Option<&mut i32>; 0] = map.get_disjoint_mut::<&str, 0>([]);
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn get_disjoint_unchecked_mut_empty_keys() {
+        let mut map: Map<&str, i32, 5> = Map::new();
+        let result: [Option<&mut i32>; 0] =
+            unsafe { map.get_disjoint_unchecked_mut::<&str, 0>([]) };
         assert!(result.is_empty());
     }
 

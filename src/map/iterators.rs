@@ -508,4 +508,34 @@ mod tests {
         let _i = IterMut::<String, u32>::default();
         let _i = IntoIter::<String, u32, 3>::default();
     }
+
+    #[test]
+    fn iter_count() {
+        let mut m: Map<char, u32, 4> = Map::new();
+        m.insert('a', 97);
+        m.insert('b', 98);
+        m.insert('c', 99);
+        let it = m.iter();
+        assert_eq!(it.count(), 3); // Count all elements
+    }
+
+    #[test]
+    fn iter_mut_count() {
+        let mut m: Map<char, u32, 4> = Map::new();
+        m.insert('a', 97);
+        m.insert('b', 98);
+        m.insert('c', 99);
+        let it_mut = m.iter_mut();
+        assert_eq!(it_mut.count(), 3); // Count all elements
+    }
+
+    #[test]
+    fn into_iter_count() {
+        let mut m: Map<char, u32, 4> = Map::new();
+        m.insert('a', 97);
+        m.insert('b', 98);
+        m.insert('c', 99);
+        let it_owned = m.into_iter();
+        assert_eq!(it_owned.count(), 3); // Count all elements
+    }
 }

@@ -84,4 +84,30 @@ mod tests {
         assert!(after.is_empty());
         assert_eq!(bytes.len(), read_len);
     }
+
+    #[test]
+    fn serialize_non_empty_map() {
+        let config = bincode::config::legacy();
+        let mut map: Map<u8, u8, 8> = Map::new();
+        map.insert(10, 20);
+        map.insert(30, 40);
+        let mut bytes: [u8; 1024] = [0; 1024];
+        let len = encode_into_slice(&map, &mut bytes, config).unwrap();
+        let bytes = &bytes[..len];
+        let (deserialized_map, read_len): (Map<u8, u8, 8>, usize) =
+            decode_from_slice(&bytes, config).unwrap();
+        assert_eq!(map.len(), deserialized_map.len());
+        assert_eq!(bytes.len(), read_len);
+        for (key, value) in map {
+            assert_eq!(deserialized_map.get(&key), Some(&value));
+        }
+    }
+
+    #[test]
+    fn deserialize_invalid_data() {
+        let config = bincode::config::legacy();
+        let invalid_bytes: [u8; 4] = [0xFF, 0xFF, 0xFF, 0xFF];
+        let result: Result<(Map<u8, u8, 8>, usize), _> = decode_from_slice(&invalid_bytes, config);
+        assert!(result.is_err());
+    }
 }

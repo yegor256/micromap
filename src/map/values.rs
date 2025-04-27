@@ -311,4 +311,71 @@ mod tests {
         drop(values);
         assert_eq!(1, Rc::strong_count(&v));
     }
+
+    #[test]
+    fn values_clone() {
+        let mut m: Map<i32, String, 10> = Map::new();
+        m.insert(1, "foo".to_string());
+        m.insert(2, "bar".to_string());
+        let values = m.values();
+        let cloned_values = values.clone();
+        assert_eq!(
+            values.collect::<Vec<_>>(),
+            cloned_values.collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn values_default() {
+        let values: Values<'_, String, i32> = Values::default();
+        assert_eq!(values.len(), 0);
+        assert_eq!(values.size_hint(), (0, Some(0)));
+    }
+
+    #[test]
+    fn values_mut_default() {
+        let values_mut: ValuesMut<'_, String, i32> = ValuesMut::default();
+        assert_eq!(values_mut.len(), 0);
+        assert_eq!(values_mut.size_hint(), (0, Some(0)));
+    }
+
+    #[test]
+    fn into_values_default() {
+        let into_values: IntoValues<String, i32, 10> = IntoValues::default();
+        assert_eq!(into_values.len(), 0);
+        assert_eq!(into_values.size_hint(), (0, Some(0)));
+    }
+
+    #[test]
+    fn values_debug() {
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("one".to_string(), 42);
+        m.insert("two".to_string(), 16);
+        let values = m.values();
+        let debug_str = format!("{:?}", values);
+        assert!(debug_str.contains("42"));
+        assert!(debug_str.contains("16"));
+    }
+
+    #[test]
+    fn values_mut_debug() {
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("one".to_string(), 42);
+        m.insert("two".to_string(), 16);
+        let values_mut = m.values_mut();
+        let debug_str = format!("{:?}", values_mut);
+        assert!(debug_str.contains("42"));
+        assert!(debug_str.contains("16"));
+    }
+
+    #[test]
+    fn into_values_debug() {
+        let mut m: Map<String, i32, 10> = Map::new();
+        m.insert("one".to_string(), 42);
+        m.insert("two".to_string(), 16);
+        let into_values = m.into_values();
+        let debug_str = format!("{:?}", into_values);
+        assert!(debug_str.contains("42"));
+        assert!(debug_str.contains("16"));
+    }
 }

@@ -160,4 +160,51 @@ mod tests {
         assert_eq!(set_d.union(&set_b).size_hint(), (6, Some(8)));
         assert_eq!(set_d.union(&set_c).size_hint(), (2, Some(2)));
     }
+
+    #[test]
+    fn union_default_and_clone() {
+        let set_a = Set::from([1, 2, 3]);
+        let set_b = Set::from([4, 5, 6]);
+        let union = set_a.union(&set_b);
+        let cloned_union = union.clone();
+        assert_eq!(union.count(), cloned_union.count());
+    }
+
+    #[test]
+    fn union_debug_fmt() {
+        let set_a = Set::from([1, 2, 3]);
+        let set_b = Set::from([4, 5, 6]);
+        let union = set_a.union(&set_b);
+        let debug_output = format!("{:?}", union);
+        assert!(debug_output.contains("1"));
+        assert!(debug_output.contains("6"));
+    }
+
+    #[test]
+    fn union_count_and_fold() {
+        let set_a = Set::from([1, 2, 3]);
+        let set_b = Set::from([3, 4, 5]);
+        let union = set_a.union(&set_b);
+        assert_eq!(union.clone().count(), 5);
+        let sum: i32 = union.fold(0, |acc, &x| acc + x);
+        assert_eq!(sum, 15); // 1 + 2 + 3 + 4 + 5
+    }
+
+    #[test]
+    fn union_combined_test() {
+        let set_a = Set::from([1, 2, 3]);
+        let set_b = Set::from([3, 4, 5]);
+        let union = set_a.union(&set_b);
+        // Test clone
+        let cloned_union = union.clone();
+        assert_eq!(union.clone().count(), cloned_union.count());
+        // Test debug fmt
+        let debug_output = format!("{:?}", union);
+        assert!(debug_output.contains("1"));
+        assert!(debug_output.contains("5"));
+        // Test count and fold
+        assert_eq!(union.clone().count(), 5);
+        let sum: i32 = union.fold(0, |acc, &x| acc + x);
+        assert_eq!(sum, 15); // 1 + 2 + 3 + 4 + 5
+    }
 }
