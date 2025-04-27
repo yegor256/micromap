@@ -499,5 +499,7 @@ mod tests {
             entry.insert(b'E');
             assert_eq!(entry.remove_entry(), ('e', b'E'));
         }
+        let occupied_entry = m.entry('e').insert_entry(b'e');
+        assert_eq!(occupied_entry.get(), &b'e');
     }
 }
