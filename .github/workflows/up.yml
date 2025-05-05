@@ -21,6 +21,7 @@ jobs:
           sed -E -i "s/micromap = \"[^\"]+\"/micromap = \"${latest}\"/g" README.md
       - uses: peter-evans/create-pull-request@v7
         with:
+          sign-commits: true
           branch: version-up
           commit-message: 'new version in README'
           delete-branch: true

@@ -17,6 +17,7 @@ jobs:
       - run: ./rebuild_benchmark.sh
       - uses: peter-evans/create-pull-request@v7
         with:
+          sign-commits: true
           branch: benchmark
           commit-message: 'new benchmark results'
           delete-branch: true
