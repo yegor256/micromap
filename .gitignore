@@ -1,8 +1,8 @@
+.DS_Store
+.idea/
 *.bak
 *.relf
 *.svg
-.DS_Store
-.idea/
 bin/
 node_modules/
 target/
