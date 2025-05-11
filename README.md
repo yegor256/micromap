@@ -143,12 +143,13 @@ If your changes
 degrade performance, think twice before submitting a pull request.
 
 About the **version change**, we follow the rules of this
-[Cargo SemVer reference](https://doc.rust-lang.org/cargo/reference/semver.html).
-If your code has an impact on semver compatibility, such as **breaking changes**, then
-you may also need to explicitly upgrade the version.
+[Cargo SemVer reference](https://doc.rust-lang.org/cargo/reference/semver.html)
+. If your code has an impact on semver compatibility, such as
+**breaking changes**, then you may also need to explicitly upgrade the version.
 Because our project version uses a placeholder, you can
-_add a hint note after the version number `0.0.0`_ in Cargo.toml `package.version`
-to mark that you want to update the version, which we call "version hint", as follows:
+_add a hint note after the version number `0.0.0`_ in Cargo.toml
+`package.version` to mark that you want to update the version, which we call
+"version hint", as follows:
 
 ```toml
 [package]
