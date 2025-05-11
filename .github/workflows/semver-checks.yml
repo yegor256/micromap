@@ -24,7 +24,7 @@ jobs:
           echo "Response: $response"
           version="$(echo "$response" | jq -r '.crate.newest_version')"
           echo "Newest version is: $version"
-          echo "version=$version" >> $GITHUB_ENV
+          echo "version=$version" >> "$GITHUB_ENV"
       - name: Use the fetched version
         run: |
           echo "The fetched version is ${{ env.version }}"
