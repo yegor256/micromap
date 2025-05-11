@@ -71,7 +71,7 @@
 //! quantity (len) information, that's all.
 
 #![cfg_attr(all(not(feature = "std"), not(doc), not(test)), no_std)]
-#![doc(html_root_url = "https://docs.rs/micromap/0.0.0")]
+#![doc(html_root_url = "https://docs.rs/micromap/0.1.0")]
 #![deny(warnings)]
 // `clippy::pedantic` have false positives about the `#[must_use]` attr
 // sometimes If a false positive occurs, we explicitly mark it
