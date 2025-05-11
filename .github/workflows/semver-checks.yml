@@ -37,11 +37,11 @@ jobs:
           cat Cargo.toml
       - name: Run cargo-semver-checks
         id: semverchecks
-        continue-on-error: true # Even if an error occurs, the workflow will continue to execute
+        continue-on-error: true
         uses: obi1kenobi/cargo-semver-checks-action@v2
         with:
           feature-group: all-features
-      - name: Create a pull request if something failed
+      - name: Create a PR for version update reminder 
         if: ${{ contains(steps.semverchecks.outcome, 'failure') }}
         uses: peter-evans/create-pull-request@v7
         with:
@@ -56,4 +56,5 @@ jobs:
           title: The version needs to be updated
           body: |
             The workflow detected an issue during the semver-checks process.
-            Please review the code changes and resolve this pr before publishing.
+            Please review the code changes, pass the 'cargo semver-checks' and
+            resolve this pr before publishing.
