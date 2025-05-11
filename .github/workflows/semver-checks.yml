@@ -58,8 +58,8 @@ jobs:
       - name: note the solution for the failure of cargo-semver-checks
         if: ${{ contains(steps.semverchecks.outcome, 'failure') }}
         run: |
-          echo "::error::cargo-semver-checks failed, please add the hint comment to the \`package.version\` line in Cargo.toml file.\nOr you don't want to update the version, please check your code and find why cargo-semver-checks failed."
-          echo "::warning::The comment version hint line should be like:\nversion = \"0.0.0\" # hint: <new_version>\n"
+          printf "::error::cargo-semver-checks failed, please add the hint comment to the \`package.version\` line in Cargo.toml file.\nOr you don't want to update the version, please check your code and find why cargo-semver-checks failed.\n"
+          printf "::warning::The comment version hint line should be like:\nversion = \"0.0.0\" # hint: <new_version>\n"
           exit 1
     #   - name: Create a PR for version update reminder 
     #     if: ${{ contains(steps.semverchecks.outcome, 'failure') }}
