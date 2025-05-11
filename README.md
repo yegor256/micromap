@@ -142,6 +142,20 @@ Then, after the changes you make, run it again. Compare the results.
 If your changes
 degrade performance, think twice before submitting a pull request.
 
+About the **version change**, we follow the rules of this [Cargo SemVer reference](https://doc.rust-lang.org/cargo/reference/semver.html).
+If your code has an impact on semver compatibility, such as **breaking changes**, then you may also need to explicitly upgrade the version.
+Because our project version uses a placeholder, you can _add a hint note after the version number `0.0.0`_ in Cargo.toml `package.version`
+to mark that you want to update the version, which we call "version hint", as follows:
+
+```toml
+[package]
+name = "micromap"
+version = "0.0.0" # hint: 1.2.3
+# ...
+```
+
+If no version change is required, do not add any comments after the version number `0.0.0`.
+
 [std]: https://doc.rust-lang.org/std/collections/struct.HashMap.html
 [rs]: https://github.com/yegor256/micromap/blob/master/tests/benchmark.rs
 [action]: https://github.com/yegor256/micromap/actions/workflows/benchmark.yml
