@@ -4,7 +4,7 @@
 # yamllint disable rule:line-length
 name: semver-checks
 on:
-  workflow_dispatch: # 手动触发工作流
+  workflow_dispatch:
   push:
     branches:
       - master
@@ -17,24 +17,41 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Extract version hint from Cargo.toml
+        id: extract_hint
+        run: |
+          # Extract the comment content in a specific format after the "version" field
+          version_hint="$(grep '^version = ' Cargo.toml | sed -E 's/.*# hint: ([^ ]+)/\1/')"
+          if [[ "$version_hint" == "version = "* ]]; then
+            version_hint=""
+          fi
+          echo "Extracted version hint: $version_hint"
+          echo "version_hint=$version_hint" >> "$GITHUB_ENV"
+      - name: Show extracted version_hint and set it as dest_version to env
+        run: |
+          if [ -n "${{ env.version_hint }}" ]; then
+            echo "::warning::Version hint: ${{ env.version_hint }}"
+            echo "dest_version=${{ env.version_hint }}" >> "$GITHUB_ENV"
+          else
+            echo "::warning::No version hint found."
+          fi
       - name: Get newest version from crates.io
         id: fetch_version
+        if: "${{ env.dest_version == '' }}" 
         run: |
           response="$(curl -s https://crates.io/api/v1/crates/micromap)"
           echo "Response: $response"
           version="$(echo "$response" | jq -r '.crate.newest_version')"
           echo "Newest version is: $version"
-          echo "version=$version" >> "$GITHUB_ENV"
-      - name: Use the fetched version
+          echo "newset_version=$version" >> "$GITHUB_ENV"
+      - name: Use the fetched newset version
         run: |
-          echo "The fetched version is ${{ env.version }}"
+          echo "The fetched newset version is ${{ env.newset_version }}"
+          echo "dest_version=${{ env.newset_version }}" >> "$GITHUB_ENV"
       - name: Replace version in Cargo.toml
         run: |
-          sed -i 's/^version = "0.0.0"/version = "'${{ env.version }}'"/' Cargo.toml
-          echo "Updated Cargo.toml with version: ${{ env.version }}"
-      - name: Show updated Cargo.toml
-        run: |
-          cat Cargo.toml
+          sed -i 's/^version = "0.0.0"/version = "'${{ env.dest_version }}'"/' Cargo.toml
+          echo "Updated Cargo.toml with version: ${{ env.dest_version }}"
       - name: Run cargo-semver-checks
         id: semverchecks
         continue-on-error: true
