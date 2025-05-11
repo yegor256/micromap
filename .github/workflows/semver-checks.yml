@@ -58,6 +58,11 @@ jobs:
           printf "::error::cargo-semver-checks failed, please add the hint comment to the \`package.version\` line in Cargo.toml file. Or you don't want to update the version, please check your code and find why cargo-semver-checks failed.\n"
           printf "::warning::The comment version hint line should be like: version = \"0.0.0\" # hint: <new_version>\n"
           exit 1
+      - name: use cargo
+        if: ${{ env.version_hint }}
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
       - name: Update the README.md
         if: ${{ env.version_hint }}
         run: sed -E -i "s/micromap = \"[^\"]+\"/micromap = \"${{ env.version_hint }}\"/g" README.md
@@ -65,6 +70,10 @@ jobs:
         if: ${{ env.version_hint }}
         run: |
           sed -i -E 's/^(version = ")[^"]+(".*# hint: .*)$/\10.0.0"/' Cargo.toml
+      - name: Update the Cargo.lock
+        if: ${{ env.version_hint }}
+        run: |
+          cargo update --package micromap
       - name: Create a PR for version update reminder 
         if: ${{ env.version_hint }}
         uses: peter-evans/create-pull-request@v7
