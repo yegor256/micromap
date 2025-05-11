@@ -41,7 +41,6 @@ jobs:
         if: "${{ env.dest_version == '' }}" 
         run: |
           response="$(curl -s https://crates.io/api/v1/crates/micromap)"
-          echo "Response: $response"
           version="$(echo "$response" | jq -r '.crate.newest_version')"
           echo "::notice::Newest version is: $version"
           echo "newset_version=$version" >> "$GITHUB_ENV"
@@ -53,6 +52,7 @@ jobs:
         run: |
           sed -i 's/^version = "0.0.0"/version = "'${{ env.dest_version }}'"/' Cargo.toml
           echo "Updated Cargo.toml with version: ${{ env.dest_version }}"
+          echo "::notice::Use version ${{ env.dest_version }} for cargo-semver-checks."
       - name: Run cargo-semver-checks
         id: semverchecks
         continue-on-error: true
@@ -63,8 +63,8 @@ jobs:
         if: ${{ contains(steps.semverchecks.outcome, 'failure') }}
         run: |
           echo "::error::cargo-semver-checks failed, please add the hint comment to the \`package.version\` line in Cargo.toml file."
-          echo "::notice::The version hint line should be like: \`version = \"0.0.0\" # hint: <new_version>\`"
-          echo "::warning::Or you don't want to update the version, please check your code and find why cargo-semver-checks failed."
+          echo "::error::Or you don't want to update the version, please check your code and find why cargo-semver-checks failed."
+          echo "::warning::The version hint line should be like: \`version = \"0.0.0\" # hint: <new_version>\`"
           exit 1
     #   - name: Create a PR for version update reminder 
     #     if: ${{ contains(steps.semverchecks.outcome, 'failure') }}
