@@ -2,9 +2,7 @@
 # SPDX-License-Identifier: MIT
 ---
 # yamllint disable rule:line-length
-
-name: Get Micromap Version
-
+name: semver-checks
 on:
   workflow_dispatch: # 手动触发工作流
   push:
@@ -18,8 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-
+        uses: actions/checkout@v4
       - name: Get newest version from crates.io
         id: fetch_version
         run: |
@@ -28,19 +25,15 @@ jobs:
           version=$(echo "$response" | jq -r '.crate.newest_version')
           echo "Newest version is: $version"
           echo "version=$version" >> $GITHUB_ENV
-
       - name: Use the fetched version
         run: |
           echo "The fetched version is ${{ env.version }}"
-
       - name: Replace version in Cargo.toml
         run: |
           sed -i 's/^version = "0.0.0"/version = "'${{ env.version }}'"/' Cargo.toml
           echo "Updated Cargo.toml with version: ${{ env.version }}"
-
       - name: Show updated Cargo.toml
         run: |
           cat Cargo.toml
-
       - name: Run cargo semver-checks
         uses: obi1kenobi/cargo-semver-checks-action@v2
