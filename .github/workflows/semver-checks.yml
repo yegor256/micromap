@@ -8,9 +8,6 @@ on:
   push:
     branches:
       - master
-  pull_request:
-    branches:
-      - master
 jobs:
   semver-checks:
     runs-on: ubuntu-latest
@@ -61,20 +58,24 @@ jobs:
           printf "::error::cargo-semver-checks failed, please add the hint comment to the \`package.version\` line in Cargo.toml file. Or you don't want to update the version, please check your code and find why cargo-semver-checks failed.\n"
           printf "::warning::The comment version hint line should be like: version = \"0.0.0\" # hint: <new_version>\n"
           exit 1
-    #   - name: Create a PR for version update reminder 
-    #     if: ${{ contains(steps.semverchecks.outcome, 'failure') }}
-    #     uses: peter-evans/create-pull-request@v7
-    #     with:
-    #       sign-commits: true
-    #       branch: semver-checks
-    #       delete-branch: true
-    #       assignees: yegor256
-    #       base: master
-    #       commit-message: |
-    #         cargo-semver-checks faild, so we need to confirm whether the version
-    #         really needs to be updated or it is just a logical error.
-    #       title: The version needs to be updated
-    #       body: |
-    #         The workflow detected an issue during the semver-checks process.
-    #         Please review the code changes, pass the 'cargo semver-checks' and
-    #         resolve this pr before publishing.
+      - name: Update the README.md
+        if: ${{ env.version_hint }}
+        run: sed -E -i "s/micromap = \"[^\"]+\"/micromap = \"${{ env.version_hint }}\"/g" README.md
+      - name: Reset the version placeholder in Cargo.toml
+        if: ${{ env.version_hint }}
+        run: |
+          sed -i -E 's/^(version = ")[^"]+(".*# hint: .*)$/\10.0.0"/' Cargo.toml
+      - name: Create a PR for version update reminder 
+        if: ${{ env.version_hint }}
+        uses: peter-evans/create-pull-request@v7
+        with:
+          title: 'The version needs to be updated to ${{ env.version_hint }}'
+          sign-commits: true
+          branch: semver-checks
+          delete-branch: true
+          assignees: yegor256
+          base: master
+          commit-message: |
+            The comment version hint in Cargo.toml is set, so we need to update the version in readme, and
+            remove the version hint comment after Cargo.toml package.version field, and tag the new version
+            to publish the it to `crates.io`.
