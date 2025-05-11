@@ -58,20 +58,27 @@ jobs:
         uses: obi1kenobi/cargo-semver-checks-action@v2
         with:
           feature-group: all-features
-      - name: Create a PR for version update reminder 
+      - name: note the solution for the failure of cargo-semver-checks
         if: ${{ contains(steps.semverchecks.outcome, 'failure') }}
-        uses: peter-evans/create-pull-request@v7
-        with:
-          sign-commits: true
-          branch: semver-checks
-          delete-branch: true
-          assignees: yegor256
-          base: master
-          commit-message: |
-            cargo-semver-checks faild, so we need to confirm whether the version
-            really needs to be updated or it is just a logical error.
-          title: The version needs to be updated
-          body: |
-            The workflow detected an issue during the semver-checks process.
-            Please review the code changes, pass the 'cargo semver-checks' and
-            resolve this pr before publishing.
+        run: |
+          echo "::error::cargo-semver-checks failed, please add the hint comment to the `package.version` line in Cargo.toml file."
+          echo "::error::The version hint line should be like: `version = "0.0.0" # hint: <new_version>`"
+          echo "::error::Or you don't want to update the version, please check your code and find why cargo-semver-checks failed."
+          exit 1
+    #   - name: Create a PR for version update reminder 
+    #     if: ${{ contains(steps.semverchecks.outcome, 'failure') }}
+    #     uses: peter-evans/create-pull-request@v7
+    #     with:
+    #       sign-commits: true
+    #       branch: semver-checks
+    #       delete-branch: true
+    #       assignees: yegor256
+    #       base: master
+    #       commit-message: |
+    #         cargo-semver-checks faild, so we need to confirm whether the version
+    #         really needs to be updated or it is just a logical error.
+    #       title: The version needs to be updated
+    #       body: |
+    #         The workflow detected an issue during the semver-checks process.
+    #         Please review the code changes, pass the 'cargo semver-checks' and
+    #         resolve this pr before publishing.
