@@ -36,10 +36,10 @@ jobs:
         run: |
           cat Cargo.toml
       - name: Run cargo semver-checks
+        continue-on-error: true # Even if an error occurs, the workflow will continue to execute
         uses: obi1kenobi/cargo-semver-checks-action@v2
         with:
           feature-group: all-features
-        continue-on-error: true # Even if an error occurs, the workflow will continue to execute
       - name: Create a pull request if something failed
         if: failure()
         uses: peter-evans/create-pull-request@v7
