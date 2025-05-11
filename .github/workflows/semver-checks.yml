@@ -41,7 +41,7 @@ jobs:
         with:
           feature-group: all-features
       - name: Create a pull request if something failed
-        if: steps.semverchecks.outcome != 'success'
+        if: ${{ steps.semverchecks.outcome }} != 'success'
         uses: peter-evans/create-pull-request@v7
         with:
           sign-commits: true
