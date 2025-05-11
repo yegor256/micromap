@@ -302,6 +302,7 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
     /// full is undefined behavior instead of panic. So you need to make sure that
     /// the map is not full before calling.
     #[inline]
+    #[must_use]
     pub unsafe fn insert_unchecked(&mut self, k: K, v: V) -> Option<V> {
         let (_, existing_pair) = self.insert_i(k, v, false);
         existing_pair.map(|(_, v)| v)
@@ -1057,7 +1058,7 @@ mod tests {
         let mut m: Map<i32, i32, 1> = Map::new();
         unsafe {
             assert_eq!(m.insert_unchecked(1, 10), None);
-            m.insert_unchecked(2, 20); // This should panic in debug mode.
+            let _ = m.insert_unchecked(2, 20); // This should panic in debug mode.
         }
     }
 
