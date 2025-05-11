@@ -24,16 +24,17 @@ jobs:
           version_hint="$(grep '^version = ' Cargo.toml | sed -E 's/.*# hint: ([^ ]+)/\1/')"
           if [[ "$version_hint" == "version = "* ]]; then
             version_hint=""
+          else
+            echo "Extracted version hint: $version_hint"
           fi
-          echo "Extracted version hint: $version_hint"
           echo "version_hint=$version_hint" >> "$GITHUB_ENV"
       - name: Show extracted version_hint and set it as dest_version to env
         run: |
           if [ -n "${{ env.version_hint }}" ]; then
-            echo "::warning::Version hint: ${{ env.version_hint }}"
+            echo "::notice::Version hint: ${{ env.version_hint }}"
             echo "dest_version=${{ env.version_hint }}" >> "$GITHUB_ENV"
           else
-            echo "::warning::No version hint found."
+            echo "::notice::No version hint found."
           fi
       - name: Get newest version from crates.io
         id: fetch_version
@@ -42,7 +43,7 @@ jobs:
           response="$(curl -s https://crates.io/api/v1/crates/micromap)"
           echo "Response: $response"
           version="$(echo "$response" | jq -r '.crate.newest_version')"
-          echo "Newest version is: $version"
+          echo "::notice::Newest version is: $version"
           echo "newset_version=$version" >> "$GITHUB_ENV"
       - name: Use the fetched newset version
         run: |
@@ -62,8 +63,8 @@ jobs:
         if: ${{ contains(steps.semverchecks.outcome, 'failure') }}
         run: |
           echo "::error::cargo-semver-checks failed, please add the hint comment to the \`package.version\` line in Cargo.toml file."
-          echo "::error::The version hint line should be like: \`version = \"0.0.0\" # hint: <new_version>\`"
-          echo "::error::Or you don't want to update the version, please check your code and find why cargo-semver-checks failed."
+          echo "::notice::The version hint line should be like: \`version = \"0.0.0\" # hint: <new_version>\`"
+          echo "::warning::Or you don't want to update the version, please check your code and find why cargo-semver-checks failed."
           exit 1
     #   - name: Create a PR for version update reminder 
     #     if: ${{ contains(steps.semverchecks.outcome, 'failure') }}
