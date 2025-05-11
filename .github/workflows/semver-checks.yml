@@ -20,9 +20,9 @@ jobs:
       - name: Get newest version from crates.io
         id: fetch_version
         run: |
-          response=$(curl -s https://crates.io/api/v1/crates/micromap)
+          response="$(curl -s https://crates.io/api/v1/crates/micromap)"
           echo "Response: $response"
-          version=$(echo "$response" | jq -r '.crate.newest_version')
+          version="$(echo "$response" | jq -r '.crate.newest_version')"
           echo "Newest version is: $version"
           echo "version=$version" >> $GITHUB_ENV
       - name: Use the fetched version
