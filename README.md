@@ -158,7 +158,8 @@ version = "0.0.0" # hint: 1.2.3
 # ...
 ```
 
-If no version change is required, do not add any comments after the version number `0.0.0`.
+If no version change is required, do not add any comments after the version
+number `0.0.0`.
 
 [std]: https://doc.rust-lang.org/std/collections/struct.HashMap.html
 [rs]: https://github.com/yegor256/micromap/blob/master/tests/benchmark.rs
