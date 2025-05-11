@@ -37,3 +37,22 @@ jobs:
           cat Cargo.toml
       - name: Run cargo semver-checks
         uses: obi1kenobi/cargo-semver-checks-action@v2
+        with:
+          feature-group: all-features
+        continue-on-error: true # Even if an error occurs, the workflow will continue to execute
+      - name: Create a pull request if something failed
+        if: failure()
+        uses: peter-evans/create-pull-request@v7
+        with:
+          sign-commits: true
+          branch: semver-checks
+          delete-branch: true
+          assignees: yegor256
+          base: master
+          commit-message: |
+            cargo-semver-checks faild, so we need to confirm whether the version
+            really needs to be updated or it is just a logical error.
+          title: The version needs to be updated
+          body: |
+            The workflow detected an issue during the semver-checks process.
+            Please review the code changes and resolve this pr before publishing.
