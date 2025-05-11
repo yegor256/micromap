@@ -1,0 +1,36 @@
+name: Get Micromap Version
+
+on:
+  workflow_dispatch: # 手动触发工作流
+
+jobs:
+  fetch-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Get newest version from crates.io
+        id: fetch_version
+        run: |
+          response=$(curl -s https://crates.io/api/v1/crates/micromap)
+          echo "Response: $response"
+          version=$(echo "$response" | jq -r '.crate.newest_version')
+          echo "Newest version is: $version"
+          echo "version=$version" >> $GITHUB_ENV
+
+      - name: Use the fetched version
+        run: |
+          echo "The fetched version is ${{ env.version }}"
+
+      - name: Replace version in Cargo.toml
+        run: |
+          sed -i 's/^version = "0.0.0"/version = "'${{ env.version }}'"/' Cargo.toml
+          echo "Updated Cargo.toml with version: ${{ env.version }}"
+
+      - name: Show updated Cargo.toml
+        run: |
+          cat Cargo.toml
+
+      - name: Run cargo semver-checks
+        uses: obi1kenobi/cargo-semver-checks-action@v2
