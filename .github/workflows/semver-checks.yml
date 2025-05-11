@@ -35,13 +35,14 @@ jobs:
       - name: Show updated Cargo.toml
         run: |
           cat Cargo.toml
-      - name: semverchecks
+      - name: Run cargo-semver-checks
+        id: semverchecks
         continue-on-error: true # Even if an error occurs, the workflow will continue to execute
         uses: obi1kenobi/cargo-semver-checks-action@v2
         with:
           feature-group: all-features
       - name: Create a pull request if something failed
-        if: ${{ steps.semverchecks.outcome }} != 'success'
+        if: ${{ contains(steps.semverchecks.outcome, 'failure') }}
         uses: peter-evans/create-pull-request@v7
         with:
           sign-commits: true
