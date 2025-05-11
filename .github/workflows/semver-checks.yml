@@ -1,8 +1,18 @@
+# SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
+# SPDX-License-Identifier: MIT
+---
+# yamllint disable rule:line-length
+
 name: Get Micromap Version
 
 on:
   workflow_dispatch: # 手动触发工作流
-
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 jobs:
   fetch-version:
     runs-on: ubuntu-latest
