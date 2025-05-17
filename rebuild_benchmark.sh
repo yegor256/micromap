@@ -69,7 +69,7 @@ done
     done
     echo ''
     echo "The experiment [was performed][action] on $(date +%d-%m-%Y)."
-    echo "There were ${cycles} repetition cycles."
+    echo "There were ${cycles} repetitions."
     echo "The entire benchmark took ${SECONDS}s."
     echo "Uname: '$(uname)'."
 } > target/benchmark/table.md

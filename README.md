@@ -81,7 +81,7 @@ while the numbers below 1.0 demonstrate performance loss.
 | `tinymap::array_map::ArrayMap` | 2.01 | 4.15 | 4.32 | 3.93 | 3.99 | 4.43 | 4.34 |
 
 The experiment [was performed][action] on 13-05-2025.
-There were 1000000 repetition cycles.
+There were 1000000 repetitions.
 The entire benchmark took 274s.
 Uname: 'Linux'.
 
@@ -134,8 +134,7 @@ $env:RUSTDOCFLAGS="--cfg docsrs"; cargo +nightly doc --all-features --no-deps --
 ```
 
 Then, after the changes you make, run it again. Compare the results.
-If your changes
-degrade performance, think twice before submitting a pull request.
+If your changes degrade the performance, think twice before submitting a pull request.
 
 About the **version change**, we follow the rules of this
 [Cargo SemVer reference](https://doc.rust-lang.org/cargo/reference/semver.html)
