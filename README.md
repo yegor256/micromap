@@ -25,11 +25,6 @@ it may be better to use the standard
 since the performance of `micromap::Map` _may_ start to degrade.
 See the [benchmarking results](#benchmark) below.
 
-**WELCOME**:
-Not all functions that you might expect to have in a map are implemented.
-I will appreciate if you contribute by implementing these
-[missing functions](https://github.com/yegor256/micromap/issues).
-
 First, add this to `Cargo.toml`:
 
 ```toml
@@ -128,15 +123,15 @@ If you modified the comment docs, run this to check:
 
 * Linux:
 
-    ```bash
-    RUSTDOCFLAGS="--cfg docsrs" cargo +nightly doc --all-features --no-deps
-    ```
+```bash
+RUSTDOCFLAGS="--cfg docsrs" cargo +nightly doc --all-features --no-deps
+```
 
 * Windows(PowerShell):
 
-    ```PowerShell
-    $env:RUSTDOCFLAGS="--cfg docsrs"; cargo +nightly doc --all-features --no-deps --open; Remove-Item Env:\RUSTDOCFLAGS
-    ```
+```PowerShell
+$env:RUSTDOCFLAGS="--cfg docsrs"; cargo +nightly doc --all-features --no-deps --open; Remove-Item Env:\RUSTDOCFLAGS
+```
 
 Then, after the changes you make, run it again. Compare the results.
 If your changes
