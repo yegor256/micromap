@@ -29,7 +29,7 @@ linear-map = "1.2.0"
 indexmap = "2.2.6"
 litemap = "0.8.0"
 flurry = "0.5.2"
-criterion = "0.5.1"
+criterion = "0.6.0"
 seq-macro = "0.3.6"
 rand = { version = "0.9.1", default-features = false, features = ["small_rng"] }
 uuid = { version = "1.16.0", default-features = false, features = ["v4"] }
