@@ -133,8 +133,10 @@ RUSTDOCFLAGS="--cfg docsrs" cargo +nightly doc --all-features --no-deps
 $env:RUSTDOCFLAGS="--cfg docsrs"; cargo +nightly doc --all-features --no-deps --open; Remove-Item Env:\RUSTDOCFLAGS
 ```
 
-Then, after the changes you make, run it again. Compare the results.
-If your changes degrade the performance, think twice before submitting a pull request.
+Then, after the changes you make, run it again.
+Compare the results.
+If your changes degrade the performance,
+think twice before submitting a pull request.
 
 About the **version change**, we follow the rules of this
 [Cargo SemVer reference](https://doc.rust-lang.org/cargo/reference/semver.html)
