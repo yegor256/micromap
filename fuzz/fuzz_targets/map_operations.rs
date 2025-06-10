@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
+// SPDX-License-Identifier: MIT
+
 #![no_main]
 
 use libfuzzer_sys::fuzz_target;
