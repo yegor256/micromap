@@ -25,16 +25,14 @@ jobs:
       CARGO_TERM_COLOR: always
     steps:
       - uses: actions/checkout@v4
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
       - name: Install cargo-mutants
         uses: taiki-e/install-action@v2
         with:
           tool: cargo-mutants
       - name: Run mutation tests
-        run: cargo mutants --no-shuffle
+        run: cargo mutants --no-shuffle --shard 1/4
       - name: Upload mutants.out directory
         uses: actions/upload-artifact@v4
         if: always()
