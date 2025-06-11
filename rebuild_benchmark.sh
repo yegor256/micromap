@@ -16,6 +16,27 @@ capacities="2 4 8 16 32 64 128"
 cycles=1000000
 first=$(echo "${capacities}" | cut -f1 -d' ')
 
+# Function to get abbreviated display name for long map names
+get_display_name() {
+    case "$1" in
+        "linked_hash_map::LinkedHashMap")
+            echo "LinkedHashMap"
+            ;;
+        "nohash_hasher::BuildNoHashHasher")
+            echo "NoHashHasher"
+            ;;
+        "std::collections::BTreeMap")
+            echo "std::BTreeMap"
+            ;;
+        "tinymap::array_map::ArrayMap")
+            echo "tinymap::ArrayMap"
+            ;;
+        *)
+            echo "$1"
+            ;;
+    esac
+}
+
 rm -rf target/benchmark
 mkdir -p target/benchmark
 SECONDS=0
@@ -39,7 +60,8 @@ done
     echo ''
     maps=$(cut -f 1 "target/benchmark/${first}.out")
     for map in ${maps}; do
-        echo -n "| \`${map}\`"
+        display_name=$(get_display_name "${map}")
+        echo -n "| \`${display_name}\`"
         if [ "${map}" == "${micromap}" ]; then
             echo -n ' 👍'
         fi
