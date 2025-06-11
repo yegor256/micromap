@@ -39,19 +39,11 @@ done
     echo ''
     maps=$(cut -f 1 "target/benchmark/${first}.out")
     for map in ${maps}; do
-        # First row: map name with empty data cells
         echo -n "| \`${map}\`"
         if [ "${map}" == "${micromap}" ]; then
             echo -n ' 👍'
         fi
         echo -n ' |'
-        for capacity in ${capacities}; do
-            echo -n ' |'
-        done
-        echo ''
-        
-        # Second row: empty name cell with benchmark data
-        echo -n '| |'
         for capacity in ${capacities}; do
             our=$(grep "${micromap}" "target/benchmark/${capacity}.out" \
                 | cut -f 2)
