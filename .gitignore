@@ -1,4 +1,4 @@
-.DS_Store
+﻿.DS_Store
 .idea/
 *.bak
 *.relf
@@ -7,3 +7,4 @@ bin/
 node_modules/
 target/
 tmp/
+fuzz/artifacts/
