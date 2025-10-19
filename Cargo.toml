@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
+﻿# SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
 [package]
@@ -12,6 +12,7 @@ readme = "README.md"
 license = "MIT"
 homepage = "https://github.com/yegor256/micromap"
 keywords = ["memory", "map"]
+exclude = ["fuzz"]
 categories = ["data-structures", "memory-management"]
 
 [dependencies]
