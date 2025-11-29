@@ -1,0 +1,33 @@
+﻿# SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
+# SPDX-License-Identifier: MIT
+
+name: CI (Build + Short Fuzz)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-fuzz:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install nightly toolchain for fuzzing
+        run: rustup toolchain install nightly
+
+      - name: Install cargo-fuzz
+        run: cargo install cargo-fuzz
+
+      - name: Build library
+        run: cargo build --release
+
+      - name: Run short fuzz test (60s)
+        run: cargo +nightly fuzz run fuzz_map_basic -- -max_total_time=60
+
