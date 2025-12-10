@@ -78,7 +78,7 @@ jobs:
           cargo update --package micromap
       - name: Create a PR for version update reminder
         if: ${{ env.version_hint }}
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           title: 'The version needs to be updated to ${{ env.version_hint }}'
           sign-commits: true

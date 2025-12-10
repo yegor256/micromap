@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - run: ./rebuild_benchmark.sh
-      - uses: peter-evans/create-pull-request@v7
+      - uses: peter-evans/create-pull-request@v8
         with:
           sign-commits: true
           branch: benchmark
