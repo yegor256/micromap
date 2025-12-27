@@ -1,0 +1,39 @@
+﻿# SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
+# SPDX-License-Identifier: MIT
+
+name: Nightly Fuzz Testing
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  nightly-fuzz:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchains
+        run: |
+          rustup toolchain install nightly
+          rustup default nightly
+          cargo install cargo-fuzz
+
+      - name: Enable sanitizers
+        run: |
+          export RUSTFLAGS="-Zsanitizer=address"
+          export ASAN_OPTIONS=detect_leaks=1
+
+      - name: Run extended fuzzing (1h)
+        run: cargo +nightly fuzz run fuzz_map_basic -- -max_total_time=3600
+
+      - name: Upload fuzz artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-crashes
+          path: fuzz/artifacts/fuzz_map_basic/
+
