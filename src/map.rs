@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
+// SPDX-FileCopyrightText: Copyright (c) 2023-2026 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
 //! A small Map based on a fixed length array which stores key-value pairs directly.
