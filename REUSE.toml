@@ -28,6 +28,7 @@ path = [
     "Cargo.toml",
     "README.md",
     "renovate.json",
+    "fuzz/Cargo.lock",
 ]
 precedence = "override"
 SPDX-FileCopyrightText = "Copyright (c) 2025 Yegor Bugayenko"

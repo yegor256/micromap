@@ -119,6 +119,23 @@ Also, before you start making changes, run benchmarks:
 cargo bench --bench bench
 ```
 
+### Fuzz Testing
+
+For additional testing, you can run fuzz tests using [cargo-fuzz](https://github.com/rust-fuzz/cargo-fuzz):
+
+```bash
+# Install prerequisites
+rustup toolchain install nightly
+cargo install cargo-fuzz
+
+# Run fuzz tests
+cargo +nightly fuzz run map_operations
+cargo +nightly fuzz run set_operations  
+cargo +nightly fuzz run edge_cases
+```
+
+See [`fuzz/README.md`](fuzz/README.md) for more details on fuzz testing.
+
 If you modified the comment docs, run this to check:
 
 * Linux:
