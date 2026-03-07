@@ -29,6 +29,7 @@ mod tests {
         [(1, "sun"), (2, "mon"), (3, "tue"), (4, "wed"), (5, "thu")];
 
     #[test]
+    #[cfg(feature = "std")]
     fn from_iter() {
         let vec = Vec::from(TEST_ARRAY);
         let m: Map<i32, &str, 10> = Map::from_iter(vec);
@@ -36,6 +37,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "std")]
     #[should_panic]
     #[cfg(debug_assertions)]
     fn from_larger_iter() {
