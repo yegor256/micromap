@@ -16,7 +16,6 @@ categories = ["data-structures", "memory-management"]
 
 [dependencies]
 serde = { version = "1.0.200", optional = true, default-features = false }
-bincode = { version = "2.0.1", optional = true, default-features = false, features = ["serde"] }
 
 [dev-dependencies]
 hashbrown = "0.16.0"
@@ -34,11 +33,12 @@ seq-macro = "0.3.6"
 rand = { version = "0.9.1", default-features = false, features = ["small_rng"] }
 uuid = { version = "1.16.0", default-features = false, features = ["v4"] }
 foldhash = { version = "0.1.5", default-features = false }
+bincode = { version = "2.0.1", default-features = false, features = ["serde"] }
 
 [features]
 default = []
 std = []
-serde = ["dep:serde", "dep:bincode"]
+serde = ["dep:serde"]
 
 # Ref: https://users.rust-lang.org/t/how-to-document-optional-features-in-api-docs/64577/3
 [package.metadata.docs.rs]
