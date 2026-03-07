@@ -24,7 +24,8 @@
 /// While `cargo bench -- insert_.+` would match start with "insert_", such
 /// as "insert_same", "insert_same_ignore_return", "insert_and_remove" and
 /// so on.
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use std::hint::black_box;
+use criterion::{criterion_group, criterion_main, Criterion};
 use micromap::Map;
 
 pub fn insert_benchmark(c: &mut Criterion) {
