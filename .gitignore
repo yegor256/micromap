@@ -1,8 +1,12 @@
-.DS_Store
-.idea/
+# SPDX-FileCopyrightText: Copyright (c) 2025 Yegor Bugayenko
+# SPDX-License-Identifier: MIT
+
 *.bak
 *.relf
 *.svg
+.claude/
+.DS_Store
+.idea/
 bin/
 node_modules/
 target/
