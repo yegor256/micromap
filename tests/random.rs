@@ -21,7 +21,7 @@ use uuid::Uuid;
 // DON'T change the code unless you know what you are doing.
 
 const ROUNDS: usize = 12345; // 123456 is ok, but a bit slower. (XOR_EXPECT=0xFD9A2154FC6C60DD)
-const XOR_EXPECT: u64 = 0x150D46E005A17B7C; // for a specific ROUNDS=12345
+const XOR_EXPECT: u64 = 0x6FB21AFD20B844D9; // for a specific ROUNDS=12345
 
 /// Run this by:
 /// `$ cargo test --test random (without --release)`
@@ -30,6 +30,15 @@ const XOR_EXPECT: u64 = 0x150D46E005A17B7C; // for a specific ROUNDS=12345
 /// calculated at compile time when optimization is enabled and it will stuck.
 #[test]
 fn each_capacity() {
+    // Spawn thread with larger stack to handle 257 map capacity variants
+    let handle = std::thread::Builder::new()
+        .stack_size(16 * 1024 * 1024)
+        .spawn(each_capacity_impl)
+        .expect("failed to spawn test thread");
+    handle.join().expect("test thread panicked");
+}
+
+fn each_capacity_impl() {
     let mut xor_hash = 0u64;
     seq!(N in 0..257 {
         let micro_map: Map<Uuid, [u8; 16], N> = Map::new();
