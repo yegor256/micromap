@@ -39,10 +39,14 @@ jobs:
         id: fetch_version
         if: "${{ env.dest_version == '' }}"
         run: |
-          response="$(curl -s https://crates.io/api/v1/crates/micromap)"
-          newset_version="$(echo "$response" | jq -r '.crate.newest_version')"
-          echo "::notice::Newest version fetch from crates.io is: \`$newset_version\`"
-          echo "dest_version=$newset_version" >> "$GITHUB_ENV"
+          response="$(curl -s -H 'User-Agent: micromap-ci' https://crates.io/api/v1/crates/micromap)"
+          newest_version="$(echo "$response" | jq -r '.crate.newest_version // empty')"
+          if [ -z "$newest_version" ] || [ "$newest_version" = "null" ]; then
+            echo "::error::Failed to fetch version from crates.io"
+            exit 1
+          fi
+          echo "::notice::Newest version fetch from crates.io is: \`$newest_version\`"
+          echo "dest_version=$newest_version" >> "$GITHUB_ENV"
       - name: Replace version in Cargo.toml
         run: |
           sed -i 's/^version = "0.0.0"/version = "'${{ env.dest_version }}'"/' Cargo.toml
