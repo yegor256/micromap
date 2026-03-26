@@ -22,7 +22,7 @@ jobs:
         run: cargo install cargo-tarpaulin
       - name: Run tarpaulin
         run: cargo tarpaulin --all-features --exclude-files src/lib.rs -- --test-threads 1
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
