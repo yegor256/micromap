@@ -18,7 +18,7 @@ categories = ["data-structures", "memory-management"]
 serde = { version = "1.0.228", optional = true, default-features = false }
 
 [dev-dependencies]
-hashbrown = "0.16.1"
+hashbrown = "0.17.0"
 heapless = "0.9.2"
 rustc-hash = "2.0.0"
 nohash-hasher = "0.2.0"
