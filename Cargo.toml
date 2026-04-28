@@ -30,7 +30,7 @@ litemap = "0.8.1"
 flurry = "0.5.2"
 criterion = "0.8.2"
 seq-macro = "0.3.6"
-rand = { version = "0.9.2", default-features = false, features = ["small_rng"] }
+rand = { version = "0.10.0", default-features = false, features = ["small_rng"] }
 uuid = { version = "1.22.0", default-features = false, features = ["v4"] }
 foldhash = { version = "0.2.0", default-features = false }
 bincode = { version = "2.0.1", default-features = false, features = ["serde"] }
