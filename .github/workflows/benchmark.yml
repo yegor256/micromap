@@ -13,7 +13,7 @@ jobs:
     timeout-minutes: 15
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - run: ./rebuild_benchmark.sh
       - uses: peter-evans/create-pull-request@v8
         with:
