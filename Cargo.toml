@@ -34,6 +34,7 @@ rand = { version = "0.9.2", default-features = false, features = ["small_rng"] }
 uuid = { version = "1.22.0", default-features = false, features = ["v4"] }
 foldhash = { version = "0.2.0", default-features = false }
 bincode = { version = "2.0.1", default-features = false, features = ["serde"] }
+proptest = { version = "1.5.0", default-features = false, features = ["std"] }
 
 [features]
 default = []
@@ -52,3 +53,6 @@ harness = false
 
 [[test]]
 name = "random"
+
+[[test]]
+name = "proptest"
