@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
+# SPDX-License-Identifier: MIT
+
+# Configuration for cargo-mutants mutation testing
+# This tool creates small modifications to source code to test if our test suite
+# can detect the changes, helping validate test quality.
+# See https://mutants.rs/configuration.html for full documentation
+
+# Exclude files that don't need mutation testing
+exclude_globs = [
+    # Documentation and examples
+    "examples/*",
+    "benches/*",
+    # Test files themselves
+    "tests/*",
+    # Build scripts and tooling
+    "rebuild_benchmark.sh",
+]
+
+# Timeout for each test run (in seconds) 
+# Conservative timeout for CI environment
+timeout = 120
+
+# Skip functions that are likely to have trivial mutations
+skip_mutants = [
+    # Skip simple getter functions that are unlikely to have meaningful mutations
+    "*::capacity",
+    "*::len", 
+    "*::is_empty",
+    # Skip basic iterator size hint functions
+    "*::size_hint",
+    # Skip debug/display implementations
+    "*::fmt",
+]
+
+# Test command to run for each mutant
+# Use the same basic test command as CI
+test_tool = "cargo"
