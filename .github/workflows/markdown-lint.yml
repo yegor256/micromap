@@ -8,10 +8,17 @@ name: markdown-lint
     branches:
       - master
       - dev
+    paths:
+      - '**.md'
+      - '.github/workflows/markdown-lint.yml'
   pull_request:
     branches:
       - master
-    paths-ignore: ['paper/**', 'sandbox/**']
+    paths:
+      - '**.md'
+      - '.github/workflows/markdown-lint.yml'
+      - '!paper/**'
+      - '!sandbox/**'
 concurrency:
   group: markdown-lint-${{ github.ref }}
   cancel-in-progress: true
