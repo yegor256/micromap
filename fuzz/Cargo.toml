@@ -1,0 +1,35 @@
+[package]
+name = "micromap-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.micromap]
+path = ".."
+
+[[bin]]
+name = "map_operations"
+path = "fuzz_targets/map_operations.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "set_operations"
+path = "fuzz_targets/set_operations.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "edge_cases"
+path = "fuzz_targets/edge_cases.rs"
+test = false
+doc = false
+bench = false
