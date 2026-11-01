@@ -1,0 +1,13 @@
+{
+  // Configuration for markdownlint-cli2
+  "config": {
+    // Configure line length rule
+    "MD013": {
+      // Increase line length limit to accommodate benchmark table
+      "line_length": 120,
+      // Exclude tables and code blocks from line length checking
+      "tables": false,
+      "code_blocks": false
+    }
+  }
+}

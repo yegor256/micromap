@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
+# SPDX-FileCopyrightText: Copyright (c) 2023-2026 Yegor Bugayenko
 # SPDX-FileCopyrightText: Copyright (c) 2025 owtotwo
 # SPDX-License-Identifier: MIT
 ---
@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Extract version hint from Cargo.toml
         id: extract_hint
         run: |
@@ -39,10 +39,14 @@ jobs:
         id: fetch_version
         if: "${{ env.dest_version == '' }}"
         run: |
-          response="$(curl -s https://crates.io/api/v1/crates/micromap)"
-          newset_version="$(echo "$response" | jq -r '.crate.newest_version')"
-          echo "::notice::Newest version fetch from crates.io is: \`$newset_version\`"
-          echo "dest_version=$newset_version" >> "$GITHUB_ENV"
+          response="$(curl -s -H 'User-Agent: micromap-ci' https://crates.io/api/v1/crates/micromap)"
+          newest_version="$(echo "$response" | jq -r '.crate.newest_version // empty')"
+          if [ -z "$newest_version" ] || [ "$newest_version" = "null" ]; then
+            echo "::error::Failed to fetch version from crates.io"
+            exit 1
+          fi
+          echo "::notice::Newest version fetch from crates.io is: \`$newest_version\`"
+          echo "dest_version=$newest_version" >> "$GITHUB_ENV"
       - name: Replace version in Cargo.toml
         run: |
           sed -i 's/^version = "0.0.0"/version = "'${{ env.dest_version }}'"/' Cargo.toml
@@ -78,7 +82,7 @@ jobs:
           cargo update --package micromap
       - name: Create a PR for version update reminder
         if: ${{ env.version_hint }}
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           title: 'The version needs to be updated to ${{ env.version_hint }}'
           sign-commits: true

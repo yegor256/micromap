@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
+# SPDX-FileCopyrightText: Copyright (c) 2023-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 ---
 # yamllint disable rule:line-length
@@ -13,9 +13,9 @@ jobs:
     timeout-minutes: 15
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: ./rebuild_benchmark.sh
-      - uses: peter-evans/create-pull-request@v7
+      - uses: peter-evans/create-pull-request@v8
         with:
           sign-commits: true
           branch: benchmark
