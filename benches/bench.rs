@@ -1,7 +1,10 @@
-// SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
+// SPDX-FileCopyrightText: Copyright (c) 2023-2026 Yegor Bugayenko
 // SPDX-FileCopyrightText: Copyright (c) 2025 owtotwo
 // SPDX-License-Identifier: MIT
 
+use criterion::{criterion_group, criterion_main, Criterion};
+use micromap::Map;
+use std::hint::black_box;
 /// Benchmark Usage:
 ///
 /// `cargo bench --bench bench` will run all benchmarks in this file.
@@ -24,8 +27,6 @@
 /// While `cargo bench -- insert_.+` would match start with "insert_", such
 /// as "insert_same", "insert_same_ignore_return", "insert_and_remove" and
 /// so on.
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use micromap::Map;
 
 pub fn insert_benchmark(c: &mut Criterion) {
     c.bench_function("insert_same", |b| {
