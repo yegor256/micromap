@@ -55,6 +55,10 @@
 //! And no feature is enabled by default:
 //! - `serde`: When this optional dependency is enabled, micromap implements the
 //!   `serde::Serialize` and `serde::Deserialize` traits.
+//! - `rkyv`: When this optional dependency is enabled, micromap implements the
+//!   `rkyv::Archive`, `rkyv::Serialize` and `rkyv::Deserialize` traits, enabling
+//!   zero-copy deserialization through the archived counterparts of `Map` and
+//!   `Set` in `micromap::map::rkyv` and `micromap::set::rkyv`.
 //! - `std`: Currently no effect, you can just ignore it.
 //!
 //! ## Capacity and Allocation
