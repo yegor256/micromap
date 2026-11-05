@@ -21,7 +21,14 @@ use uuid::Uuid;
 // DON'T change the code unless you know what you are doing.
 
 const ROUNDS: usize = 12345; // 123456 is ok, but a bit slower. (XOR_EXPECT=0xFD9A2154FC6C60DD)
+
+// The expected value depends on the target pointer width: `SmallRng` is a different
+// generator on 32-bit targets (`Xoshiro128PlusPlus` instead of `Xoshiro256PlusPlus`),
+// and `foldhash` computes hashes differently there.
+#[cfg(target_pointer_width = "64")]
 const XOR_EXPECT: u64 = 0x6FB21AFD20B844D9; // for a specific ROUNDS=12345
+#[cfg(not(target_pointer_width = "64"))]
+const XOR_EXPECT: u64 = 0x1BA306F2FF1A39B9; // for a specific ROUNDS=12345, verified on i686
 
 /// Run this by:
 /// `$ cargo test --test random (without --release)`
