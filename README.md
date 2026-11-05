@@ -60,8 +60,8 @@ a few other Rust maps, changing the total capacity of the map (horizontal axis).
 We applied the same interactions
 ([`benchmark.rs`][rs])
 to them and measured how fast they performed. In the following table,
-the numbers over 1.0 indicate performance gain,
-while the numbers below 1.0 demonstrate performance loss.
+the numbers over 1.0 indicate a gain for `micromap::Map` (the baseline, 1.00),
+while the numbers below 1.0 demonstrate a loss for it.
 
 <!-- benchmark -->
 | | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
