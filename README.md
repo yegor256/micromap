@@ -19,7 +19,7 @@ It is also faster than
 [IndexMap](https://crates.io/crates/indexmap),
 and _all_ others.
 The smaller the map, the higher the performance.
-It was observed that when a map contains more than 20 keys,
+In our measurements, when a map contains more than ~32 keys,
 it may be better to use the standard
 [`HashMap`](https://doc.rust-lang.org/std/collections/struct.HashMap.html),
 since the performance of `micromap::Map` _may_ start to degrade.
