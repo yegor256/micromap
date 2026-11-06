@@ -482,8 +482,8 @@ impl<K: PartialEq, V, const N: usize> Map<K, V, N> {
             return [const { None }; J];
         }
         // check for overlapping keys (O(n^2), but n is small)
-        for (i, k) in ks[..ks.len() - 1].iter().enumerate() {
-            for k_behind in &ks[i + 1..] {
+        for (i, k) in ks.iter().enumerate() {
+            for k_behind in ks.iter().skip(i + 1) {
                 assert!(k != k_behind, "Overlapping keys");
             }
         }
@@ -1308,6 +1308,27 @@ mod tests {
             assert_eq!(library.insert(csapp_new.clone(), 20), Some(10));
             // the key is still `csapp_old` instead of `csapp_new`.
             assert_eq!(library.get_key_value(&csapp_new), Some((&csapp_old, &20)));
+            assert_eq!(library.len(), 1);
+        }
+
+        #[test]
+        fn insert_unchecked_will_not_update_the_key() {
+            let mut library: Map<Book, u32, 5> = Map::new();
+            let csapp_old = Book {
+                isbn: 9780134092669,
+                title: "CSAPP 3rd".to_string(),
+            };
+            let csapp_new = Book {
+                isbn: 9780134092669,
+                title: "Computer Systems: A Programmer's Perspective (3rd Edition)".to_string(),
+            };
+            unsafe {
+                assert_eq!(library.insert_unchecked(csapp_old.clone(), 10), None);
+                assert_eq!(library.insert_unchecked(csapp_new.clone(), 20), Some(10));
+            }
+            let (stored_key, value) = library.get_key_value(&csapp_new).unwrap();
+            assert_eq!(stored_key.title, csapp_old.title);
+            assert_eq!(value, &20);
             assert_eq!(library.len(), 1);
         }
 

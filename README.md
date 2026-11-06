@@ -106,6 +106,15 @@ last version by `rustup update stable`, and then:
 cargo test -vv
 ```
 
+We also use mutation testing to validate the quality of our tests using [cargo-mutants](https://mutants.rs/):
+
+```bash
+cargo install cargo-mutants
+cargo mutants
+```
+
+This tests whether our test suite can detect intentional bugs introduced by the mutation testing tool.
+
 If everything goes well, fork repository, make changes, send us a
 [pull request](https://www.yegor256.com/2014/04/15/github-guidelines.html).
 We will review your changes and apply them to the `master` branch shortly,
