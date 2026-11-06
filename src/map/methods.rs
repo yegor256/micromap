@@ -1326,7 +1326,9 @@ mod tests {
                 assert_eq!(library.insert_unchecked(csapp_old.clone(), 10), None);
                 assert_eq!(library.insert_unchecked(csapp_new.clone(), 20), Some(10));
             }
-            assert_eq!(library.get_key_value(&csapp_new), Some((&csapp_old, &20)));
+            let (stored_key, value) = library.get_key_value(&csapp_new).unwrap();
+            assert_eq!(stored_key.title, csapp_old.title);
+            assert_eq!(value, &20);
             assert_eq!(library.len(), 1);
         }
 

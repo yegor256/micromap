@@ -35,7 +35,7 @@ jobs:
         with:
           tool: cargo-mutants
       - name: Run mutation tests
-        run: cargo mutants --all-features --no-shuffle --shard ${{ matrix.shard }}/4
+        run: cargo mutants --all-features --cap-lints=true --no-shuffle --shard ${{ matrix.shard }}/4
       - name: Upload mutants.out directory
         uses: actions/upload-artifact@v4
         if: always()
