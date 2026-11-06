@@ -7,7 +7,7 @@ use core::{fmt, iter::FusedIterator, mem::MaybeUninit};
 
 impl<K, V, const N: usize> Map<K, V, N> {
     /// Clears the map, returning all key-value pairs as an iterator. For reuse, the
-    /// memory of capacity `N` will be keeped.
+    /// memory of capacity `N` will be kept.
     ///
     /// If the returned iterator is dropped before being fully consumed, it drops the
     /// remaining key-value pairs. The returned iterator keeps a mutable borrow on
