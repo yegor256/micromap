@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
+// SPDX-FileCopyrightText: Copyright (c) 2023-2026 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
 #![no_main]
@@ -61,7 +61,7 @@ fn test_map_capacity<const N: usize>(data: &[u8]) {
                 let old_len = map.len();
                 let old_contains = map.contains_key(&key);
                 let removed = map.remove(&key);
-                
+
                 if removed.is_some() {
                     assert!(old_contains);
                     assert_eq!(map.len(), old_len - 1);
@@ -100,7 +100,7 @@ fn test_map_capacity<const N: usize>(data: &[u8]) {
                 let old_len = map.len();
                 map.retain(|k, v| (*k as u32 + *v as u32) % 3 != 0);
                 assert!(map.len() <= old_len);
-                
+
                 // Verify all remaining elements satisfy the predicate
                 for (k, v) in &map {
                     assert!((*k as u32 + *v as u32) % 3 != 0);
@@ -111,11 +111,11 @@ fn test_map_capacity<const N: usize>(data: &[u8]) {
                 let collected_keys: Vec<u16> = map.keys().copied().collect();
                 let collected_values: Vec<u16> = map.values().copied().collect();
                 let collected_pairs: Vec<(u16, u16)> = map.iter().map(|(k, v)| (*k, *v)).collect();
-                
+
                 assert_eq!(collected_keys.len(), map.len());
                 assert_eq!(collected_values.len(), map.len());
                 assert_eq!(collected_pairs.len(), map.len());
-                
+
                 // Verify each collected key exists in the map
                 for key in collected_keys {
                     assert!(map.contains_key(&key));
@@ -128,7 +128,7 @@ fn test_map_capacity<const N: usize>(data: &[u8]) {
         assert!(map.len() <= N);
         assert_eq!(map.is_empty(), map.len() == 0);
         assert_eq!(map.capacity(), N);
-        
+
         // Count actual entries vs reported length
         let actual_count = map.iter().count();
         assert_eq!(actual_count, map.len());

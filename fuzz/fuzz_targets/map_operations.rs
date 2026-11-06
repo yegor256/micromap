@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
+// SPDX-FileCopyrightText: Copyright (c) 2023-2026 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
 #![no_main]
@@ -26,7 +26,7 @@ fuzz_target!(|data: &[u8]| {
                     let key = data[i];
                     let value = data[i + 1];
                     i += 2;
-                    
+
                     // Use checked_insert to avoid panics on full map
                     let _ = map.checked_insert(key, value);
                 }

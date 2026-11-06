@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
+// SPDX-FileCopyrightText: Copyright (c) 2023-2026 Yegor Bugayenko
 // SPDX-License-Identifier: MIT
 
 #![no_main]
@@ -25,7 +25,7 @@ fuzz_target!(|data: &[u8]| {
                 if i < data.len() {
                     let value = data[i];
                     i += 1;
-                    
+
                     // Use checked_insert to avoid panics on full set
                     let _ = set.checked_insert(value);
                 }
