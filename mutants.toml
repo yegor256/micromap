@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2023-2025 Yegor Bugayenko
+# SPDX-FileCopyrightText: Copyright (c) 2023-2026 Yegor Bugayenko
 # SPDX-License-Identifier: MIT
 
 # Configuration for cargo-mutants mutation testing
@@ -17,7 +17,7 @@ exclude_globs = [
     "rebuild_benchmark.sh",
 ]
 
-# Timeout for each test run (in seconds) 
+# Timeout for each test run (in seconds)
 # Conservative timeout for CI environment
 timeout = 120
 
@@ -25,7 +25,7 @@ timeout = 120
 skip_mutants = [
     # Skip simple getter functions that are unlikely to have meaningful mutations
     "*::capacity",
-    "*::len", 
+    "*::len",
     "*::is_empty",
     # Skip basic iterator size hint functions
     "*::size_hint",
