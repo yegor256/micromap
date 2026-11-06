@@ -25,3 +25,8 @@ jobs:
       - run: cargo fmt --check
       - run: cargo doc --no-deps
       - run: cargo clippy -- --no-deps
+      - run: rustup toolchain install nightly
+      - run: cargo install cargo-fuzz
+      - run: cargo +nightly fuzz build map_operations
+      - run: cargo +nightly fuzz build set_operations
+      - run: cargo +nightly fuzz build edge_cases
