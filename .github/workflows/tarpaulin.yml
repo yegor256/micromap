@@ -14,10 +14,9 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable
-          override: true
       - name: Install cargo-tarpaulin
         run: cargo install cargo-tarpaulin
       - name: Run tarpaulin
