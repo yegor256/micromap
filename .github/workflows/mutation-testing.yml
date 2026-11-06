@@ -21,6 +21,9 @@ jobs:
   mutants:
     timeout-minutes: 60
     runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        shard: [1, 2, 3, 4]
     env:
       CARGO_TERM_COLOR: always
     steps:
@@ -32,10 +35,10 @@ jobs:
         with:
           tool: cargo-mutants
       - name: Run mutation tests
-        run: cargo mutants --no-shuffle --shard 1/4
+        run: cargo mutants --all-features --no-shuffle --shard ${{ matrix.shard }}/4
       - name: Upload mutants.out directory
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: mutants-report
+          name: mutants-report-${{ matrix.shard }}
           path: mutants.out/
