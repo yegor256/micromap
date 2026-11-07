@@ -23,7 +23,7 @@
 //! ```
 
 use super::Map;
-use core::{error::Error, fmt, mem::MaybeUninit, ptr};
+use core::{error::Error, fmt, ptr};
 use rkyv::{
     bytecheck::CheckBytes,
     munge::munge,
@@ -197,30 +197,15 @@ where
     S: Fallible + ?Sized,
 {
     fn serialize(&self, serializer: &mut S) -> Result<Self::Resolver, S::Error> {
-        let mut slots = MaybeUninit::<[Option<(K::Resolver, V::Resolver)>; N]>::uninit();
-        let ptr = slots
-            .as_mut_ptr()
-            .cast::<Option<(K::Resolver, V::Resolver)>>();
+        // The array starts fully initialized with `None` slots, so if a
+        // serializer returns an error (or panics), the resolvers of the
+        // already serialized pairs, which may own resources, are dropped.
+        let mut slots: [Option<(K::Resolver, V::Resolver)>; N] = core::array::from_fn(|_| None);
         for (i, (k, v)) in self.iter().enumerate() {
             let resolver = (k.serialize(serializer)?, v.serialize(serializer)?);
-            unsafe {
-                // SAFETY: `i` is less than `self.len()`, which is at most `N`.
-                ptr.add(i).write(Some(resolver));
-            }
+            slots[i] = Some(resolver);
         }
-        for i in self.len()..N {
-            unsafe {
-                // SAFETY: `i` is less than `N`.
-                ptr.add(i).write(None);
-            }
-        }
-        Ok(MapResolver {
-            slots: unsafe {
-                // SAFETY: all `N` slots have been initialized above; on an
-                // error the function has already returned early.
-                slots.assume_init()
-            },
-        })
+        Ok(MapResolver { slots })
     }
 }
 
@@ -234,20 +219,22 @@ where
     D: Fallible + ?Sized,
 {
     fn deserialize(&self, deserializer: &mut D) -> Result<Map<K, V, N>, D::Error> {
-        let mut pairs: [MaybeUninit<(K, V)>; N] = [const { MaybeUninit::uninit() }; N];
-        let mut count = 0;
+        // The map starts empty and its length is advanced after each fully
+        // deserialized pair, so if a deserializer returns an error (or
+        // panics), the pairs deserialized so far are dropped by the map.
+        let mut map = Map::new();
         for slot in self.pairs.iter().take(self.len()) {
             match slot.as_ref() {
                 Some(pair) => {
                     let key = pair.key.deserialize(deserializer)?;
                     let value = pair.value.deserialize(deserializer)?;
-                    pairs[count].write((key, value));
-                    count += 1;
+                    map.pairs[map.len].write((key, value));
+                    map.len += 1;
                 }
                 None => break,
             }
         }
-        Ok(Map { len: count, pairs })
+        Ok(map)
     }
 }
 
@@ -318,9 +305,157 @@ where
 mod tests {
     use super::{ArchivedMap, ArchivedPair};
     use crate::Map;
+    use core::sync::atomic::{AtomicUsize, Ordering};
     use rkyv::{
-        access, from_bytes, primitive::ArchivedU32, rancor::Error, string::ArchivedString, to_bytes,
+        access,
+        bytecheck::CheckBytes,
+        from_bytes,
+        munge::munge,
+        primitive::{ArchivedU32, ArchivedU64},
+        rancor::{fail, Error, Fallible, Source},
+        string::ArchivedString,
+        to_bytes,
+        traits::Portable,
+        Archive, Deserialize, Place, Serialize,
     };
+
+    /// Counts drops of [`DropCounted`] values.
+    static DROPS: AtomicUsize = AtomicUsize::new(0);
+
+    /// Counts drops of [`Guard`] resolvers.
+    static GUARDS: AtomicUsize = AtomicUsize::new(0);
+
+    /// A value that counts its drops and refuses to deserialize itself when
+    /// its value is three or more, so that the error paths of [`Map`]
+    /// deserialization can be checked for leaks of previously deserialized
+    /// pairs.
+    struct DropCounted(u64);
+
+    impl Drop for DropCounted {
+        fn drop(&mut self) {
+            DROPS.fetch_add(1, Ordering::SeqCst);
+        }
+    }
+
+    /// A value whose serializer acquires a resource and refuses to serialize
+    /// itself when its value is hundred or more, so that the error paths of
+    /// [`Map`] serialization can be checked for leaks of the resolvers of
+    /// the earlier pairs.
+    struct Guarded(u64);
+
+    /// The resolver of a [`Guarded`], which owns a resource and counts its
+    /// own drops.
+    #[derive(Debug)]
+    struct Guard;
+
+    impl Drop for Guard {
+        fn drop(&mut self) {
+            GUARDS.fetch_add(1, Ordering::SeqCst);
+        }
+    }
+
+    /// The archived counterpart of both [`DropCounted`] and [`Guarded`].
+    #[derive(Debug)]
+    #[repr(C)]
+    struct ArchivedNumber {
+        /// The archived value.
+        value: ArchivedU64,
+    }
+
+    // SAFETY: `ArchivedNumber` consists of a single portable primitive in a
+    // `#[repr(C)]` layout.
+    unsafe impl Portable for ArchivedNumber {}
+
+    unsafe impl<C: Fallible + ?Sized> CheckBytes<C> for ArchivedNumber {
+        // SAFETY: the single field is a primitive type, whose every bit
+        // pattern is valid, so there is nothing to check.
+        unsafe fn check_bytes(_: *const Self, _: &mut C) -> Result<(), C::Error> {
+            Ok(())
+        }
+    }
+
+    /// The error reported when a [`DropCounted`] refuses to be deserialized.
+    #[derive(Debug)]
+    struct RefusedToDeserialize {
+        /// The refused value.
+        value: u64,
+    }
+
+    impl core::fmt::Display for RefusedToDeserialize {
+        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+            write!(f, "value {} refuses to be deserialized", self.value)
+        }
+    }
+
+    impl core::error::Error for RefusedToDeserialize {}
+
+    /// The error reported when a [`Guarded`] refuses to be serialized.
+    #[derive(Debug)]
+    struct RefusedToSerialize {
+        /// The refused value.
+        value: u64,
+    }
+
+    impl core::fmt::Display for RefusedToSerialize {
+        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+            write!(f, "value {} refuses to be serialized", self.value)
+        }
+    }
+
+    impl core::error::Error for RefusedToSerialize {}
+
+    impl Archive for DropCounted {
+        type Archived = ArchivedNumber;
+        type Resolver = ();
+
+        fn resolve(&self, _resolver: (), out: Place<ArchivedNumber>) {
+            munge!(let ArchivedNumber { value } = out);
+            value.write(ArchivedU64::from_native(self.0));
+        }
+    }
+
+    impl<S: Fallible + ?Sized> Serialize<S> for DropCounted {
+        fn serialize(&self, _: &mut S) -> Result<(), S::Error> {
+            Ok(())
+        }
+    }
+
+    impl<D> Deserialize<DropCounted, D> for ArchivedNumber
+    where
+        D: Fallible + ?Sized,
+        D::Error: Source,
+    {
+        fn deserialize(&self, _: &mut D) -> Result<DropCounted, D::Error> {
+            let value = self.value.to_native();
+            if value >= 3 {
+                fail!(RefusedToDeserialize { value });
+            }
+            Ok(DropCounted(value))
+        }
+    }
+
+    impl Archive for Guarded {
+        type Archived = ArchivedNumber;
+        type Resolver = Guard;
+
+        fn resolve(&self, _: Guard, out: Place<ArchivedNumber>) {
+            munge!(let ArchivedNumber { value } = out);
+            value.write(ArchivedU64::from_native(self.0));
+        }
+    }
+
+    impl<S> Serialize<S> for Guarded
+    where
+        S: Fallible + ?Sized,
+        S::Error: Source,
+    {
+        fn serialize(&self, _: &mut S) -> Result<Guard, S::Error> {
+            if self.0 >= 100 {
+                fail!(RefusedToSerialize { value: self.0 });
+            }
+            Ok(Guard)
+        }
+    }
 
     #[test]
     fn round_trip_small_map() {
@@ -420,5 +555,35 @@ mod tests {
         let overflow = usize::MAX.to_le_bytes();
         bytes[root..root + width].copy_from_slice(&overflow[..width]);
         assert!(access::<ArchivedMap<u8, u8, 8>, Error>(&bytes[..]).is_err());
+    }
+
+    #[test]
+    fn deserialize_error_drops_preceding_pairs() {
+        let mut before: Map<u8, DropCounted, 8> = Map::new();
+        before.insert(1, DropCounted(1));
+        before.insert(2, DropCounted(2));
+        before.insert(3, DropCounted(3));
+        let bytes = to_bytes::<Error>(&before).unwrap();
+        let created = DROPS.load(Ordering::SeqCst);
+        let result = from_bytes::<Map<u8, DropCounted, 8>, Error>(&bytes[..]);
+        assert!(result.is_err());
+        // The two pairs deserialized before the failing one must have been
+        // dropped by the partially built map.
+        assert_eq!(DROPS.load(Ordering::SeqCst) - created, 2);
+    }
+
+    #[test]
+    fn serialize_error_drops_earlier_resolvers() {
+        let mut before: Map<u8, Guarded, 8> = Map::new();
+        before.insert(1, Guarded(1));
+        before.insert(2, Guarded(2));
+        before.insert(3, Guarded(100));
+        let created = GUARDS.load(Ordering::SeqCst);
+        let result = to_bytes::<Error>(&before);
+        assert!(result.is_err());
+        // The resolvers of the two successfully serialized pairs, which own
+        // resources, must have been dropped when serialization failed on the
+        // third pair.
+        assert_eq!(GUARDS.load(Ordering::SeqCst) - created, 2);
     }
 }
