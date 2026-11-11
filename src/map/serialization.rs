@@ -38,6 +38,9 @@ impl<'de, K: PartialEq + Deserialize<'de>, V: Deserialize<'de>, const N: usize> 
     {
         let mut m: Self::Value = Map::new();
         while let Some((key, value)) = access.next_entry()? {
+            if m.len() == N && !m.contains_key(&key) {
+                return Err(serde::de::Error::invalid_length(N + 1, &self));
+            }
             m.insert(key, value);
         }
         Ok(m)
@@ -109,5 +112,46 @@ mod tests {
         let invalid_bytes: [u8; 4] = [0xFF, 0xFF, 0xFF, 0xFF];
         let result: Result<(Map<u8, u8, 8>, usize), _> = decode_from_slice(&invalid_bytes, config);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn deserialize_exactly_n_entries() {
+        let config = bincode::config::legacy();
+        let mut before: Map<u8, u8, 2> = Map::new();
+        before.insert(1, 10);
+        before.insert(2, 20);
+        let mut bytes: [u8; 1024] = [0; 1024];
+        let len = encode_into_slice(&before, &mut bytes, config).unwrap();
+        let bytes = &bytes[..len];
+        let (after, read_len): (Map<u8, u8, 2>, usize) = decode_from_slice(&bytes, config).unwrap();
+        assert_eq!(2, after.len());
+        assert_eq!(Some(&10), after.get(&1u8));
+        assert_eq!(Some(&20), after.get(&2u8));
+        assert_eq!(bytes.len(), read_len);
+    }
+
+    #[test]
+    fn deserialize_more_than_n_entries() {
+        let config = bincode::config::legacy();
+        let entries = vec![(1u8, 10u8), (2, 20), (3, 30)];
+        let mut bytes: [u8; 1024] = [0; 1024];
+        let len = encode_into_slice(&entries, &mut bytes, config).unwrap();
+        let bytes = &bytes[..len];
+        let result: Result<(Map<u8, u8, 2>, usize), _> = decode_from_slice(&bytes, config);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn deserialize_duplicate_entry_at_full_capacity() {
+        let config = bincode::config::legacy();
+        let entries = vec![(1u8, 10u8), (2, 20), (1, 99)];
+        let mut bytes: [u8; 1024] = [0; 1024];
+        let len = encode_into_slice(&entries, &mut bytes, config).unwrap();
+        let bytes = &bytes[..len];
+        let (after, read_len): (Map<u8, u8, 2>, usize) = decode_from_slice(&bytes, config).unwrap();
+        assert_eq!(2, after.len());
+        assert_eq!(Some(&99), after.get(&1u8));
+        assert_eq!(Some(&20), after.get(&2u8));
+        assert_eq!(bytes.len(), read_len);
     }
 }

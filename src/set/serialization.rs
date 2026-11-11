@@ -36,6 +36,9 @@ impl<'de, T: PartialEq + Deserialize<'de>, const N: usize> Visitor<'de> for Vi<T
     {
         let mut m: Self::Value = Set::new();
         while let Some(key) = seq.next_element()? {
+            if m.len() == N && !m.contains(&key) {
+                return Err(serde::de::Error::invalid_length(N + 1, &self));
+            }
             m.insert(key);
         }
         Ok(m)
@@ -78,6 +81,47 @@ mod tests {
         let bytes = &bytes[..len];
         let (after, read_len): (Set<u8, 8>, usize) = decode_from_slice(&bytes, config).unwrap();
         assert!(after.is_empty());
+        assert_eq!(bytes.len(), read_len);
+    }
+
+    #[test]
+    fn deserialize_exactly_n_elements() {
+        let config = bincode::config::legacy();
+        let mut before: Set<u8, 2> = Set::new();
+        before.insert(1);
+        before.insert(2);
+        let mut bytes: [u8; 1024] = [0; 1024];
+        let len = encode_into_slice(&before, &mut bytes, config).unwrap();
+        let bytes = &bytes[..len];
+        let (after, read_len): (Set<u8, 2>, usize) = decode_from_slice(&bytes, config).unwrap();
+        assert_eq!(2, after.len());
+        assert!(after.contains(&1u8));
+        assert!(after.contains(&2u8));
+        assert_eq!(bytes.len(), read_len);
+    }
+
+    #[test]
+    fn deserialize_more_than_n_elements() {
+        let config = bincode::config::legacy();
+        let elements = vec![1u8, 2, 3];
+        let mut bytes: [u8; 1024] = [0; 1024];
+        let len = encode_into_slice(&elements, &mut bytes, config).unwrap();
+        let bytes = &bytes[..len];
+        let result: Result<(Set<u8, 2>, usize), _> = decode_from_slice(&bytes, config);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn deserialize_duplicate_element_at_full_capacity() {
+        let config = bincode::config::legacy();
+        let elements = vec![1u8, 2, 1];
+        let mut bytes: [u8; 1024] = [0; 1024];
+        let len = encode_into_slice(&elements, &mut bytes, config).unwrap();
+        let bytes = &bytes[..len];
+        let (after, read_len): (Set<u8, 2>, usize) = decode_from_slice(&bytes, config).unwrap();
+        assert_eq!(2, after.len());
+        assert!(after.contains(&1u8));
+        assert!(after.contains(&2u8));
         assert_eq!(bytes.len(), read_len);
     }
 }
