@@ -11,7 +11,7 @@ name: benchmark
 jobs:
   pr:
     timeout-minutes: 15
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v6
       - run: ./rebuild_benchmark.sh
