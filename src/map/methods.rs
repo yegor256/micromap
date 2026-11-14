@@ -74,10 +74,17 @@ impl<K, V, const N: usize> Map<K, V, N> {
     /// ```
     #[inline]
     pub fn clear(&mut self) {
-        for i in 0..self.len {
+        // Reset `len` first, so that a panic in a `Drop` impl below can't leave
+        // the map counting already dropped pairs (they would be dropped again
+        // during unwinding, e.g. by the `Drop` impl of the map). This is what
+        // `Vec::clear()` does.
+        let len = self.len;
+        self.len = 0;
+        for i in 0..len {
+            // SAFETY: all these indices were below `len` before the reset above,
+            // so all pairs there were initialized.
             unsafe { self.item_drop(i) };
         }
-        self.len = 0;
     }
 
     /// Retains only the elements specified by the predicate.
@@ -658,12 +665,19 @@ mod internal {
         /// Remove by index and drop it (by swapping the last one here and reducing the length).
         #[inline]
         pub(crate) unsafe fn remove_index_drop(&mut self, i: usize) {
-            self.item_drop(i);
+            // Make the map consistent BEFORE dropping: a panic in a `Drop` impl
+            // must not leave `len` counting an already dropped pair (it would be
+            // dropped again during unwinding, e.g. by the `Drop` impl of the map).
+            let removed = self.item_read(i);
             self.len -= 1;
             if i != self.len {
                 let value = self.item_read(self.len);
                 self.item_write(i, value);
             }
+            // SAFETY: the pair was read out of the slot above, and the map no
+            // longer counts it, so dropping it here (or its `Drop` impl panicking)
+            // can't touch any pair the map still owns.
+            drop(removed);
         }
 
         /// Remove by index and return it (by swapping the last one here and reducing the length).
@@ -774,6 +788,9 @@ mod internal {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::panic::{catch_unwind, AssertUnwindSafe};
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    use std::sync::Arc;
 
     #[test]
     fn insert_and_check_length() {
@@ -944,6 +961,143 @@ mod tests {
         assert_eq!(map.get("key1"), None);
         assert_eq!(map.get("key2"), Some(&40));
         assert_eq!(map.get("key3"), Some(&60));
+    }
+
+    /// A value that counts its drops and may panic in its `Drop` impl,
+    /// to check that a panicking `Drop` can't make the map drop a pair twice.
+    #[cfg(test)]
+    struct Bomb {
+        drops: Arc<AtomicUsize>,
+        armed: bool,
+    }
+
+    impl Drop for Bomb {
+        fn drop(&mut self) {
+            self.drops.fetch_add(1, Ordering::SeqCst);
+            assert!(!self.armed, "Bomb exploded");
+        }
+    }
+
+    #[test]
+    fn clear_drops_every_exactly_once_without_panic() {
+        let drops = Arc::new(AtomicUsize::new(0));
+        let mut m: Map<u8, Bomb, 3> = Map::new();
+        for i in 0..3 {
+            m.insert(
+                i,
+                Bomb {
+                    drops: Arc::clone(&drops),
+                    armed: false,
+                },
+            );
+        }
+        m.clear();
+        assert_eq!(drops.load(Ordering::SeqCst), 3);
+        assert!(m.is_empty());
+    }
+
+    #[test]
+    fn clear_does_not_double_drop_when_a_drop_panics() {
+        let drops = Arc::new(AtomicUsize::new(0));
+        let mut m: Map<u8, Bomb, 3> = Map::new();
+        for i in 0..3 {
+            m.insert(
+                i,
+                Bomb {
+                    drops: Arc::clone(&drops),
+                    armed: i == 1,
+                },
+            );
+        }
+        let caught = catch_unwind(AssertUnwindSafe(|| m.clear()));
+        assert!(caught.is_err(), "clear() must panic in the armed Drop");
+        assert_eq!(
+            drops.load(Ordering::SeqCst),
+            2,
+            "no pair may be dropped twice"
+        );
+        assert_eq!(m.len(), 0, "len must be reset even when a Drop panics");
+        drop(m);
+        assert_eq!(
+            drops.load(Ordering::SeqCst),
+            2,
+            "dropping the emptied map must not drop anything again"
+        );
+    }
+
+    #[test]
+    fn retain_drops_exactly_removed_pairs_without_panic() {
+        let drops = Arc::new(AtomicUsize::new(0));
+        let mut m: Map<u8, Bomb, 4> = Map::new();
+        for i in 0..4 {
+            m.insert(
+                i,
+                Bomb {
+                    drops: Arc::clone(&drops),
+                    armed: false,
+                },
+            );
+        }
+        m.retain(|&k, _| k % 2 == 0);
+        assert_eq!(drops.load(Ordering::SeqCst), 2);
+        assert_eq!(m.len(), 2);
+        drop(m);
+        assert_eq!(drops.load(Ordering::SeqCst), 4);
+    }
+
+    #[test]
+    fn retain_does_not_double_drop_when_a_drop_panics() {
+        let drops = Arc::new(AtomicUsize::new(0));
+        let mut m: Map<u8, Bomb, 4> = Map::new();
+        for i in 0..4 {
+            m.insert(
+                i,
+                Bomb {
+                    drops: Arc::clone(&drops),
+                    armed: i == 0,
+                },
+            );
+        }
+        let caught = catch_unwind(AssertUnwindSafe(|| m.retain(|_, _| false)));
+        assert!(caught.is_err(), "retain() must panic in the armed Drop");
+        assert_eq!(
+            drops.load(Ordering::SeqCst),
+            1,
+            "the removed pair must be dropped exactly once"
+        );
+        assert_eq!(m.len(), 3, "the map must stay consistent after the panic");
+        drop(m);
+        assert_eq!(
+            drops.load(Ordering::SeqCst),
+            4,
+            "each surviving pair must be dropped exactly once afterwards"
+        );
+    }
+
+    #[test]
+    fn remove_hands_the_pair_out_and_keeps_others_alive() {
+        let drops = Arc::new(AtomicUsize::new(0));
+        let mut m: Map<u8, Bomb, 4> = Map::new();
+        for i in 0..4 {
+            m.insert(
+                i,
+                Bomb {
+                    drops: Arc::clone(&drops),
+                    armed: false,
+                },
+            );
+        }
+        let removed = m.remove(&2);
+        assert!(removed.is_some());
+        assert_eq!(
+            drops.load(Ordering::SeqCst),
+            0,
+            "remove() must not drop the returned pair, only hand it out"
+        );
+        drop(removed);
+        assert_eq!(drops.load(Ordering::SeqCst), 1);
+        drop(m);
+        assert_eq!(drops.load(Ordering::SeqCst), 4);
     }
 
     #[test]
