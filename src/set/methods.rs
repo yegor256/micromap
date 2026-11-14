@@ -161,20 +161,17 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
 
     /// Attempt to insert a value into the set. (will not update, and no panic)
     ///
-    /// - If the value exists, whether the set is full or not, we update the
-    ///   value (exclude key), and return `Some(Some(old_value))`;
-    /// - If the key does not exist and the set is full already, we can do
-    ///   nothing, so just return `None`;
-    /// - If the key does not exist and the set has empty slot, we insert
-    ///   into that slot and return `Some(None)`.
-    ///
-    ///
     /// - If the value existed, we do nothing, and return `Some(T)`, which is the value
     ///   parameter we passed in.
-    /// - If the value does not exist and the set is full already, return `Some(T)` like
-    ///   above.
+    /// - If the value does not exist and the set is full already, we can do
+    ///   nothing, so just return `None`.
     /// - If the value does not exist and the set has empty slot, we insert into that slot
     ///   and return `None`.
+    ///
+    /// Note that the returned `None` is ambiguous: it means either that the new
+    /// value was successfully inserted, or that the set is full and the value
+    /// was not inserted at all. Use [`try_insert()`][Self::try_insert] if you
+    /// need to distinguish these two situations.
     ///
     /// # Examples
     /// ```
@@ -219,6 +216,47 @@ impl<T: PartialEq, const N: usize> Set<T, N> {
             self.map
                 .insert_ii_for_full(k, (), false)
                 .map(|(_, (k, ()))| k)
+        }
+    }
+
+    /// Attempt to insert a value into the set. (will not update, and no panic)
+    ///
+    /// Unlike [`checked_insert()`][Self::checked_insert], this method never
+    /// confuses a successful insertion with a failed one:
+    ///
+    /// - If the value existed, whether the set is full or not, we do nothing,
+    ///   and return `Some(Some(value))`, which is the value parameter we
+    ///   passed in;
+    /// - If the value does not exist and the set is full already, we can do
+    ///   nothing, so just return `None`;
+    /// - If the value does not exist and the set has empty slot, we insert
+    ///   into that slot and return `Some(None)`.
+    ///
+    /// # Examples
+    /// ```
+    /// use micromap::Set;
+    /// let mut set: Set<_, 3> = Set::new();
+    /// // The value is new and the set has an empty slot, so it gets inserted.
+    /// assert_eq!(set.try_insert(1), Some(None));
+    /// // The value is already in the set, no-op, the argument is handed back.
+    /// assert_eq!(set.try_insert(1), Some(Some(1)));
+    /// assert_eq!(set.try_insert(2), Some(None));
+    /// assert_eq!(set.try_insert(3), Some(None));
+    /// assert_eq!(set.len(), set.capacity());
+    /// // The set is full now, but an existing value is still a no-op.
+    /// assert_eq!(set.try_insert(2), Some(Some(2)));
+    /// // This insertion will cause capacity overflow, so no insertion is
+    /// // performed and `None` is returned.
+    /// assert_eq!(set.try_insert(4), None);
+    /// ```
+    #[inline]
+    pub fn try_insert(&mut self, k: T) -> Option<Option<T>> {
+        if self.len() < N {
+            Some(self.map.insert_ii(k, (), false).1.map(|(k, ())| k))
+        } else {
+            self.map
+                .insert_ii_for_full(k, (), false)
+                .map(|(_, (k, ()))| Some(k))
         }
     }
 
@@ -472,6 +510,69 @@ mod tests {
         assert_eq!(set.checked_insert(2), None);
         assert_eq!(set.checked_insert(3), None);
         assert_eq!(set.len(), 2);
+    }
+
+    #[test]
+    fn test_try_insert_new_value_when_not_full() {
+        let mut set: Set<i32, 3> = Set::new();
+        assert_eq!(set.try_insert(1), Some(None));
+        assert_eq!(set.try_insert(2), Some(None));
+        assert_eq!(set.len(), 2);
+        assert!(set.contains(&1));
+        assert!(set.contains(&2));
+    }
+
+    #[test]
+    fn test_try_insert_existing_value_when_not_full() {
+        let mut set: Set<i32, 3> = Set::new();
+        set.insert(1);
+        assert_eq!(set.try_insert(1), Some(Some(1)));
+        assert_eq!(set.len(), 1);
+    }
+
+    #[test]
+    fn test_try_insert_fails_when_set_is_full() {
+        let mut set = Set::from([1, 2]);
+        assert_eq!(set.len(), set.capacity());
+        assert_eq!(set.try_insert(3), None);
+        assert_eq!(set.len(), 2);
+        assert!(!set.contains(&3));
+    }
+
+    #[test]
+    fn test_try_insert_existing_value_when_full() {
+        let mut set = Set::from([1, 2]);
+        assert_eq!(set.len(), set.capacity());
+        assert_eq!(set.try_insert(2), Some(Some(2)));
+        assert_eq!(set.len(), 2);
+    }
+
+    #[test]
+    fn test_try_insert_into_zero_capacity() {
+        let mut set: Set<i32, 0> = Set::new();
+        assert_eq!(set.try_insert(1), None);
+        assert_eq!(set.len(), 0);
+    }
+
+    #[test]
+    fn test_try_insert_hands_back_the_argument_when_present() {
+        // Only the first element in the tuple is considered when determining
+        // whether two `Foo`s are equal.
+        #[derive(Debug)]
+        struct Foo(u8, char);
+        impl PartialEq for Foo {
+            fn eq(&self, other: &Self) -> bool {
+                self.0 == other.0
+            }
+        }
+        impl Eq for Foo {}
+        let mut set: Set<Foo, 2> = Set::new();
+        assert_eq!(set.try_insert(Foo(1, 'a')), Some(None));
+        // `Foo(1, 'b')` is equal to the stored `Foo(1, 'a')`, so it is a no-op:
+        // the passed-in value is handed back and the set keeps `Foo(1, 'a')`.
+        assert_eq!(set.try_insert(Foo(1, 'b')), Some(Some(Foo(1, 'b'))));
+        assert_eq!(set.len(), 1);
+        assert_eq!(set.get(&Foo(1, 'z')).unwrap().1, 'a');
     }
 
     #[test]
