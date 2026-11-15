@@ -483,7 +483,6 @@ dependencies = [
  "bincode",
  "criterion",
  "flurry",
- "foldhash",
  "hashbrown",
  "heapless",
  "indexmap",

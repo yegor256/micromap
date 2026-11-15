@@ -6,6 +6,7 @@
 
 use seq_macro::seq;
 use std::hash::Hash;
+use std::hash::Hasher;
 use std::vec;
 
 use indexmap::IndexMap;
@@ -22,13 +23,15 @@ use uuid::Uuid;
 
 const ROUNDS: usize = 12345; // 123456 is ok, but a bit slower. (XOR_EXPECT=0xFD9A2154FC6C60DD)
 
-// The expected value depends on the target pointer width: `SmallRng` is a different
-// generator on 32-bit targets (`Xoshiro128PlusPlus` instead of `Xoshiro256PlusPlus`),
-// and `foldhash` computes hashes differently there.
+// The expected value depends on the target pointer width only: `SmallRng` is a different
+// generator on 32-bit targets (`Xoshiro128PlusPlus` instead of `Xoshiro256PlusPlus`).
+// `make_hash()` below is byte-oriented and feeds every value in big-endian order,
+// so its output does not depend on the endianness of the target and the same
+// constant works on both little- and big-endian machines of the same pointer width.
 #[cfg(target_pointer_width = "64")]
-const XOR_EXPECT: u64 = 0x6FB21AFD20B844D9; // for a specific ROUNDS=12345
+const XOR_EXPECT: u64 = 0x16BEEBF13A4B97D5; // for a specific ROUNDS=12345
 #[cfg(not(target_pointer_width = "64"))]
-const XOR_EXPECT: u64 = 0x1BA306F2FF1A39B9; // for a specific ROUNDS=12345, verified on i686
+const XOR_EXPECT: u64 = 0x694E11D7CE2D762C; // for a specific ROUNDS=12345, verified on wasm32 (32-bit pointer width)
 
 /// Run this by:
 /// `$ cargo test --test random (without --release)`
@@ -367,8 +370,93 @@ fn for_n<const N: usize>(mut map: impl IsMap<Uuid, [u8; 16], N>) -> Vec<OpResult
     return results;
 }
 
+/// A byte-oriented FNV-1a hasher. Every `write_*` method feeds its value in
+/// big-endian byte order, so the resulting hash is identical on little- and
+/// big-endian targets. Generic hashers like `foldhash` (used here before) read
+/// native-endian words and do not promise the same hashes across platforms,
+/// which broke this test on s390x (see #438).
+#[derive(Default)]
+struct PortableHasher {
+    state: u64,
+}
+
+impl PortableHasher {
+    fn absorb(&mut self, bytes: &[u8]) {
+        for &byte in bytes {
+            self.state ^= u64::from(byte);
+            self.state = self.state.wrapping_mul(0x100000001b3);
+        }
+    }
+}
+
+impl Hasher for PortableHasher {
+    fn finish(&self) -> u64 {
+        self.state
+    }
+
+    fn write(&mut self, bytes: &[u8]) {
+        self.absorb(bytes);
+    }
+
+    fn write_u8(&mut self, n: u8) {
+        self.absorb(&[n]);
+    }
+
+    fn write_u16(&mut self, n: u16) {
+        self.absorb(&n.to_be_bytes());
+    }
+
+    fn write_u32(&mut self, n: u32) {
+        self.absorb(&n.to_be_bytes());
+    }
+
+    fn write_u64(&mut self, n: u64) {
+        self.absorb(&n.to_be_bytes());
+    }
+
+    fn write_u128(&mut self, n: u128) {
+        self.absorb(&n.to_be_bytes());
+    }
+
+    fn write_usize(&mut self, n: usize) {
+        // encode as a fixed-width 64-bit value, so the same number produces
+        // the same bytes on 32- and 64-bit targets
+        self.absorb(&(n as u64).to_be_bytes());
+    }
+
+    fn write_i8(&mut self, n: i8) {
+        self.absorb(&[n as u8]);
+    }
+
+    fn write_i16(&mut self, n: i16) {
+        self.absorb(&n.to_be_bytes());
+    }
+
+    fn write_i32(&mut self, n: i32) {
+        self.absorb(&n.to_be_bytes());
+    }
+
+    fn write_i64(&mut self, n: i64) {
+        self.absorb(&n.to_be_bytes());
+    }
+
+    fn write_i128(&mut self, n: i128) {
+        self.absorb(&n.to_be_bytes());
+    }
+
+    fn write_isize(&mut self, n: isize) {
+        // encode as a fixed-width 64-bit value, so the same number produces
+        // the same bytes on 32- and 64-bit targets
+        self.absorb(&(n as i64).to_be_bytes());
+    }
+}
+
+/// Endianness-independent replacement for the previous `foldhash`-based
+/// hashing, so that the retain predicates and the final checksum are
+/// reproducible on every platform of the same pointer width.
 fn make_hash<K: core::hash::Hash>(k: &K, seed: u64) -> u64 {
-    use core::hash::BuildHasher;
-    let state = foldhash::fast::FixedState::with_seed(seed);
-    state.hash_one(k)
+    let mut hasher = PortableHasher::default();
+    hasher.write_u64(seed);
+    k.hash(&mut hasher);
+    hasher.finish()
 }
