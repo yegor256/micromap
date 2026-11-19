@@ -43,6 +43,11 @@ mod lru_cache {
         }
 
         pub fn put(&mut self, key: K, value: V) {
+            if self.capacity == 0 {
+                // Nothing can ever be stored, and there is nothing to evict:
+                // just discard the pair, no matter which backend is in use.
+                return;
+            }
             if self.map.contains_key(&key) {
                 self.order.retain(|k| k != &key);
             } else if self.map.len() == self.capacity {
@@ -52,6 +57,25 @@ mod lru_cache {
             }
             self.order.push_back(key.clone());
             self.map.insert(key, value);
+        }
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+
+        #[test]
+        fn zero_capacity_micro_discards() {
+            let mut micro: LRUCache<i32, i32, 0> = LRUCache::new();
+            micro.put(1, 1);
+            assert_eq!(micro.get(&1), None);
+        }
+
+        #[test]
+        fn zero_capacity_hash_discards() {
+            let mut hash: LRUCache<i32, i32, 0, HashMap<i32, i32>> = LRUCache::new();
+            hash.put(1, 1);
+            assert_eq!(hash.get(&1), None);
         }
     }
 }
@@ -163,5 +187,16 @@ fn main() {
         assert_eq!(cache.get(&1), None); // None (removed)
         assert_eq!(cache.get(&3), Some(&3)); // Some(&3)
         assert_eq!(cache.get(&4), Some(&4)); // Some(&4)
+    }
+    {
+        // Degenerate case: a cache with no room for anything simply
+        // discards every inserted pair, for both backends.
+        let mut cache: LRUCache<_, _, 0> = LRUCache::new();
+        cache.put(1, 1);
+        assert_eq!(cache.get(&1), None); // None (nothing fits)
+
+        let mut cache: LRUCache<_, _, 0, HashMap<_, _>> = LRUCache::new();
+        cache.put(1, 1);
+        assert_eq!(cache.get(&1), None); // None (nothing fits)
     }
 }
