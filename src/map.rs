@@ -54,6 +54,22 @@ use core::mem::MaybeUninit;
 /// into it, it simply panics. Moreover, in the "release" mode it doesn't panic,
 /// but its behaviour is undefined. In the "release" mode all boundary checks
 /// are disabled, for the sake of higher performance.
+///
+/// # Floating point keys
+///
+/// Floating point numbers can be used as keys, because [`Map`] only requires
+/// `PartialEq` from them, unlike [`std::collections::HashMap`], which needs
+/// `Eq` and `Hash`. However, `NaN` is not equal to anything, not even to itself.
+/// This means that [`Map::get()`], [`Map::contains_key()`] and [`Map::remove()`]
+/// never find a `NaN` key, while every [`Map::insert()`] of `NaN` adds a new
+/// pair instead of replacing the existing one:
+///
+/// ```
+/// let mut m : micromap::Map<f64, char, 3> = micromap::Map::new();
+/// m.insert(f64::NAN, 'a');
+/// m.insert(f64::NAN, 'b');
+/// assert_eq!(m.len(), 2);
+/// ```
 pub struct Map<K, V, const N: usize> {
     /// The next available pair in the array.
     len: usize,

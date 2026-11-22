@@ -65,9 +65,29 @@ use crate::map::Map;
 /// performance (But in general, you can just use [`insert()`] or [`checked_insert()`]
 /// in most cases).
 ///
+/// # Floating point keys
+///
+/// Floating point numbers can be stored in a [`Set`], because it only requires
+/// `PartialEq` from them, unlike [`std::collections::HashSet`], which needs
+/// `Eq` and `Hash`. However, `NaN` is not equal to anything, not even to itself.
+/// This means that [`contains()`], [`get()`] and [`take()`] never find a `NaN`
+/// item, while every [`insert()`] of `NaN` adds a new item instead of replacing
+/// the existing one:
+///
+/// ```
+/// use micromap::Set;
+/// let mut set : Set<f64, 3> = Set::new();
+/// set.insert(f64::NAN);
+/// set.insert(f64::NAN);
+/// assert_eq!(set.len(), 2);
+/// ```
+///
 /// [`insert()`]: Set::insert
 /// [`checked_insert()`]: Set::checked_insert
 /// [`insert_unchecked()`]: Set::insert_unchecked
+/// [`contains()`]: Set::contains
+/// [`get()`]: Set::get
+/// [`take()`]: Set::take
 #[repr(transparent)]
 pub struct Set<T, const N: usize> {
     map: Map<T, (), N>,
