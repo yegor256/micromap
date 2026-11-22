@@ -67,15 +67,21 @@ impl<K, V, const N: usize> Map<K, V, N> {
 
 impl<K, V, const N: usize> Drop for Map<K, V, N> {
     fn drop(&mut self) {
-        for i in 0..self.len {
-            unsafe { self.item_drop(i) };
-        }
+        let initialized =
+            core::ptr::slice_from_raw_parts_mut(self.pairs.as_mut_ptr().cast::<(K, V)>(), self.len);
+        // SAFETY: exactly the prefix `0..len` of `pairs` contains initialized
+        // pairs. Unlike a manual loop, the drop glue of a slice keeps dropping
+        // the remaining pairs even when a destructor panics.
+        unsafe { core::ptr::drop_in_place(initialized) };
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::panic::{catch_unwind, AssertUnwindSafe};
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    use std::sync::Arc;
 
     #[test]
     fn makes_default_map() {
@@ -120,5 +126,42 @@ mod tests {
         m.insert((), Rc::clone(&v));
         drop(m);
         assert_eq!(Rc::strong_count(&v), 1);
+    }
+
+    /// A value that counts its drops and may panic in its `Drop` impl,
+    /// to check that a panicking `Drop` can't leak the pairs after it.
+    #[cfg(test)]
+    struct Bomb {
+        drops: Arc<AtomicUsize>,
+        armed: bool,
+    }
+
+    impl Drop for Bomb {
+        fn drop(&mut self) {
+            self.drops.fetch_add(1, Ordering::SeqCst);
+            assert!(!self.armed, "Bomb exploded");
+        }
+    }
+
+    #[test]
+    fn drop_does_not_leak_remaining_pairs_when_a_drop_panics() {
+        let drops = Arc::new(AtomicUsize::new(0));
+        let mut m: Map<u8, Bomb, 3> = Map::new();
+        for i in 0..3 {
+            m.insert(
+                i,
+                Bomb {
+                    drops: Arc::clone(&drops),
+                    armed: i == 0,
+                },
+            );
+        }
+        let caught = catch_unwind(AssertUnwindSafe(|| drop(m)));
+        assert!(caught.is_err(), "drop() must panic in the armed Drop");
+        assert_eq!(
+            drops.load(Ordering::SeqCst),
+            3,
+            "pairs after the panicking one must be dropped, not leaked"
+        );
     }
 }
