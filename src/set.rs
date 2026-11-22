@@ -16,6 +16,9 @@ mod from;
 mod intersection;
 mod iterators;
 mod methods;
+#[cfg(feature = "rkyv")]
+#[cfg_attr(docsrs, doc(cfg(feature = "rkyv")))]
+pub mod rkyv;
 #[cfg(feature = "serde")]
 #[cfg_attr(docsrs, doc(cfg(feature = "serde")))]
 mod serialization;
